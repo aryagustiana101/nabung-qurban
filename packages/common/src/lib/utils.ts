@@ -5,6 +5,7 @@ import {
   enUS as dateFnsLocaleEn,
   id as dateFnsLocaleId,
 } from "date-fns/locale";
+import { customAlphabet, nanoid } from "nanoid";
 
 export function formatDate(
   value: Date,
@@ -52,4 +53,10 @@ export function formatMoney(
     style: "currency",
     maximumFractionDigits,
   }).format(value);
+}
+
+export function randomString(length = 21, opts?: { characters?: string }) {
+  return opts?.characters
+    ? customAlphabet(opts.characters, length)()
+    : nanoid(length);
 }
