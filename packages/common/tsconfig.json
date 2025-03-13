@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "preserveWatchOutput": true,
+    "baseUrl": ".",
+    "lib": ["ESNext"],
+    "paths": {
+      "@repo/common/*": ["./src/*"],
+      "@repo/common": ["./src/index"]
+    }
+  },
+  "include": ["**/*.ts"]
+}

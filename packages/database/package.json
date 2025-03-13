@@ -1,0 +1,36 @@
+{
+  "name": "@repo/database",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "prisma": {
+    "seed": "tsx ./prisma/seed.ts"
+  },
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "dotenv -e .env -- prisma migrate",
+    "db:push": "dotenv -e .env -- prisma db push",
+    "db:seed": "dotenv -e .env -- prisma db seed",
+    "dev": "pnpm build -- --watch"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "@repo/common": "workspace:*",
+    "@t3-oss/env-core": "^0.12.0",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.13.10",
+    "dotenv-cli": "^8.0.0",
+    "prisma": "^6.5.0",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

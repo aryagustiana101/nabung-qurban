@@ -1,0 +1,34 @@
+{
+  "name": "nabung-qurban",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.6.1",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10",
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "check-types": "turbo run check-types",
+    "clean": "rm -rf .turbo **/**/.turbo **/**/dist **/**/.cache **/**/.next",
+    "clean:node_modules": "rm -rf **/**/node_modules node_modules",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "cd packages/database && pnpm db:migrate",
+    "db:push": "cd packages/database && pnpm db:push",
+    "db:seed": "cd packages/database && pnpm db:seed",
+    "dev": "turbo run dev",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "postinstall": "pnpm db:generate && pnpm build --filter @repo/database",
+    "preinstall": "npx only-allow pnpm",
+    "start:api": "cd apps/api && pnpm start",
+    "start:web": "cd apps/web && pnpm start"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.2"
+  }
+}
