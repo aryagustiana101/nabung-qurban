@@ -1,3 +1,3 @@
 export type Env = {
-  Variables: { token: string };
+  Variables: { token?: string | null };
 };
