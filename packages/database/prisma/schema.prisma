@@ -16,13 +16,142 @@ enum UserStatus {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  name      String
-  username  String     @unique
-  status    UserStatus @default(active)
-  password  String
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String?
+  phoneNumber String     @map("phone_number")
+  status      UserStatus @default(active)
+  username    String     @unique
+  password    String
+  image       String?    @db.LongText
+  verifiedAt  DateTime?  @map("verified_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  userAccounts UserAccount[]
+  userTokens   UserToken[]
+  userLogs     UserLog[]
+  userOtpCodes UserOtpCode[]
 
   @@map("users")
+}
+
+enum UserAccountType {
+  shohibul_qurban
+  pejuang_qurban
+  antar_qurban
+
+  @@map("user_account_types")
+}
+
+model UserAccount {
+  id        Int             @id @default(autoincrement())
+  userId    Int             @map("user_id")
+  type      UserAccountType @default(shohibul_qurban)
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_accounts")
+}
+
+model Token {
+  id        Int       @id @default(autoincrement())
+  key       String    @unique
+  secret    String    @db.LongText
+  abilities Json
+  expiredAt DateTime? @map("expired_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  userToken UserToken?
+
+  @@map("tokens")
+}
+
+model UserToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  tokenId   Int      @unique @map("token_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  token Token @relation(fields: [tokenId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([tokenId])
+  @@index([userId])
+  @@map("user_tokens")
+}
+
+enum UserLogAction {
+  login
+  logout
+  register
+  forgot_password
+  change_password
+
+  @@map("user_log_actions")
+}
+
+model UserLog {
+  id        Int           @id @default(autoincrement())
+  userId    Int           @map("user_id")
+  action    UserLogAction
+  remark    String?
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_logs")
+}
+
+enum OtpCodePurpose {
+  login
+  register
+  forgot_password
+  change_password
+
+  @@map("otp_code_purposes")
+}
+
+enum OtpCodeStatus {
+  used
+  unused
+
+  @@map("otp_code_statuses")
+}
+
+model OtpCode {
+  id        Int            @id @default(autoincrement())
+  key       String         @unique
+  purpose   OtpCodePurpose
+  status    OtpCodeStatus  @default(unused)
+  secret    String
+  expiredAt DateTime       @map("expired_at")
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  userOtpCode UserOtpCode?
+
+  @@map("otp_codes")
+}
+
+model UserOtpCode {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  otpCodeId Int      @unique @map("otp_code_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  otpCode OtpCode @relation(fields: [otpCodeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([otpCodeId])
+  @@index([userId])
+  @@map("user_otp_codes")
 }
