@@ -3,18 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-      "@repo/common": [
-        "../../packages/common/src/index"
-      ],
-      "@repo/common/*": [
-        "../../packages/common/src/*"
-      ],
+      "~/*": ["./src/*"],
+      "@repo/common": ["../../packages/common/src/index"],
+      "@repo/common/*": ["../../packages/common/src/*"]
     }
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
