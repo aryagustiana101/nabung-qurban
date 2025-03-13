@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
+import { randomString } from "@repo/common";
 import { Hono } from "hono";
-import { nanoid } from "nanoid";
 import { zodValidatorMiddleware } from "~/lib/middleware";
 import { getPublicUrl, getUploadPresignedUrl } from "~/lib/storage";
 import { routerSchema } from "~/schemas/storage-schema";
@@ -10,10 +10,10 @@ const app = new Hono<Env>();
 
 app.get(
   "/",
-  zValidator("query", routerSchema.get, zodValidatorMiddleware),
+  zValidator("query", routerSchema.getPresignedUrl, zodValidatorMiddleware),
   async (c) => {
     const input = c.req.valid("query");
-    const file = `upload/${nanoid()}.${input.file.match(/\.(\w+)$/)?.[1] ?? "png"}`;
+    const file = `upload/${randomString()}.${input.file.match(/\.(\w+)$/)?.[1] ?? "png"}`;
 
     const upload = await getUploadPresignedUrl(file, {
       expires: input.expires,

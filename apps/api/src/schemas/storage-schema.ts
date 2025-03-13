@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const routerSchema = {
-  get: z.object({
+  getPresignedUrl: z.object({
     file: z
       .string({ message: "File is required" })
       .min(1, { message: "File is required" }),
