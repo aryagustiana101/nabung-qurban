@@ -28,10 +28,11 @@ model User {
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
 
-  userAccounts UserAccount[]
-  userTokens   UserToken[]
-  userLogs     UserLog[]
-  userOtpCodes UserOtpCode[]
+  userAccounts              UserAccount[]
+  userTokens                UserToken[]
+  userLogs                  UserLog[]
+  userOtpCodes              UserOtpCode[]
+  userResetPasswordSessions UserResetPasswordSession[]
 
   @@map("users")
 }
@@ -154,4 +155,34 @@ model UserOtpCode {
   @@index([otpCodeId])
   @@index([userId])
   @@map("user_otp_codes")
+}
+
+enum UserResetPasswordSessionStatus {
+  active
+  inactive
+
+  @@map("user_reset_password_session_statuses")
+}
+
+enum UserResetPasswordSessionGateway {
+  change_password
+  forgot_password
+
+  @@map("user_reset_password_session_gateways")
+}
+
+model UserResetPasswordSession {
+  id        Int                             @id @default(autoincrement())
+  userId    Int                             @map("user_id")
+  key       String                          @unique
+  gateway   UserResetPasswordSessionGateway
+  status    UserResetPasswordSessionStatus  @default(active)
+  expiredAt DateTime                        @map("expired_at")
+  createdAt DateTime                        @default(now()) @map("created_at")
+  updatedAt DateTime                        @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_reset_password_sessions")
 }

@@ -1,3 +1,4 @@
+import { APP_ENVIRONMENTS, LOCALES, TIMEZONES } from "@repo/common";
 import { createEnv } from "@t3-oss/env-core";
 import dotenv from "dotenv";
 import { z } from "zod";
@@ -7,8 +8,9 @@ dotenv.config({ path: ".env", override: true });
 export const env = createEnv({
   runtimeEnv: process.env,
   server: {
-    APP_ENV: z.enum(["development", "production"]).default("development"),
-    APP_TZ: z.enum(["UTC", "Asia/Jakarta"]),
+    APP_ENV: z.enum(APP_ENVIRONMENTS).default("development"),
+    APP_LOCALE: z.enum(LOCALES).default("en"),
+    APP_TZ: z.enum(TIMEZONES),
     AWS_ACCESS_KEY_ID: z.string().min(1),
     AWS_BUCKET: z.string().min(1),
     AWS_DEFAULT_REGION: z.string().min(1),

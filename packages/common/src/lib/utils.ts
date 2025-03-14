@@ -1,5 +1,6 @@
 import { TZDate } from "@date-fns/tz";
 import { DATE_FORMAT } from "@repo/common/lib/constants";
+import type { Currency, Timezone } from "@repo/common/types";
 import { format as _formatDate, parse as _parseDate } from "date-fns";
 import {
   enUS as dateFnsLocaleEn,
@@ -11,7 +12,7 @@ export function formatDate(
   value: Date,
   format: string,
   locale: "en" | "id",
-  timezone: "UTC" | "Asia/Jakarta",
+  timezone: Timezone,
   opts?: Parameters<typeof _formatDate>["2"],
 ) {
   return _formatDate(new TZDate(value, timezone), format, {
@@ -23,7 +24,7 @@ export function formatDate(
 export function parseDate(
   value: string | Date,
   format?: string,
-  timezone?: "UTC" | "Asia/Jakarta",
+  timezone?: Timezone,
   opts?: Parameters<typeof _parseDate>["3"],
 ) {
   if (typeof value === "string" && !format) {
@@ -41,7 +42,7 @@ export function parseDate(
 export function formatMoney(
   value: number,
   opts?: {
-    currency?: "idr" | "usd";
+    currency?: Currency;
     maximumFractionDigits?: number;
   },
 ) {

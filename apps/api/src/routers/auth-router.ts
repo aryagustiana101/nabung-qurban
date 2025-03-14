@@ -96,6 +96,7 @@ app.post(
         username: input.phoneNumber,
         phoneNumber: input.phoneNumber,
         password: await bcrypt.hash(input.pin, 10),
+        userAccounts: { create: { type: "shohibul_qurban" } },
         name: `USER-${randomString(8, { characters: CHARACTERS.ALPHANUMERIC }).toUpperCase()}`,
       },
     });
