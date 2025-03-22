@@ -13,7 +13,6 @@ async function main() {
       username: "root",
       status: "active",
       verifiedAt: new Date(),
-      email: env.DB_SEED_USER_EMAIL,
       password: env.DB_SEED_ROOT_PASSWORD,
       phoneNumber: env.DB_SEED_USER_PHONE_NUMBER,
     },
