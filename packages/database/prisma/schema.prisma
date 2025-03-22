@@ -40,7 +40,7 @@ model User {
   userTokens                UserToken[]
   userLogs                  UserLog[]
   userOtpCodes              UserOtpCode[]
-  userResetPasswordSessions UserResetPasswordSession[]
+  userPasswordResetSessions UserPasswordResetSession[]
 
   @@map("users")
 }
@@ -66,14 +66,22 @@ model UserAccount {
   @@map("user_accounts")
 }
 
+enum TokenStatus {
+  active
+  inactive
+
+  @@map("token_statuses")
+}
+
 model Token {
-  id        Int       @id @default(autoincrement())
-  key       String    @unique
-  secret    String    @db.LongText
+  id        Int         @id @default(autoincrement())
+  key       String      @unique
+  status    TokenStatus @default(active)
+  secret    String      @db.LongText
   abilities Json
-  expiredAt DateTime? @map("expired_at")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  expiredAt DateTime?   @map("expired_at")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
 
   userToken UserToken?
 
@@ -119,13 +127,12 @@ model UserLog {
   @@map("user_logs")
 }
 
-enum OtpCodePurpose {
+enum OtpCodeAction {
   login
   register
   forgot_password
-  change_password
 
-  @@map("otp_code_purposes")
+  @@map("otp_code_actions")
 }
 
 enum OtpCodeStatus {
@@ -136,14 +143,14 @@ enum OtpCodeStatus {
 }
 
 model OtpCode {
-  id        Int            @id @default(autoincrement())
-  key       String         @unique
-  purpose   OtpCodePurpose
-  status    OtpCodeStatus  @default(unused)
+  id        Int           @id @default(autoincrement())
+  key       String        @unique
+  action    OtpCodeAction
+  status    OtpCodeStatus @default(unused)
   secret    String
-  expiredAt DateTime       @map("expired_at")
-  createdAt DateTime       @default(now()) @map("created_at")
-  updatedAt DateTime       @updatedAt @map("updated_at")
+  expiredAt DateTime      @map("expired_at")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
 
   userOtpCode UserOtpCode?
 
@@ -165,26 +172,25 @@ model UserOtpCode {
   @@map("user_otp_codes")
 }
 
-enum UserResetPasswordSessionStatus {
+enum UserPasswordResetSessionStatus {
   active
   inactive
 
-  @@map("user_reset_password_session_statuses")
+  @@map("user_password_reset_session_statuses")
 }
 
-enum UserResetPasswordSessionAction {
-  change_password
+enum UserPasswordResetSessionAction {
   forgot_password
 
-  @@map("user_reset_password_session_actions")
+  @@map("user_password_reset_session_actions")
 }
 
-model UserResetPasswordSession {
+model UserPasswordResetSession {
   id        Int                            @id @default(autoincrement())
   userId    Int                            @map("user_id")
   key       String                         @unique
-  gateway   UserResetPasswordSessionAction
-  status    UserResetPasswordSessionStatus @default(active)
+  action    UserPasswordResetSessionAction
+  status    UserPasswordResetSessionStatus @default(active)
   expiredAt DateTime                       @map("expired_at")
   createdAt DateTime                       @default(now()) @map("created_at")
   updatedAt DateTime                       @updatedAt @map("updated_at")
@@ -192,5 +198,5 @@ model UserResetPasswordSession {
   user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@index([userId])
-  @@map("user_reset_password_sessions")
+  @@map("user_password_reset_sessions")
 }

@@ -2,9 +2,15 @@ import type { Prisma } from "@prisma/client";
 import {
   DATE_FORMAT,
   type Locale,
+  TOKEN_STATUSES,
+  TOKEN_STATUS_MAP,
   type Timezone,
   USER_ACCOUNT_TYPES,
   USER_ACCOUNT_TYPE_MAP,
+  USER_PASSWORD_RESET_SESSION_ACTIONS,
+  USER_PASSWORD_RESET_SESSION_ACTION_MAP,
+  USER_PASSWORD_RESET_SESSION_STATUSES,
+  USER_PASSWORD_RESET_SESSION_STATUS_MAP,
   USER_STATUSES,
   USER_STATUS_MAP,
   USER_TYPES,
@@ -38,6 +44,7 @@ export function parseUser({
     username: detail.username,
     password: detail.password,
     image: detail.image,
+    verifiedAt: detail.verifiedAt,
     createdAt: detail.createdAt,
     updatedAt: detail.updatedAt,
     fmt: detail.fmt,
@@ -68,12 +75,16 @@ export function parseUserDetail({
     username: user.username,
     password: user.password,
     image: user.image,
+    verifiedAt: user.verifiedAt,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     fmt: {
       status: USER_STATUS_MAP[user.status],
       type: USER_TYPE_MAP[user.type],
       image: user.image ?? defaultValue.image,
+      verifiedAt: user.verifiedAt
+        ? formatDate(user.verifiedAt, DATE_FORMAT.NORMAL, locale, timezone)
+        : "-",
       createdAt: formatDate(
         user.createdAt,
         DATE_FORMAT.NORMAL,
@@ -136,12 +147,14 @@ export function parseToken({
   return {
     id: token.id,
     key: token.key,
+    status: z.enum(TOKEN_STATUSES).parse(token.status),
     secret: token.secret,
     abilities: z.string().array().safeParse(token.abilities)?.data ?? [],
     expiredAt: token.expiredAt,
     createdAt: token.createdAt,
     updatedAt: token.updatedAt,
     fmt: {
+      status: TOKEN_STATUS_MAP[token.status],
       expiredAt: token.expiredAt
         ? formatDate(token.expiredAt, DATE_FORMAT.NORMAL, locale, timezone)
         : "-",
@@ -153,6 +166,54 @@ export function parseToken({
       ),
       updatedAt: formatDate(
         token.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseUserPasswordResetSession({
+  userPasswordResetSession,
+  locale,
+  timezone,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  userPasswordResetSession: Prisma.UserPasswordResetSessionGetPayload<object>;
+}) {
+  return {
+    id: userPasswordResetSession.id,
+    key: userPasswordResetSession.key,
+    action: z
+      .enum(USER_PASSWORD_RESET_SESSION_ACTIONS)
+      .parse(userPasswordResetSession.action),
+    status: z
+      .enum(USER_PASSWORD_RESET_SESSION_STATUSES)
+      .parse(userPasswordResetSession.status),
+    expiredAt: userPasswordResetSession.expiredAt,
+    createdAt: userPasswordResetSession.createdAt,
+    updatedAt: userPasswordResetSession.updatedAt,
+    fmt: {
+      action:
+        USER_PASSWORD_RESET_SESSION_ACTION_MAP[userPasswordResetSession.action],
+      status:
+        USER_PASSWORD_RESET_SESSION_STATUS_MAP[userPasswordResetSession.status],
+      expiredAt: formatDate(
+        userPasswordResetSession.expiredAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      createdAt: formatDate(
+        userPasswordResetSession.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        userPasswordResetSession.updatedAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,
