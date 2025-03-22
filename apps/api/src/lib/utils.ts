@@ -3,7 +3,7 @@ import {
   formatMoney as _formatMoney,
   parseDate as _parseDate,
 } from "@repo/common";
-import { objectToSnake } from "ts-case-convert";
+import { objectToCamel, objectToSnake } from "ts-case-convert";
 import { env } from "~/env";
 
 type FormatDateParams = Parameters<typeof _formatDate>;
@@ -38,6 +38,21 @@ export function formatMoney(
   return _formatMoney(value, opts);
 }
 
-export function transformRecord<T extends object>(record: T) {
+export function transformRecord<T extends object>(
+  record: T,
+  format?: "snake",
+): ReturnType<typeof objectToSnake<T>>;
+export function transformRecord<T extends object>(
+  record: T,
+  format?: "camel",
+): ReturnType<typeof objectToCamel<T>>;
+export function transformRecord<T extends object>(
+  record: T,
+  format: "snake" | "camel" = "snake",
+) {
+  if (format === "camel") {
+    return objectToCamel<T>(record);
+  }
+
   return objectToSnake<T>(record);
 }
