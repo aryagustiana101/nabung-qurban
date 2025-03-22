@@ -15,12 +15,20 @@ enum UserStatus {
   @@map("user_statuses")
 }
 
+enum UserType {
+  internal
+  external
+
+  @@map("user_types")
+}
+
 model User {
   id          Int        @id @default(autoincrement())
   name        String
-  email       String?
   phoneNumber String     @map("phone_number")
+  email       String?
   status      UserStatus @default(active)
+  type        UserType   @default(external)
   username    String     @unique
   password    String
   image       String?    @db.LongText
@@ -164,22 +172,22 @@ enum UserResetPasswordSessionStatus {
   @@map("user_reset_password_session_statuses")
 }
 
-enum UserResetPasswordSessionGateway {
+enum UserResetPasswordSessionAction {
   change_password
   forgot_password
 
-  @@map("user_reset_password_session_gateways")
+  @@map("user_reset_password_session_actions")
 }
 
 model UserResetPasswordSession {
-  id        Int                             @id @default(autoincrement())
-  userId    Int                             @map("user_id")
-  key       String                          @unique
-  gateway   UserResetPasswordSessionGateway
-  status    UserResetPasswordSessionStatus  @default(active)
-  expiredAt DateTime                        @map("expired_at")
-  createdAt DateTime                        @default(now()) @map("created_at")
-  updatedAt DateTime                        @updatedAt @map("updated_at")
+  id        Int                            @id @default(autoincrement())
+  userId    Int                            @map("user_id")
+  key       String                         @unique
+  gateway   UserResetPasswordSessionAction
+  status    UserResetPasswordSessionStatus @default(active)
+  expiredAt DateTime                       @map("expired_at")
+  createdAt DateTime                       @default(now()) @map("created_at")
+  updatedAt DateTime                       @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 

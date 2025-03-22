@@ -7,6 +7,8 @@ import {
   USER_ACCOUNT_TYPE_MAP,
   USER_STATUSES,
   USER_STATUS_MAP,
+  USER_TYPES,
+  USER_TYPE_MAP,
   formatDate,
 } from "@repo/common";
 import { z } from "zod";
@@ -29,9 +31,10 @@ export function parseUser({
   return {
     id: detail.id,
     name: detail.name,
-    email: detail.email,
     phoneNumber: detail.phoneNumber,
+    email: detail.email,
     status: detail.status,
+    type: detail.type,
     username: detail.username,
     password: detail.password,
     image: detail.image,
@@ -58,9 +61,10 @@ export function parseUserDetail({
   return {
     id: user.id,
     name: user.name,
-    email: user.email,
     phoneNumber: user.phoneNumber,
+    email: user.email,
     status: z.enum(USER_STATUSES).parse(user.status),
+    type: z.enum(USER_TYPES).parse(user.type),
     username: user.username,
     password: user.password,
     image: user.image,
@@ -68,6 +72,7 @@ export function parseUserDetail({
     updatedAt: user.updatedAt,
     fmt: {
       status: USER_STATUS_MAP[user.status],
+      type: USER_TYPE_MAP[user.type],
       image: user.image ?? defaultValue.image,
       createdAt: formatDate(
         user.createdAt,
