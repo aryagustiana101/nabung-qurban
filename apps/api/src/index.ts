@@ -3,11 +3,13 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { env } from "~/env";
+import { context } from "~/lib/middleware";
 import appRouter from "~/routers/_app-router";
 import type { Env } from "~/types";
 
 const app = new Hono<Env>();
 
+app.use(context);
 app.use(logger());
 app.route("/", appRouter);
 

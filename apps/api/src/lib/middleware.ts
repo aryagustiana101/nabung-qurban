@@ -28,6 +28,8 @@ export function zodValidatorMiddleware<T, U>(
 }
 
 export const protect = createMiddleware<Env>(async (c, next) => {
+  const locale = c.var.locale;
+  const timezone = c.var.timezone;
   const note = c.req.header("Authorization")?.split("Bearer ")?.at(1);
 
   if (!note) {
@@ -53,13 +55,7 @@ export const protect = createMiddleware<Env>(async (c, next) => {
     ? await db.token.findUnique({ where: { key: payload.key } })
     : null;
 
-  const token = _token
-    ? parseToken({
-        token: _token,
-        timezone: env.APP_TZ,
-        locale: env.APP_LOCALE,
-      })
-    : null;
+  const token = _token ? parseToken({ locale, timezone, token: _token }) : null;
 
   if (!token) {
     return c.json(
@@ -98,9 +94,9 @@ export const protect = createMiddleware<Env>(async (c, next) => {
 
   const user = _user
     ? parseUser({
+        locale,
+        timezone,
         user: _user,
-        timezone: env.APP_TZ,
-        locale: env.APP_LOCALE,
         defaultValue: { image: getPublicUrl("static/avatar.png") },
       })
     : null;
@@ -114,6 +110,14 @@ export const protect = createMiddleware<Env>(async (c, next) => {
 
   c.set("token", token);
   c.set("user", user);
+
+  await next();
+});
+
+export const context = createMiddleware<Env>(async (c, next) => {
+  c.set("currency", "idr");
+  c.set("timezone", env.APP_TZ);
+  c.set("locale", env.APP_LOCALE);
 
   await next();
 });

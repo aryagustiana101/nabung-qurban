@@ -14,7 +14,7 @@ const field = {
 
 export const routerSchema = {
   update: z.object({
-    name: field.name,
+    name: field.name.optional(),
     email: field.email.nullish().default(null),
     image: field.image.nullish().default(null),
   }),

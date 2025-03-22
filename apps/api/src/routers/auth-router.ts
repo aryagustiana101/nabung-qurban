@@ -322,7 +322,10 @@ app.post(
   "/otp",
   zValidator("json", routerSchema.verifyOtp, zodValidatorMiddleware),
   async (c) => {
+    const locale = c.var.locale;
+    const timezone = c.var.timezone;
     const input = c.req.valid("json");
+
     const otpCode = await db.otpCode.findUnique({
       where: { key: input.key },
       include: { userOtpCode: { include: { user: true } } },
@@ -394,8 +397,8 @@ app.post(
       const secret = jwt.sign({ key }, env.JWT_SECRET);
 
       const token = parseToken({
-        timezone: env.APP_TZ,
-        locale: env.APP_LOCALE,
+        locale,
+        timezone,
         token: await db.token.create({
           data: {
             key,
@@ -426,8 +429,8 @@ app.post(
 
     if (otpCode.action === "forgot_password") {
       const session = parseUserPasswordResetSession({
-        timezone: env.APP_TZ,
-        locale: env.APP_LOCALE,
+        locale,
+        timezone,
         userPasswordResetSession: await db.userPasswordResetSession.create({
           data: {
             userId: user.id,
