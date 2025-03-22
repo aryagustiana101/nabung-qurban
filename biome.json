@@ -21,12 +21,20 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": { "fix": "none", "level": "error" }
+      }
     }
   },
   "javascript": {
+    "jsxRuntime": "reactClassic",
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all",
+      "jsxQuoteStyle": "double"
     }
   }
 }
