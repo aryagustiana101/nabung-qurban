@@ -84,13 +84,6 @@ export const protect = createMiddleware<Env>(async (c, next) => {
     );
   }
 
-  if (token.abilities.length <= 0) {
-    return c.json(
-      { success: false, message: "Token abilities invalid", result: null },
-      { status: 401 },
-    );
-  }
-
   const _user = await db.user.findFirst({
     include: { userAccounts: true },
     where: { userTokens: { some: { tokenId: token.id } } },

@@ -1,13 +1,15 @@
 import { zValidator } from "@hono/zod-validator";
 import { CHARACTERS, randomString } from "@repo/common";
+import { parseToken } from "@repo/database";
 import bcrypt from "bcryptjs";
-import { addMinutes, isAfter } from "date-fns";
+import { addMinutes, addMonths, isAfter } from "date-fns";
 import { Hono } from "hono";
 import jwt from "jsonwebtoken";
 import { env } from "~/env";
 import { db } from "~/lib/db";
 import { sendOtp } from "~/lib/meta";
 import { zodValidatorMiddleware } from "~/lib/middleware";
+import { transformRecord } from "~/lib/utils";
 import { routerSchema } from "~/schemas/auth-schema";
 import type { Env } from "~/types";
 
@@ -178,8 +180,13 @@ app.post(
         );
       }
 
-      let token: string | null = null;
       const verified = await bcrypt.compare(input.code, otpCode.secret);
+
+      let token: {
+        secret: string;
+        expiredAt: Date | null;
+        fmt: { expiredAt: string };
+      } | null = null;
 
       if (verified) {
         await db.otpCode.update({
@@ -196,16 +203,27 @@ app.post(
 
         if (otpCode.purpose === "login") {
           const key = randomString(12);
-          token = jwt.sign({ key }, env.JWT_SECRET);
+          const secret = jwt.sign({ key }, env.JWT_SECRET);
 
-          await db.token.create({
-            data: {
-              key,
-              abilities: ["user"],
-              secret: await bcrypt.hash(token, 10),
-              userToken: { create: { userId: user.id } },
-            },
+          const _token = parseToken({
+            timezone: env.APP_TZ,
+            locale: env.APP_LOCALE,
+            token: await db.token.create({
+              data: {
+                key,
+                abilities: [],
+                expiredAt: addMonths(new Date(), 1),
+                secret: await bcrypt.hash(secret, 10),
+                userToken: { create: { userId: user.id } },
+              },
+            }),
           });
+
+          token = {
+            secret,
+            expiredAt: _token.expiredAt,
+            fmt: { expiredAt: _token.fmt.expiredAt },
+          };
         }
       }
 
@@ -213,7 +231,9 @@ app.post(
         {
           success: verified,
           message: verified ? null : "Invalid OTP code",
-          result: token ? { verified, token } : { verified },
+          result: token
+            ? { verified, token: transformRecord(token) }
+            : { verified },
         },
         { status: verified ? 200 : 400 },
       );

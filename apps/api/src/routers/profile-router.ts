@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { transformRecord } from "~/lib/utils";
 import type { Env } from "~/types";
 
 const app = new Hono<Env>();
@@ -14,7 +15,11 @@ app.get("/", async (c) => {
   }
 
   return c.json(
-    { success: true, message: null, result: user },
+    {
+      success: true,
+      message: null,
+      result: transformRecord({ ...user, password: undefined }),
+    },
     { status: 200 },
   );
 });
