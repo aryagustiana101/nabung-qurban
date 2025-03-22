@@ -40,6 +40,13 @@ export const USER_PASSWORD_RESET_SESSION_STATUS_MAP = {
   inactive: "Inactive",
 };
 
+export const USER_ADDRESS_TYPES = ["main", "alternative"] as const;
+
+export const USER_ADDRESS_TYPE_MAP = {
+  main: "Main",
+  alternative: "Alternative",
+};
+
 export const TOKEN_STATUSES = ["active", "inactive"] as const;
 
 export const TOKEN_STATUS_MAP = {

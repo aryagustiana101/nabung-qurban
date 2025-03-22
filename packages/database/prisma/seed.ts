@@ -47,12 +47,56 @@ async function main() {
     { id: 1, tokenId: 1, userId: 2 },
   ];
 
+  const userAddresses: Prisma.UserAddressCreateManyInput[] = [
+    {
+      id: 1,
+      userId: 2,
+      type: "main",
+      name: "Home",
+      note: "Family home",
+      contactName: env.DB_SEED_USER_NAME,
+      contactPhoneNumber: env.DB_SEED_USER_PHONE_NUMBER,
+      detail:
+        "KP. Waluran Lebak, RT.01/RW.05, Sukalaksana, Kec. Samarang, Kabupaten Garut, Jawa Barat 44161",
+      location: {
+        name: "Warung Teh Sri",
+        detail:
+          "KP. Waluran Lebak, RT.01/RW.05, Sukalaksana, Kec. Samarang, Kabupaten Garut, Jawa Barat 44161",
+        coordinates: {
+          latitude: "-7.208804454103096",
+          longitude: "107.81188569325376",
+        },
+      },
+    },
+    {
+      id: 2,
+      userId: 2,
+      name: "Apartment",
+      type: "alternative",
+      note: "Secondary place",
+      contactName: env.DB_SEED_USER_NAME,
+      contactPhoneNumber: env.DB_SEED_USER_PHONE_NUMBER,
+      detail:
+        "Jl. Cibiru Indah No.4, Cibiru Wetan, Kec. Cileunyi, Kabupaten Bandung, Jawa Barat 40625",
+      location: {
+        name: "Kost Pondok Priangan 2 / Tipe B",
+        detail:
+          "Jl. Cibiru Indah No.4, Cibiru Wetan, Kec. Cileunyi, Kabupaten Bandung, Jawa Barat 40625",
+        coordinates: {
+          latitude: "-6.9385845988586645",
+          longitude: "107.72529316722083",
+        },
+      },
+    },
+  ];
+
   const result = await db.$transaction(async (trx) => {
     return Promise.all([
       trx.user.createMany({ data: users, skipDuplicates: true }),
       trx.userAccount.createMany({ data: userAccounts, skipDuplicates: true }),
       trx.token.createMany({ data: tokens, skipDuplicates: true }),
       trx.userToken.createMany({ data: userTokens, skipDuplicates: true }),
+      trx.userAddress.createMany({ data: userAddresses, skipDuplicates: true }),
     ]);
   });
 

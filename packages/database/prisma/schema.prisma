@@ -41,6 +41,7 @@ model User {
   userLogs                  UserLog[]
   userOtpCodes              UserOtpCode[]
   userPasswordResetSessions UserPasswordResetSession[]
+  userAddresses             UserAddress[]
 
   @@map("users")
 }
@@ -199,4 +200,30 @@ model UserPasswordResetSession {
 
   @@index([userId])
   @@map("user_password_reset_sessions")
+}
+
+enum UserAddressType {
+  main
+  alternative
+
+  @@map("user_address_types")
+}
+
+model UserAddress {
+  id                 Int             @id @default(autoincrement())
+  userId             Int             @map("user_id")
+  name               String
+  type               UserAddressType
+  contactName        String          @map("contact_name")
+  contactPhoneNumber String          @map("contact_phone_number")
+  location           Json
+  detail             String          @db.LongText
+  note               String?         @db.LongText
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_addresses")
 }

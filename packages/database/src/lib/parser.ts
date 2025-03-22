@@ -7,6 +7,8 @@ import {
   type Timezone,
   USER_ACCOUNT_TYPES,
   USER_ACCOUNT_TYPE_MAP,
+  USER_ADDRESS_TYPES,
+  USER_ADDRESS_TYPE_MAP,
   USER_PASSWORD_RESET_SESSION_ACTIONS,
   USER_PASSWORD_RESET_SESSION_ACTION_MAP,
   USER_PASSWORD_RESET_SESSION_STATUSES,
@@ -175,9 +177,9 @@ export function parseToken({
 }
 
 export function parseUserPasswordResetSession({
-  userPasswordResetSession,
   locale,
   timezone,
+  userPasswordResetSession,
 }: {
   locale: Locale;
   timezone: Timezone;
@@ -214,6 +216,57 @@ export function parseUserPasswordResetSession({
       ),
       updatedAt: formatDate(
         userPasswordResetSession.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseUserAddress({
+  locale,
+  timezone,
+  userAddress,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  userAddress: Prisma.UserAddressGetPayload<object>;
+}) {
+  const location =
+    z
+      .object({
+        name: z.string(),
+        detail: z.string(),
+        coordinates: z.object({
+          latitude: z.string(),
+          longitude: z.string(),
+        }),
+      })
+      .safeParse(userAddress.location)?.data ?? null;
+
+  return {
+    id: userAddress.id,
+    name: userAddress.name,
+    type: z.enum(USER_ADDRESS_TYPES).parse(userAddress.type),
+    contactName: userAddress.contactName,
+    contactPhoneNumber: userAddress.contactPhoneNumber,
+    location,
+    detail: userAddress.detail,
+    note: userAddress.note,
+    createdAt: userAddress.createdAt,
+    updatedAt: userAddress.updatedAt,
+    fmt: {
+      type: USER_ADDRESS_TYPE_MAP[userAddress.type],
+      note: userAddress.note,
+      createdAt: formatDate(
+        userAddress.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        userAddress.updatedAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,
