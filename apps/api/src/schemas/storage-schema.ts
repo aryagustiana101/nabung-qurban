@@ -12,6 +12,6 @@ export const routerSchema = {
         (v) => (v ? z.number().int().safeParse(Number(v)).success : true),
         { path: ["expires"], message: "Expires must be a number" },
       )
-      .transform((v) => z.number().int().parse(Number(v))),
+      .transform((v) => z.number().int().safeParse(Number(v)).data ?? 3600),
   }),
 };
