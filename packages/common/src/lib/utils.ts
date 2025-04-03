@@ -61,3 +61,23 @@ export function randomString(length = 21, opts?: { characters?: string }) {
     ? customAlphabet(opts.characters, length)()
     : nanoid(length);
 }
+
+export function computePagination({
+  type,
+  page,
+  limit,
+  count,
+}: {
+  page?: number;
+  limit: number;
+  count: number;
+  cursor?: number;
+  type: "offset" | "cursor";
+}) {
+  return {
+    type,
+    recordCount: count,
+    offset: { page, pageCount: Math.ceil(count / limit) },
+    cursor: null,
+  };
+}

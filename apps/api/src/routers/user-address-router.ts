@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import { computePagination } from "@repo/common";
 import { type Prisma, parseUserAddress } from "@repo/database";
 import { Hono } from "hono";
 import { db } from "~/lib/db";
@@ -57,10 +58,9 @@ app.get(
         message: null,
         result: {
           count,
-          pagination: {
-            type: "offset",
-            offset: { page, page_count: Math.ceil(count / limit) },
-          },
+          pagination: transformRecord(
+            computePagination({ type: "offset", count, limit, page }),
+          ),
           records: userAddresses.map((userAddress) => {
             return transformRecord(
               parseUserAddress({ locale, timezone, userAddress }),
