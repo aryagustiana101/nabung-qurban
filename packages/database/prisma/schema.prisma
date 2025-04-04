@@ -227,3 +227,199 @@ model UserAddress {
   @@index([userId])
   @@map("user_addresses")
 }
+
+enum ServiceStatus {
+  active
+  inactive
+
+  @@map("service_statuses")
+}
+
+enum ServiceLevel {
+  main
+  alternative
+
+  @@map("service_levels")
+}
+
+model Service {
+  id          Int           @id @default(autoincrement())
+  code        String        @unique
+  name        String
+  status      ServiceStatus
+  level       ServiceLevel
+  description String?       @db.LongText
+  image       String        @db.LongText
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  productServices ProductService[]
+
+  @@map("services")
+}
+
+enum ProductStatus {
+  draft
+  published
+  archived
+
+  @@map("product_statuses")
+}
+
+model Product {
+  id         Int           @id @default(autoincrement())
+  name       String
+  status     ProductStatus
+  thumbnail  String        @db.LongText
+  images     Json
+  attributes Json
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  productServices        ProductService[]
+  productVariants        ProductVariant[]
+  productCategoryEntries ProductCategoryEntry[]
+
+  @@map("products")
+}
+
+model ProductService {
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id")
+  serviceId Int      @map("service_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([productId])
+  @@index([serviceId])
+  @@map("product_services")
+}
+
+model ProductCategory {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  productCategoryEntries ProductCategoryEntry[]
+
+  @@map("product_categories")
+}
+
+model ProductCategoryEntry {
+  id                Int      @id @default(autoincrement())
+  productCategoryId Int      @map("product_category_id")
+  productId         Int      @map("product_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  product         Product         @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productCategory ProductCategory @relation(fields: [productCategoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([productId])
+  @@index([productCategoryId])
+  @@map("product_category_entries")
+}
+
+enum ProductVariantStatus {
+  active
+  inactive
+
+  @@map("product_variant_statuses")
+}
+
+model ProductVariant {
+  id        Int                  @id @default(autoincrement())
+  productId Int                  @map("product_id")
+  name      String
+  status    ProductVariantStatus
+  price     Int
+  sku       String?
+  stock     Int?
+  weight    Int?
+  location  String?
+  createdAt DateTime             @default(now()) @map("created_at")
+  updatedAt DateTime             @updatedAt @map("updated_at")
+
+  product                        Product                        @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productVariantAttributeEntries ProductVariantAttributeEntry[]
+  productVariantDiscounts        ProductVariantDiscount[]
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model ProductVariantAttribute {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  rule      Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  productVariantAttributeEntries ProductVariantAttributeEntry[]
+
+  @@map("product_variant_attributes")
+}
+
+model ProductVariantAttributeEntry {
+  id                        Int      @id @default(autoincrement())
+  productVariantAttributeId Int      @map("product_variant_attribute_id")
+  productVariantId          Int      @map("product_variant_id")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  productVariant          ProductVariant          @relation(fields: [productVariantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productVariantAttribute ProductVariantAttribute @relation(fields: [productVariantAttributeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([productVariantId])
+  @@index([productVariantAttributeId])
+  @@map("product_variant_attribute_entries")
+}
+
+enum DiscountLevel {
+  product_variant
+
+  @@map("discount_levels")
+}
+
+enum DiscountType {
+  flat
+  percentage
+
+  @@map("discount_types")
+}
+
+model Discount {
+  id        Int           @id @default(autoincrement())
+  name      String
+  level     DiscountLevel
+  type      DiscountType
+  value     Int
+  rule      Json
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  productVariantDiscounts ProductVariantDiscount[]
+
+  @@map("discounts")
+}
+
+model ProductVariantDiscount {
+  id               Int      @id @default(autoincrement())
+  productVariantId Int      @map("product_variant_id")
+  discountId       Int      @map("discount_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  discount       Discount       @relation(fields: [discountId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([productVariantId])
+  @@index([discountId])
+  @@map("product_variant_discounts")
+}

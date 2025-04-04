@@ -1,4 +1,5 @@
 import { type Prisma, PrismaClient } from "@prisma/client";
+import type { ProductAttributeKey } from "@repo/common";
 import { env } from "@repo/database/env";
 import { addMonths } from "date-fns";
 
@@ -90,15 +91,689 @@ async function main() {
     },
   ];
 
-  const result = await db.$transaction(async (trx) => {
-    return Promise.all([
-      trx.user.createMany({ data: users, skipDuplicates: true }),
-      trx.userAccount.createMany({ data: userAccounts, skipDuplicates: true }),
-      trx.token.createMany({ data: tokens, skipDuplicates: true }),
-      trx.userToken.createMany({ data: userTokens, skipDuplicates: true }),
-      trx.userAddress.createMany({ data: userAddresses, skipDuplicates: true }),
-    ]);
-  });
+  const services: Prisma.ServiceCreateManyInput[] = [
+    {
+      id: 1,
+      status: "active",
+      description: null,
+      level: "alternative",
+      code: "daftar-antar-qurban",
+      name: "Daftar Antar Qurban",
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/daftar-antar-qurban-icon.png",
+    },
+    {
+      id: 2,
+      status: "active",
+      description: null,
+      level: "alternative",
+      code: "daftar-pejuang-qurban",
+      name: "Daftar Pejuang Qurban",
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/daftar-pejuang-qurban-icon.png",
+    },
+    {
+      id: 3,
+      code: "ppob",
+      name: "PPOB",
+      level: "main",
+      description: null,
+      status: "inactive",
+      image: "https://nabung-qurban.sgp1.vultrobjects.com/static/ppob-icon.png",
+    },
+    {
+      id: 4,
+      level: "main",
+      status: "active",
+      code: "cicilan-qurban",
+      name: "Cicilan Qurban",
+      description:
+        "Pembelian Qurban yang dibayarkan secara cicllan dan Qurban dikirimkan ke Anda",
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/cicilan-qurban-icon.png",
+    },
+    {
+      id: 5,
+      level: "main",
+      status: "active",
+      code: "beli-qurban-tunai",
+      name: "Beli Qurban Tunai",
+      description:
+        "Pembelian Qurban yang dibayarkan secara tunai dan Qurban dikirimkan ke Anda",
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/beli-qurban-tunai-icon.png",
+    },
+    {
+      id: 6,
+      level: "main",
+      status: "active",
+      code: "tebar-qurban-voucher-cicilan",
+      name: "Tebar Qurban Voucher Cicilan",
+      description: null,
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/tebar-qurban-voucher-cicilan-icon.png",
+    },
+    {
+      id: 7,
+      level: "main",
+      status: "active",
+      code: "tebar-qurban-voucher-beli",
+      name: "Tebar Qurban Voucher Beli",
+      description: null,
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/tebar-qurban-voucher-beli-icon.png",
+    },
+    {
+      id: 8,
+      level: "main",
+      status: "active",
+      code: "tebar-qurban-cicilan",
+      name: "Tebar Qurban Cicilan",
+      description:
+        "Pembelian Qurban yang dibayarkan secara cicllan dan Qurban didistribusikan oleh NQ",
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/tebar-qurban-cicilan-icon.png",
+    },
+    {
+      id: 9,
+      level: "main",
+      status: "active",
+      code: "tebar-qurban-pembelian",
+      name: "Tebar Qurban Pembelian",
+      description:
+        "Pembelian Qurban yang dibayarkan secara tunai dan Qurban didistribusIkan oleh NQ",
+      image:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/tebar-qurban-pembelian-icon.png",
+    },
+  ];
+
+  const productCategories: Prisma.ProductCategoryCreateManyInput[] = [
+    { id: 1, code: "domba", name: "Domba" },
+    { id: 2, code: "unta", name: "Unta" },
+    { id: 3, code: "kambing", name: "Kambing" },
+    { id: 4, code: "sapi", name: "Sapi" },
+  ];
+
+  const productAttributes: {
+    title: string;
+    value: string;
+    key: ProductAttributeKey;
+  }[] = [
+    {
+      title: "",
+      key: "pricing_info",
+      value: "Harga belum termasuk biaya Admin dan pengiriman",
+    },
+    {
+      title: "",
+      key: "transaction_info",
+      value:
+        "Pembayaran Mulai Rp 5.000.000\nMaks. pelunasan H-7 sebelum Idul Adha",
+    },
+    {
+      title: "",
+      key: "delivery_info",
+      value: "Qurban dikirim H-3",
+    },
+    {
+      title: "",
+      key: "additional_info",
+      value: "Gambar hewan qurban hanya display",
+    },
+    {
+      key: "detail_product",
+      title: "Detail Qurban",
+      value:
+        "Tahun Qurban dan jenis hewan qurban mempengaruhi harga qurban per-ekornya",
+    },
+    {
+      key: "important_info",
+      title: "Informasi Penting",
+      value:
+        "Untuk pembelian menggunakan DP, pelunasan hanya bisa dilakukan maksimal 90 % (atau sesuai parameter dari NQ), jika  bobot hewan yang didistribusikan lebih berat dari bobot yang dipesan pembeli harus membayar kelebihannya, sedangkan jika kondisi bobot kurang dari bobot pesanan maka  kelebihan pembayaran akan masuk ke saldo shohibul qurban.",
+    },
+  ];
+
+  const products: Prisma.ProductCreateManyInput[] = [
+    {
+      id: 1,
+      status: "published",
+      attributes: productAttributes,
+      name: "Sapi premium 450 Kg",
+      thumbnail:
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-4-thumbnail.png",
+      images: [
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-4-image-1.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-4-image-2.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-4-image-3.png",
+      ],
+    },
+    {
+      id: 2,
+      status: "published",
+      attributes: productAttributes,
+      name: "Kambing premium 40 Kg",
+      thumbnail:
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-3-thumbnail.png",
+      images: [
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-3-image-1.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-3-image-2.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-3-image-3.png",
+      ],
+    },
+    {
+      id: 3,
+      status: "published",
+      attributes: productAttributes,
+      name: "Sapi Bali premium super 700 Kg",
+      thumbnail:
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-2-thumbnail.png",
+      images: [
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-2-image-1.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-2-image-2.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-2-image-3.png",
+      ],
+    },
+    {
+      id: 4,
+      status: "published",
+      attributes: productAttributes,
+      name: "Sapi Bali premium super 280 Kg",
+      thumbnail:
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-1-thumbnail.png",
+      images: [
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-1-image-1.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-1-image-2.png",
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-1-image-3.png",
+      ],
+    },
+    {
+      id: 5,
+      status: "published",
+      name: "Voucher Kambing",
+      thumbnail:
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-6-thumbnail.png",
+      images: [
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-6-image-1.png",
+      ],
+      attributes: [
+        {
+          title: "",
+          key: "pricing_info",
+          value: "Harga belum termasuk biaya Admin",
+        },
+        {
+          title: "",
+          key: "transaction_info",
+          value: "Maks. pelunasan H-7 sebelum Idul Adha",
+        },
+        {
+          title: "",
+          key: "additional_info",
+          value: "Gambar hewan qurban hanya display",
+        },
+        {
+          key: "detail_product",
+          title: "Detail Voucher Qurban",
+          value:
+            "Tahun Qurban dan variasi voucher hewan qurban mempengaruhi harga",
+        },
+        {
+          key: "important_info",
+          title: "Informasi Penting",
+          value:
+            "Untuk pembelian menggunakan DP, pelunasan hanya bisa dilakukan maksimal 90 % (atau sesuai parameter dari NQ), jika  bobot hewan yang didistribusikan lebih berat dari bobot yang dipesan pembeli harus membayar kelebihannya, sedangkan jika kondisi bobot kurang dari bobot pesanan maka  kelebihan pembayaran akan masuk ke saldo shohibul qurban.",
+        },
+      ],
+    },
+    {
+      id: 6,
+      status: "published",
+      name: "Voucher Qurban 1/7 Sapi",
+      thumbnail:
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-5-thumbnail.png",
+      images: [
+        "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-5-image-1.png",
+      ],
+      attributes: [
+        {
+          title: "",
+          key: "pricing_info",
+          value: "Harga belum termasuk biaya Admin",
+        },
+        {
+          title: "",
+          key: "transaction_info",
+          value: "Maks. pelunasan H-7 sebelum Idul Adha",
+        },
+        {
+          title: "",
+          key: "additional_info",
+          value: "Gambar hewan qurban hanya display",
+        },
+        {
+          key: "detail_product",
+          title: "Detail Voucher Qurban",
+          value:
+            "Tahun Qurban dan variasi voucher hewan qurban mempengaruhi harga",
+        },
+        {
+          key: "important_info",
+          title: "Informasi Penting",
+          value:
+            "Untuk pembelian menggunakan DP, pelunasan hanya bisa dilakukan maksimal 90 % (atau sesuai parameter dari NQ), jika  bobot hewan yang didistribusikan lebih berat dari bobot yang dipesan pembeli harus membayar kelebihannya, sedangkan jika kondisi bobot kurang dari bobot pesanan maka  kelebihan pembayaran akan masuk ke saldo shohibul qurban.",
+        },
+      ],
+    },
+  ];
+
+  const productServices: Prisma.ProductServiceCreateManyInput[] = [
+    { id: 1, serviceId: 5, productId: 1 },
+    { id: 2, serviceId: 4, productId: 1 },
+    { id: 3, serviceId: 9, productId: 1 },
+    { id: 4, serviceId: 8, productId: 1 },
+    { id: 5, serviceId: 5, productId: 2 },
+    { id: 6, serviceId: 4, productId: 2 },
+    { id: 7, serviceId: 9, productId: 2 },
+    { id: 8, serviceId: 8, productId: 2 },
+    { id: 9, serviceId: 5, productId: 3 },
+    { id: 10, serviceId: 4, productId: 3 },
+    { id: 11, serviceId: 9, productId: 3 },
+    { id: 12, serviceId: 8, productId: 3 },
+    { id: 13, serviceId: 5, productId: 4 },
+    { id: 14, serviceId: 4, productId: 4 },
+    { id: 15, serviceId: 9, productId: 4 },
+    { id: 16, serviceId: 8, productId: 4 },
+    { id: 17, serviceId: 7, productId: 5 },
+    { id: 18, serviceId: 6, productId: 5 },
+    { id: 19, serviceId: 7, productId: 6 },
+    { id: 20, serviceId: 6, productId: 6 },
+  ];
+
+  const productCategoryEntries: Prisma.ProductCategoryEntryCreateManyInput[] = [
+    { id: 1, productId: 1, productCategoryId: 4 },
+    { id: 2, productId: 2, productCategoryId: 4 },
+    { id: 3, productId: 3, productCategoryId: 3 },
+    { id: 4, productId: 4, productCategoryId: 4 },
+    { id: 5, productId: 5, productCategoryId: 3 },
+    { id: 6, productId: 6, productCategoryId: 4 },
+  ];
+
+  const productVariantAttributes: Prisma.ProductVariantAttributeCreateManyInput[] =
+    [
+      {
+        id: 1,
+        code: "1-domba",
+        name: "1 Domba",
+        rule: {
+          quantity: { min: 1, max: null },
+          participant: { min: 1, max: null },
+        },
+      },
+      {
+        id: 2,
+        code: "1-unta",
+        name: "1 Unta",
+        rule: {
+          quantity: { min: 1, max: null },
+          participant: { min: 1, max: null },
+        },
+      },
+      {
+        id: 3,
+        code: "1-7-unta",
+        name: "1/7 Unta",
+        rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
+      },
+      {
+        id: 4,
+        code: "1-10-unta",
+        name: "1/10 Unta",
+        rule: {
+          quantity: { min: 1, max: 1 },
+          participant: { min: 10, max: 10 },
+        },
+      },
+      {
+        id: 5,
+        code: "1-kambing",
+        name: "1 Kambing",
+        rule: {
+          quantity: { min: 1, max: null },
+          participant: { min: 1, max: null },
+        },
+      },
+      {
+        id: 6,
+        code: "1-sapi",
+        name: "1 Sapi",
+        rule: {
+          quantity: { min: 1, max: null },
+          participant: { min: 1, max: null },
+        },
+      },
+      {
+        id: 7,
+        code: "1-7-sapi",
+        name: "1/7 Sapi",
+        rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
+      },
+      {
+        id: 8,
+        code: "1446-H-2025",
+        name: "1446 H/2025",
+        rule: {
+          quantity: { min: 1, max: null },
+          participant: { min: 1, max: null },
+        },
+      },
+      {
+        id: 9,
+        code: "1447-H-2026",
+        name: "1447 H/2026",
+        rule: {
+          quantity: { min: 1, max: null },
+          participant: { min: 1, max: null },
+        },
+      },
+      {
+        id: 10,
+        code: "1448-H-2027",
+        name: "1448 H/2027",
+        rule: {
+          quantity: { min: 1, max: null },
+          participant: { min: 1, max: null },
+        },
+      },
+    ];
+
+  const productVariants: Prisma.ProductVariantCreateManyInput[] = [
+    {
+      id: 1,
+      sku: null,
+      stock: null,
+      weight: 400,
+      productId: 1,
+      status: "active",
+      price: 30_000_000,
+      name: "1446 H/2025",
+      location: "Pangalengan",
+    },
+    {
+      id: 2,
+      sku: null,
+      weight: 40,
+      stock: null,
+      productId: 2,
+      status: "active",
+      price: 5_000_000,
+      location: "Garut",
+      name: "1446 H/2025",
+    },
+    {
+      id: 3,
+      sku: null,
+      weight: 40,
+      stock: null,
+      productId: 2,
+      status: "active",
+      price: 4_000_000,
+      location: "Garut",
+      name: "1447 H/2026",
+    },
+    {
+      id: 4,
+      sku: null,
+      stock: null,
+      weight: 700,
+      productId: 3,
+      status: "active",
+      price: 70_000_000,
+      name: "1446 H/2025",
+      location: "Denpasar",
+    },
+    {
+      id: 5,
+      sku: null,
+      stock: null,
+      weight: 700,
+      productId: 3,
+      status: "active",
+      price: 65_000_000,
+      name: "1447 H/2026",
+      location: "Denpasar",
+    },
+    {
+      id: 6,
+      sku: null,
+      stock: null,
+      weight: 700,
+      productId: 3,
+      status: "active",
+      price: 55_000_000,
+      name: "1448 H/2027",
+      location: "Denpasar",
+    },
+    {
+      id: 7,
+      sku: null,
+      stock: null,
+      weight: 280,
+      productId: 4,
+      status: "active",
+      price: 25_000_000,
+      name: "1446 H/2025",
+      location: "Denpasar",
+    },
+    {
+      id: 8,
+      sku: null,
+      stock: null,
+      weight: 280,
+      productId: 4,
+      status: "active",
+      price: 20_000_000,
+      name: "1447 H/2026",
+      location: "Denpasar",
+    },
+    {
+      id: 9,
+      sku: null,
+      stock: null,
+      weight: 40,
+      productId: 5,
+      status: "active",
+      price: 1_300_000,
+      location: "Subang",
+      name: "Kambing tipe 1",
+    },
+    {
+      id: 10,
+      sku: null,
+      stock: null,
+      weight: 45,
+      productId: 5,
+      status: "active",
+      price: 1_500_000,
+      location: "Tasik",
+      name: "Kambing tipe 2",
+    },
+    {
+      id: 11,
+      sku: null,
+      stock: null,
+      weight: 700,
+      productId: 6,
+      status: "active",
+      price: 3_600_000,
+      name: "Sapi tipe 1",
+      location: "Denpasar",
+    },
+    {
+      id: 12,
+      sku: null,
+      stock: null,
+      weight: 700,
+      productId: 6,
+      status: "active",
+      price: 3_400_000,
+      name: "Sapi tipe 2",
+      location: "Denpasar",
+    },
+    {
+      id: 13,
+      sku: null,
+      stock: null,
+      weight: 450,
+      productId: 6,
+      status: "active",
+      price: 2_600_000,
+      name: "Sapi tipe 3",
+      location: "Denpasar",
+    },
+    {
+      id: 14,
+      sku: null,
+      stock: null,
+      weight: 450,
+      productId: 6,
+      status: "active",
+      price: 2_400_000,
+      name: "Sapi tipe 4",
+      location: "Denpasar",
+    },
+  ];
+
+  const productVariantAttributeEntries: Prisma.ProductVariantAttributeEntryCreateManyInput[] =
+    [
+      { id: 1, productVariantId: 1, productVariantAttributeId: 6 },
+      { id: 2, productVariantId: 1, productVariantAttributeId: 7 },
+      { id: 3, productVariantId: 2, productVariantAttributeId: 5 },
+      { id: 4, productVariantId: 3, productVariantAttributeId: 5 },
+      { id: 5, productVariantId: 4, productVariantAttributeId: 6 },
+      { id: 6, productVariantId: 4, productVariantAttributeId: 7 },
+      { id: 7, productVariantId: 5, productVariantAttributeId: 6 },
+      { id: 8, productVariantId: 5, productVariantAttributeId: 7 },
+      { id: 9, productVariantId: 6, productVariantAttributeId: 6 },
+      { id: 10, productVariantId: 6, productVariantAttributeId: 7 },
+      { id: 11, productVariantId: 7, productVariantAttributeId: 6 },
+      { id: 12, productVariantId: 7, productVariantAttributeId: 7 },
+      { id: 13, productVariantId: 8, productVariantAttributeId: 6 },
+      { id: 14, productVariantId: 8, productVariantAttributeId: 7 },
+      { id: 15, productVariantId: 9, productVariantAttributeId: 8 },
+      { id: 16, productVariantId: 9, productVariantAttributeId: 9 },
+      { id: 17, productVariantId: 10, productVariantAttributeId: 8 },
+      { id: 18, productVariantId: 10, productVariantAttributeId: 9 },
+      { id: 19, productVariantId: 11, productVariantAttributeId: 8 },
+      { id: 20, productVariantId: 11, productVariantAttributeId: 9 },
+      { id: 21, productVariantId: 11, productVariantAttributeId: 10 },
+      { id: 22, productVariantId: 12, productVariantAttributeId: 8 },
+      { id: 23, productVariantId: 12, productVariantAttributeId: 9 },
+      { id: 24, productVariantId: 12, productVariantAttributeId: 10 },
+      { id: 25, productVariantId: 13, productVariantAttributeId: 8 },
+      { id: 26, productVariantId: 13, productVariantAttributeId: 9 },
+      { id: 27, productVariantId: 14, productVariantAttributeId: 8 },
+      { id: 28, productVariantId: 14, productVariantAttributeId: 9 },
+    ];
+
+  const discounts: Prisma.DiscountCreateManyInput[] = [
+    {
+      id: 1,
+      type: "flat",
+      value: 500_000,
+      name: "500k Off",
+      level: "product_variant",
+      rule: { quantity: { min: 1, max: null } },
+    },
+    {
+      id: 2,
+      value: 10,
+      name: "10% Off",
+      type: "percentage",
+      level: "product_variant",
+      rule: { quantity: { min: 1, max: null } },
+    },
+    {
+      id: 3,
+      value: 20,
+      name: "20% Off",
+      type: "percentage",
+      level: "product_variant",
+      rule: { quantity: { min: 1, max: null } },
+    },
+    {
+      id: 4,
+      value: 30,
+      name: "30% Off",
+      type: "percentage",
+      level: "product_variant",
+      rule: { quantity: { min: 1, max: null } },
+    },
+  ];
+
+  const productVariantDiscounts: Prisma.ProductVariantDiscountCreateManyInput[] =
+    [
+      { id: 1, discountId: 2, productVariantId: 1 },
+      { id: 2, discountId: 1, productVariantId: 2 },
+      { id: 3, discountId: 1, productVariantId: 3 },
+      { id: 4, discountId: 4, productVariantId: 4 },
+      { id: 5, discountId: 3, productVariantId: 7 },
+      { id: 6, discountId: 3, productVariantId: 8 },
+      { id: 7, discountId: 3, productVariantId: 9 },
+      { id: 8, discountId: 3, productVariantId: 10 },
+      { id: 9, discountId: 4, productVariantId: 11 },
+      { id: 10, discountId: 3, productVariantId: 13 },
+    ];
+
+  const result = await db.$transaction(
+    async (trx) => {
+      return Promise.all([
+        trx.user.createMany({ data: users, skipDuplicates: true }),
+        trx.userAccount.createMany({
+          data: userAccounts,
+          skipDuplicates: true,
+        }),
+        trx.token.createMany({ data: tokens, skipDuplicates: true }),
+        trx.userToken.createMany({ data: userTokens, skipDuplicates: true }),
+        trx.userAddress.createMany({
+          data: userAddresses,
+          skipDuplicates: true,
+        }),
+        trx.service.createMany({ data: services, skipDuplicates: true }),
+        trx.productCategory.createMany({
+          skipDuplicates: true,
+          data: productCategories,
+        }),
+        trx.product.createMany({ data: products, skipDuplicates: true }),
+        trx.productService.createMany({
+          skipDuplicates: true,
+          data: productServices,
+        }),
+        trx.productCategoryEntry.createMany({
+          skipDuplicates: true,
+          data: productCategoryEntries,
+        }),
+        trx.productVariantAttribute.createMany({
+          skipDuplicates: true,
+          data: productVariantAttributes,
+        }),
+        trx.productVariant.createMany({
+          skipDuplicates: true,
+          data: productVariants,
+        }),
+        trx.productVariantAttributeEntry.createMany({
+          skipDuplicates: true,
+          data: productVariantAttributeEntries,
+        }),
+        trx.discount.createMany({ data: discounts, skipDuplicates: true }),
+        trx.productVariantDiscount.createMany({
+          skipDuplicates: true,
+          data: productVariantDiscounts,
+        }),
+      ]);
+    },
+    { maxWait: 10_000, timeout: 20_000 },
+  );
 
   console.info(
     `\n🔢 Total inserted ${result.reduce((acc, curr) => acc + curr.count, 0)}`,

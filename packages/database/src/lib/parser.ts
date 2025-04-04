@@ -1,7 +1,21 @@
 import type { Prisma } from "@prisma/client";
 import {
   DATE_FORMAT,
+  DISCOUNT_LEVELS,
+  DISCOUNT_LEVEL_MAP,
+  DISCOUNT_TYPES,
+  DISCOUNT_TYPE_MAP,
   type Locale,
+  PRODUCT_ATTRIBUTE_KEYS,
+  PRODUCT_STATUSES,
+  PRODUCT_STATUS_MAP,
+  PRODUCT_VARIANT_STATUSES,
+  PRODUCT_VARIANT_STATUS_MAP,
+  SERVICE_CODES,
+  SERVICE_LEVELS,
+  SERVICE_LEVEL_MAP,
+  SERVICE_STATUSES,
+  SERVICE_STATUS_MAP,
   TOKEN_STATUSES,
   TOKEN_STATUS_MAP,
   type Timezone,
@@ -18,45 +32,12 @@ import {
   USER_TYPES,
   USER_TYPE_MAP,
   formatDate,
+  formatMoney,
+  formatNumber,
 } from "@repo/common";
 import { z } from "zod";
 
-export type UserRecord = ReturnType<typeof parseUser>;
-
 export function parseUser({
-  user,
-  locale,
-  timezone,
-  defaultValue,
-}: {
-  locale: Locale;
-  timezone: Timezone;
-  defaultValue: { image: string };
-  user: Prisma.UserGetPayload<{ include: { userAccounts: true } }>;
-}) {
-  const detail = parseUserDetail({ user, locale, timezone, defaultValue });
-
-  return {
-    id: detail.id,
-    name: detail.name,
-    phoneNumber: detail.phoneNumber,
-    email: detail.email,
-    status: detail.status,
-    type: detail.type,
-    username: detail.username,
-    password: detail.password,
-    image: detail.image,
-    verifiedAt: detail.verifiedAt,
-    createdAt: detail.createdAt,
-    updatedAt: detail.updatedAt,
-    fmt: detail.fmt,
-    accounts: user.userAccounts.map((userAccount) => {
-      return parseUserAccount({ userAccount, locale, timezone });
-    }),
-  };
-}
-
-export function parseUserDetail({
   user,
   locale,
   timezone,
@@ -134,8 +115,6 @@ export function parseUserAccount({
     },
   };
 }
-
-export type TokenRecord = ReturnType<typeof parseToken>;
 
 export function parseToken({
   token,
@@ -271,6 +250,320 @@ export function parseUserAddress({
         locale,
         timezone,
       ),
+    },
+  };
+}
+
+export function parseService({
+  locale,
+  service,
+  timezone,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  service: Prisma.ServiceGetPayload<object>;
+}) {
+  return {
+    id: service.id,
+    code: z.enum(SERVICE_CODES).parse(service.code),
+    name: service.name,
+    status: z.enum(SERVICE_STATUSES).parse(service.status),
+    level: z.enum(SERVICE_LEVELS).parse(service.level),
+    description: service.description,
+    image: service.image,
+    createdAt: service.createdAt,
+    updatedAt: service.updatedAt,
+    fmt: {
+      status: SERVICE_STATUS_MAP[service.status],
+      level: SERVICE_LEVEL_MAP[service.level],
+      description: service.description ?? "-",
+      createdAt: formatDate(
+        service.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        service.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseProductCategory({
+  locale,
+  timezone,
+  productCategory,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  productCategory: Prisma.ProductCategoryGetPayload<object>;
+}) {
+  return {
+    id: productCategory.id,
+    code: productCategory.code,
+    name: productCategory.name,
+    createdAt: productCategory.createdAt,
+    updatedAt: productCategory.updatedAt,
+    fmt: {
+      createdAt: formatDate(
+        productCategory.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        productCategory.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseProduct({
+  locale,
+  product,
+  timezone,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  product: Prisma.ProductGetPayload<object>;
+}) {
+  return {
+    id: product.id,
+    name: product.name,
+    status: z.enum(PRODUCT_STATUSES).parse(product.status),
+    thumbnail: product.thumbnail,
+    images: parseProductImages({ product, locale, timezone }),
+    attributes: parseProductAttributes({ product, locale, timezone }),
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+    fmt: {
+      status: PRODUCT_STATUS_MAP[product.status],
+      createdAt: formatDate(
+        product.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        product.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseProductImages({
+  product,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  product: Prisma.ProductGetPayload<object>;
+}) {
+  return z.string().array().safeParse(product.images).data ?? [];
+}
+
+export function parseProductAttributes({
+  product,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  product: Prisma.ProductGetPayload<object>;
+}) {
+  return (
+    z
+      .object({
+        key: z.enum(PRODUCT_ATTRIBUTE_KEYS),
+        title: z.string(),
+        value: z.string(),
+      })
+      .array()
+      .safeParse(product.attributes)?.data ?? []
+  );
+}
+
+export function parseProductVariantAttribute({
+  locale,
+  timezone,
+  productVariantAttribute,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  productVariantAttribute: Prisma.ProductVariantAttributeGetPayload<object>;
+}) {
+  return {
+    id: productVariantAttribute.id,
+    code: productVariantAttribute.code,
+    name: productVariantAttribute.name,
+    rule: parseProductVariantAttributeRule({
+      locale,
+      timezone,
+      productVariantAttribute,
+    }),
+    createdAt: productVariantAttribute.createdAt,
+    updatedAt: productVariantAttribute.updatedAt,
+    fmt: {
+      createdAt: formatDate(
+        productVariantAttribute.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        productVariantAttribute.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseProductVariantAttributeRule({
+  productVariantAttribute,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  productVariantAttribute: Prisma.ProductVariantAttributeGetPayload<object>;
+}) {
+  const rule = z
+    .object({
+      quantity: z
+        .object({ min: z.number().nullish(), max: z.number().nullish() })
+        .nullish(),
+      participant: z
+        .object({ min: z.number().nullish(), max: z.number().nullish() })
+        .nullish(),
+    })
+    .safeParse(productVariantAttribute.rule).data;
+
+  return {
+    quantity: {
+      min: rule?.quantity?.min ?? null,
+      max: rule?.quantity?.max ?? null,
+    },
+    participant: {
+      min: rule?.participant?.min ?? null,
+      max: rule?.participant?.max ?? null,
+    },
+  };
+}
+
+export function parseProductVariant({
+  locale,
+  timezone,
+  productVariant,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  productVariant: Prisma.ProductVariantGetPayload<object>;
+}) {
+  return {
+    id: productVariant.id,
+    name: productVariant.name,
+    status: z.enum(PRODUCT_VARIANT_STATUSES).parse(productVariant.status),
+    price: productVariant.price,
+    sku: productVariant.sku,
+    stock: productVariant.stock,
+    weight: productVariant.weight,
+    location: productVariant.location,
+    createdAt: productVariant.createdAt,
+    updatedAt: productVariant.updatedAt,
+    fmt: {
+      status: PRODUCT_VARIANT_STATUS_MAP[productVariant.status],
+      price: formatMoney(productVariant.price),
+      sku: productVariant.sku ?? "-",
+      stock: productVariant.stock
+        ? formatNumber(productVariant.stock, locale)
+        : "-",
+      weight: productVariant.weight
+        ? formatNumber(productVariant.weight, locale)
+        : "-",
+      location: productVariant.location ?? "-",
+      createdAt: formatDate(
+        productVariant.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        productVariant.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseDiscount({
+  locale,
+  timezone,
+  discount,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  discount: Prisma.DiscountGetPayload<object>;
+}) {
+  return {
+    id: discount.id,
+    name: discount.name,
+    level: z.enum(DISCOUNT_LEVELS).parse(discount.level),
+    type: z.enum(DISCOUNT_TYPES).parse(discount.type),
+    value: discount.value,
+    rule: parseDiscountRule({ discount, locale, timezone }),
+    createdAt: discount.createdAt,
+    updatedAt: discount.updatedAt,
+    fmt: {
+      level: DISCOUNT_LEVEL_MAP[discount.level],
+      type: DISCOUNT_TYPE_MAP[discount.type],
+      value:
+        discount.type === "percentage"
+          ? `${discount.value}%`
+          : formatMoney(discount.value),
+      createdAt: formatDate(
+        discount.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        discount.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseDiscountRule({
+  discount,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  discount: Prisma.DiscountGetPayload<object>;
+}) {
+  const rule = z
+    .object({
+      quantity: z
+        .object({ min: z.number().nullish(), max: z.number().nullish() })
+        .nullish(),
+    })
+    .safeParse(discount.rule).data;
+
+  return {
+    quantity: {
+      min: rule?.quantity?.min ?? null,
+      max: rule?.quantity?.max ?? null,
     },
   };
 }
