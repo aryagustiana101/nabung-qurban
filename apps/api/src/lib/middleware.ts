@@ -1,5 +1,5 @@
 import type { Optional } from "@repo/common/types";
-import { parseToken, parseUser } from "@repo/database";
+import { parseToken } from "@repo/database";
 import bcrypt from "bcryptjs";
 import { isAfter } from "date-fns";
 import type { Context } from "hono";
@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import { type SafeParseReturnType, z } from "zod";
 import { env } from "~/env";
 import { db } from "~/lib/db";
+import { parseUserRecord } from "~/lib/parser";
 import { getPublicUrl } from "~/lib/storage";
 import type { Env } from "~/types";
 
@@ -93,10 +94,10 @@ export const protect = createMiddleware<Env>(async (c, next) => {
   });
 
   const user = _user
-    ? parseUser({
+    ? parseUserRecord({
         locale,
         timezone,
-        user: _user,
+        record: _user,
         defaultValue: { image: getPublicUrl("static/avatar.png") },
       })
     : null;

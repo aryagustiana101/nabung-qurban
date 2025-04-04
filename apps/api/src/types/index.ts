@@ -1,5 +1,5 @@
 import type { Currency, Locale, Timezone } from "@repo/common";
-import type { TokenRecord, UserRecord } from "@repo/database";
+import type { TokenRecord, UserRecord } from "~/lib/parser";
 
 export type Env = {
   Variables: {
