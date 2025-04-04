@@ -1,6 +1,6 @@
 import { TZDate } from "@date-fns/tz";
 import { DATE_FORMAT } from "@repo/common/lib/constants";
-import type { Currency, Timezone } from "@repo/common/types";
+import type { Currency, Locale, Timezone } from "@repo/common/types";
 import { format as _formatDate, parse as _parseDate } from "date-fns";
 import {
   enUS as dateFnsLocaleEn,
@@ -79,5 +79,44 @@ export function computePagination({
     recordCount: count,
     offset: { page, pageCount: Math.ceil(count / limit) },
     cursor: null,
+  };
+}
+
+export function formatNumber(value: number, locale: Locale) {
+  return new Intl.NumberFormat({ id: "id-ID", en: "en-US" }[locale], {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  }).format(value);
+}
+
+export function computeDiscount({
+  price,
+  discount,
+}: {
+  price: number;
+  discount: { value: number; type: "percentage" | "flat" } | null;
+}) {
+  const value = discount
+    ? discount.type === "percentage"
+      ? price * (discount.value / 100)
+      : discount.type === "flat"
+        ? discount.value
+        : 0
+    : 0;
+
+  const final = price - value;
+  const percentage = Math.round((value / price) * 100);
+
+  return {
+    cut: {
+      value,
+      percentage,
+      fmt: { value: formatMoney(value), percentage: `${percentage}%` },
+    },
+    price: {
+      original: price,
+      final,
+      fmt: { original: formatMoney(price), final: formatMoney(final) },
+    },
   };
 }
