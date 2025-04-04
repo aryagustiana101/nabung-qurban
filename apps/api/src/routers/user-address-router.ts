@@ -34,11 +34,11 @@ app.get(
       type: types.length > 0 ? { in: types } : undefined,
       OR: keyword
         ? [
-            { contactName: keyword },
             { note: { contains: keyword } },
             { name: { contains: keyword } },
-            { contactPhoneNumber: keyword },
             { detail: { contains: keyword } },
+            { contactName: { contains: keyword } },
+            { contactPhoneNumber: { contains: keyword } },
           ]
         : undefined,
     };
