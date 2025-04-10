@@ -4,7 +4,9 @@
     "paths": {
       "~/*": ["./src/*"],
       "@repo/common": ["../../packages/common/src/index"],
-      "@repo/common/*": ["../../packages/common/src/*"]
+      "@repo/common/*": ["../../packages/common/src/*"],
+      "@repo/database": ["../../packages/database/src/index"],
+      "@repo/database/*": ["../../packages/database/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -12,7 +12,7 @@
   "scripts": {
     "build": "turbo run build",
     "check-types": "turbo run check-types",
-    "clean": "rm -rf .turbo **/**/.turbo **/**/dist **/**/.cache **/**/.next",
+    "clean": "rm -rf .turbo **/**/.turbo **/**/dist **/**/.cache **/**/.next **/**/generated",
     "clean:node_modules": "rm -rf **/**/node_modules node_modules",
     "db:generate": "turbo db:generate",
     "db:migrate": "cd packages/database && pnpm db:migrate",
@@ -21,7 +21,7 @@
     "dev": "turbo run dev",
     "format": "biome format --write .",
     "lint": "biome lint .",
-    "postinstall": "pnpm db:generate && pnpm build --filter @repo/database",
+    "postinstall": "pnpm db:generate",
     "preinstall": "npx only-allow pnpm",
     "start:api": "cd apps/api && pnpm start",
     "start:web": "cd apps/web && pnpm start"

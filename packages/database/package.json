@@ -8,14 +8,18 @@
   "prisma": {
     "seed": "tsx ./prisma/seed.ts"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "tsup",
     "check-types": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:migrate": "dotenv -e .env -- prisma migrate",
     "db:push": "dotenv -e .env -- prisma db push",
-    "db:seed": "dotenv -e .env -- prisma db seed",
-    "dev": "pnpm build -- --watch"
+    "db:seed": "dotenv -e .env -- prisma db seed"
   },
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
@@ -31,7 +35,6 @@
     "@types/node": "^22.14.0",
     "dotenv-cli": "^8.0.0",
     "prisma": "^6.6.0",
-    "tsup": "^8.4.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }

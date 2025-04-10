@@ -1,4 +1,3 @@
-import type { Prisma } from "@prisma/client";
 import {
   DATE_FORMAT,
   DISCOUNT_LEVELS,
@@ -35,6 +34,7 @@ import {
   formatMoney,
   formatNumber,
 } from "@repo/common";
+import type { Prisma } from "@repo/database/client";
 import { z } from "zod";
 
 export function parseUser({

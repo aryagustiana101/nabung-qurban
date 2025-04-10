@@ -1,9 +1,13 @@
-import { type Prisma, PrismaClient } from "@prisma/client";
 import type { ProductAttributeKey } from "@repo/common";
+import { type Prisma, PrismaClient } from "@repo/database/client";
 import { env } from "@repo/database/env";
 import { addMonths } from "date-fns";
 
-const db = new PrismaClient({ log: ["error"] });
+const db = new PrismaClient({
+  log: ["error"],
+  datasources: { db: { url: env.DATABASE_URL } },
+  transactionOptions: { maxWait: 10_000, timeout: 20_000 },
+});
 
 async function main() {
   const users: Prisma.UserCreateManyInput[] = [

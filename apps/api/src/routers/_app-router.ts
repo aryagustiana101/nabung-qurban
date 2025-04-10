@@ -20,9 +20,13 @@ app.route("/services", serviceRouter);
 app.route("/products", productRouter);
 app.route("/categories", productCategoryRouter);
 
-app
-  .use(protect)
-  .route("/me", profileRouter)
-  .route("/addresses", userAddressRouter);
+app.on(
+  ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
+  ["/me", "/addresses/:id?"],
+  protect,
+);
+
+app.route("/me", profileRouter);
+app.route("/addresses", userAddressRouter);
 
 export default app;

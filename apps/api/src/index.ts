@@ -1,16 +1,18 @@
-import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
+import { trimTrailingSlash } from "hono/trailing-slash";
 import { env } from "~/env";
 import { context } from "~/lib/middleware";
 import appRouter from "~/routers/_app-router";
 import type { Env } from "~/types";
 
-const app = new Hono<Env>();
+const app = new Hono<Env>({ strict: true });
 
 app.use(context);
 app.use(logger());
+app.use(trimTrailingSlash());
+
 app.route("/", appRouter);
 
 app.use("/static/*", serveStatic({ root: "./" }));
@@ -35,6 +37,6 @@ app.onError((error, c) => {
   );
 });
 
-serve({ fetch: app.fetch, port: env.PORT }, (info) => {
-  console.info(`Server is running on port ${info.port}`);
-});
+console.info(`Server is running on port ${env.PORT}`);
+
+export default app;
