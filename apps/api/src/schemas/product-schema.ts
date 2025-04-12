@@ -34,6 +34,10 @@ export const routerSchema = {
       .string()
       .transform((value) => value.split(","))
       .nullish(),
+    warehouses: z
+      .string()
+      .transform((value) => value.split(","))
+      .nullish(),
   }),
   getSingle: z.object({
     id: z

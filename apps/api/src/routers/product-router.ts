@@ -24,6 +24,7 @@ app.get(
     const statuses = input.statuses ?? [];
     const services = input.services ?? [];
     const categories = input.categories ?? [];
+    const warehouses = input.warehouses ?? [];
 
     const where: Prisma.ProductWhereInput = {
       OR: keyword ? [{ name: { contains: keyword } }] : undefined,
@@ -35,6 +36,10 @@ app.get(
       productCategories:
         categories.length > 0
           ? { some: { category: { code: { in: categories } } } }
+          : undefined,
+      productWarehouses:
+        warehouses.length > 0
+          ? { some: { warehouse: { code: { in: warehouses } } } }
           : undefined,
     };
 

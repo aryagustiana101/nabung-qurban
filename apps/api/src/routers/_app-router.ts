@@ -8,6 +8,7 @@ import profileRouter from "~/routers/profile-router";
 import serviceRouter from "~/routers/service-router";
 import storageRouter from "~/routers/storage-router";
 import userAddressRouter from "~/routers/user-address-router";
+import warehouseRouter from "~/routers/warehouse-router";
 import type { Env } from "~/types";
 
 const app = new Hono<Env>();
@@ -19,6 +20,7 @@ app.route("/storage", storageRouter);
 app.route("/services", serviceRouter);
 app.route("/products", productRouter);
 app.route("/categories", categoryRouter);
+app.route("/warehouses", warehouseRouter);
 
 app.on(
   ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
