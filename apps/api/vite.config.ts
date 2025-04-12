@@ -9,11 +9,13 @@ const module = (await tsImport("~/env", import.meta.url)) as {
   env: typeof env;
 };
 
-export default defineConfig({
-  publicDir: "static",
-  server: { port: module.env.PORT },
-  plugins: [tsconfigPaths(), build({ port: module.env.PORT }), devServer()],
-  resolve: {
-    noExternal: ["@repo/common", "@repo/database"],
-  },
+export default defineConfig(({ command }) => {
+  return {
+    server: { port: module.env.PORT },
+    publicDir: command === "build" ? false : "static",
+    plugins: [tsconfigPaths(), build({ port: module.env.PORT }), devServer()],
+    resolve: {
+      noExternal: ["@repo/common", "@repo/database"],
+    },
+  };
 });
