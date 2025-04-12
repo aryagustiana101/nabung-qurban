@@ -1,15 +1,17 @@
 import { type Locale, type Timezone, computeDiscount } from "@repo/common";
 import {
   type Prisma,
+  parseAttribute,
+  parseCategory,
   parseDiscount,
   parseProduct,
-  parseProductCategory,
+  parseProductInventory,
   parseProductVariant,
-  parseProductVariantAttribute,
   parseService,
   type parseToken,
   parseUser,
   parseUserAccount,
+  parseWarehouse,
 } from "@repo/database";
 
 export type UserRecord = ReturnType<typeof parseUser>;
@@ -58,14 +60,14 @@ export function parseProductRecord({
   timezone: Timezone;
   record: Prisma.ProductGetPayload<{
     include: {
+      productInventories: true;
       productServices: { include: { service: true } };
-      productCategoryEntries: { include: { productCategory: true } };
+      productCategories: { include: { category: true } };
+      productWarehouses: { include: { warehouse: true } };
       productVariants: {
         include: {
           productVariantDiscounts: { include: { discount: true } };
-          productVariantAttributeEntries: {
-            include: { productVariantAttribute: true };
-          };
+          productVariantAttributes: { include: { attribute: true } };
         };
       };
     };
@@ -90,11 +92,21 @@ export function parseProductRecord({
         service: productService.service,
       });
     }),
-    categories: record.productCategoryEntries.map((productCategoryEntry) => {
-      return parseProductCategory({
+    categories: record.productCategories.map((productCategory) => {
+      return parseCategory({
         locale,
         timezone,
-        productCategory: productCategoryEntry.productCategory,
+        category: productCategory.category,
+      });
+    }),
+    inventories: record.productInventories.map((productInventory) => {
+      return parseProductInventory({ locale, timezone, productInventory });
+    }),
+    warehouses: record.productWarehouses.map((productWarehouse) => {
+      return parseWarehouse({
+        locale,
+        timezone,
+        warehouse: productWarehouse.warehouse,
       });
     }),
     variants: record.productVariants.map((productVariant) => {
@@ -117,9 +129,7 @@ export function parseProductVariantRecord({
   record: Prisma.ProductVariantGetPayload<{
     include: {
       productVariantDiscounts: { include: { discount: true } };
-      productVariantAttributeEntries: {
-        include: { productVariantAttribute: true };
-      };
+      productVariantAttributes: { include: { attribute: true } };
     };
   }>;
 }) {
@@ -139,22 +149,17 @@ export function parseProductVariantRecord({
     name: productVariant.name,
     status: productVariant.status,
     price: productVariant.price,
-    sku: productVariant.sku,
-    stock: productVariant.stock,
-    weight: productVariant.weight,
-    location: productVariant.location,
     createdAt: productVariant.createdAt,
     updatedAt: productVariant.updatedAt,
     fmt: productVariant.fmt,
     calculated: computeDiscount({ price: productVariant.price, discount }),
     discount,
-    attributes: record.productVariantAttributeEntries.map(
-      (productVariantAttributeEntry) => {
-        return parseProductVariantAttribute({
+    attributes: record.productVariantAttributes.map(
+      (productVariantAttribute) => {
+        return parseAttribute({
           locale,
           timezone,
-          productVariantAttribute:
-            productVariantAttributeEntry.productVariantAttribute,
+          attribute: productVariantAttribute.attribute,
         });
       },
     ),

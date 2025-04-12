@@ -191,7 +191,7 @@ async function main() {
     },
   ];
 
-  const productCategories: Prisma.ProductCategoryCreateManyInput[] = [
+  const categories: Prisma.CategoryCreateManyInput[] = [
     { id: 1, code: "domba", name: "Domba" },
     { id: 2, code: "unta", name: "Unta" },
     { id: 3, code: "kambing", name: "Kambing" },
@@ -394,290 +394,233 @@ async function main() {
     { id: 20, serviceId: 6, productId: 6 },
   ];
 
-  const productCategoryEntries: Prisma.ProductCategoryEntryCreateManyInput[] = [
-    { id: 1, productId: 1, productCategoryId: 4 },
-    { id: 2, productId: 2, productCategoryId: 4 },
-    { id: 3, productId: 3, productCategoryId: 3 },
-    { id: 4, productId: 4, productCategoryId: 4 },
-    { id: 5, productId: 5, productCategoryId: 3 },
-    { id: 6, productId: 6, productCategoryId: 4 },
+  const productCategories: Prisma.ProductCategoryCreateManyInput[] = [
+    { id: 1, productId: 1, categoryId: 4 },
+    { id: 2, productId: 2, categoryId: 4 },
+    { id: 3, productId: 3, categoryId: 3 },
+    { id: 4, productId: 4, categoryId: 4 },
+    { id: 5, productId: 5, categoryId: 3 },
+    { id: 6, productId: 6, categoryId: 4 },
   ];
 
-  const productVariantAttributes: Prisma.ProductVariantAttributeCreateManyInput[] =
-    [
-      {
-        id: 1,
-        code: "1-domba",
-        name: "1 Domba",
-        rule: {
-          quantity: { min: 1, max: null },
-          participant: { min: 1, max: null },
-        },
+  const attributes: Prisma.AttributeCreateManyInput[] = [
+    {
+      id: 1,
+      code: "1-domba",
+      name: "1 Domba",
+      rule: {
+        quantity: { min: 1, max: null },
+        participant: { min: 1, max: null },
       },
-      {
-        id: 2,
-        code: "1-unta",
-        name: "1 Unta",
-        rule: {
-          quantity: { min: 1, max: null },
-          participant: { min: 1, max: null },
-        },
+    },
+    {
+      id: 2,
+      code: "1-unta",
+      name: "1 Unta",
+      rule: {
+        quantity: { min: 1, max: null },
+        participant: { min: 1, max: null },
       },
-      {
-        id: 3,
-        code: "1-7-unta",
-        name: "1/7 Unta",
-        rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
+    },
+    {
+      id: 3,
+      code: "1-7-unta",
+      name: "1/7 Unta",
+      rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
+    },
+    {
+      id: 4,
+      code: "1-10-unta",
+      name: "1/10 Unta",
+      rule: {
+        quantity: { min: 1, max: 1 },
+        participant: { min: 10, max: 10 },
       },
-      {
-        id: 4,
-        code: "1-10-unta",
-        name: "1/10 Unta",
-        rule: {
-          quantity: { min: 1, max: 1 },
-          participant: { min: 10, max: 10 },
-        },
+    },
+    {
+      id: 5,
+      code: "1-kambing",
+      name: "1 Kambing",
+      rule: {
+        quantity: { min: 1, max: null },
+        participant: { min: 1, max: null },
       },
-      {
-        id: 5,
-        code: "1-kambing",
-        name: "1 Kambing",
-        rule: {
-          quantity: { min: 1, max: null },
-          participant: { min: 1, max: null },
-        },
+    },
+    {
+      id: 6,
+      code: "1-sapi",
+      name: "1 Sapi",
+      rule: {
+        quantity: { min: 1, max: null },
+        participant: { min: 1, max: null },
       },
-      {
-        id: 6,
-        code: "1-sapi",
-        name: "1 Sapi",
-        rule: {
-          quantity: { min: 1, max: null },
-          participant: { min: 1, max: null },
-        },
+    },
+    {
+      id: 7,
+      code: "1-7-sapi",
+      name: "1/7 Sapi",
+      rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
+    },
+    {
+      id: 8,
+      code: "1446-H-2025",
+      name: "1446 H/2025",
+      rule: {
+        quantity: { min: 1, max: null },
+        participant: { min: 1, max: null },
       },
-      {
-        id: 7,
-        code: "1-7-sapi",
-        name: "1/7 Sapi",
-        rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
+    },
+    {
+      id: 9,
+      code: "1447-H-2026",
+      name: "1447 H/2026",
+      rule: {
+        quantity: { min: 1, max: null },
+        participant: { min: 1, max: null },
       },
-      {
-        id: 8,
-        code: "1446-H-2025",
-        name: "1446 H/2025",
-        rule: {
-          quantity: { min: 1, max: null },
-          participant: { min: 1, max: null },
-        },
+    },
+    {
+      id: 10,
+      code: "1448-H-2027",
+      name: "1448 H/2027",
+      rule: {
+        quantity: { min: 1, max: null },
+        participant: { min: 1, max: null },
       },
-      {
-        id: 9,
-        code: "1447-H-2026",
-        name: "1447 H/2026",
-        rule: {
-          quantity: { min: 1, max: null },
-          participant: { min: 1, max: null },
-        },
-      },
-      {
-        id: 10,
-        code: "1448-H-2027",
-        name: "1448 H/2027",
-        rule: {
-          quantity: { min: 1, max: null },
-          participant: { min: 1, max: null },
-        },
-      },
-    ];
+    },
+  ];
 
   const productVariants: Prisma.ProductVariantCreateManyInput[] = [
     {
       id: 1,
-      sku: null,
-      stock: null,
-      weight: 400,
       productId: 1,
       status: "active",
       price: 30_000_000,
       name: "1446 H/2025",
-      location: "Pangalengan",
     },
     {
       id: 2,
-      sku: null,
-      weight: 40,
-      stock: null,
       productId: 2,
       status: "active",
       price: 5_000_000,
-      location: "Garut",
       name: "1446 H/2025",
     },
     {
       id: 3,
-      sku: null,
-      weight: 40,
-      stock: null,
       productId: 2,
       status: "active",
       price: 4_000_000,
-      location: "Garut",
       name: "1447 H/2026",
     },
     {
       id: 4,
-      sku: null,
-      stock: null,
-      weight: 700,
       productId: 3,
       status: "active",
       price: 70_000_000,
       name: "1446 H/2025",
-      location: "Denpasar",
     },
     {
       id: 5,
-      sku: null,
-      stock: null,
-      weight: 700,
       productId: 3,
       status: "active",
       price: 65_000_000,
       name: "1447 H/2026",
-      location: "Denpasar",
     },
     {
       id: 6,
-      sku: null,
-      stock: null,
-      weight: 700,
       productId: 3,
       status: "active",
       price: 55_000_000,
       name: "1448 H/2027",
-      location: "Denpasar",
     },
     {
       id: 7,
-      sku: null,
-      stock: null,
-      weight: 280,
       productId: 4,
       status: "active",
       price: 25_000_000,
       name: "1446 H/2025",
-      location: "Denpasar",
     },
     {
       id: 8,
-      sku: null,
-      stock: null,
-      weight: 280,
       productId: 4,
       status: "active",
       price: 20_000_000,
       name: "1447 H/2026",
-      location: "Denpasar",
     },
     {
       id: 9,
-      sku: null,
-      stock: null,
-      weight: 40,
       productId: 5,
       status: "active",
       price: 1_300_000,
-      location: "Subang",
       name: "Kambing tipe 1",
     },
     {
       id: 10,
-      sku: null,
-      stock: null,
-      weight: 45,
       productId: 5,
       status: "active",
       price: 1_500_000,
-      location: "Tasik",
       name: "Kambing tipe 2",
     },
     {
       id: 11,
-      sku: null,
-      stock: null,
-      weight: 700,
       productId: 6,
       status: "active",
       price: 3_600_000,
       name: "Sapi tipe 1",
-      location: "Denpasar",
     },
     {
       id: 12,
-      sku: null,
-      stock: null,
-      weight: 700,
       productId: 6,
       status: "active",
       price: 3_400_000,
       name: "Sapi tipe 2",
-      location: "Denpasar",
     },
     {
       id: 13,
-      sku: null,
-      stock: null,
-      weight: 450,
       productId: 6,
       status: "active",
       price: 2_600_000,
       name: "Sapi tipe 3",
-      location: "Denpasar",
     },
     {
       id: 14,
-      sku: null,
-      stock: null,
-      weight: 450,
       productId: 6,
       status: "active",
       price: 2_400_000,
       name: "Sapi tipe 4",
-      location: "Denpasar",
     },
   ];
 
-  const productVariantAttributeEntries: Prisma.ProductVariantAttributeEntryCreateManyInput[] =
+  const productVariantAttributes: Prisma.ProductVariantAttributeCreateManyInput[] =
     [
-      { id: 1, productVariantId: 1, productVariantAttributeId: 6 },
-      { id: 2, productVariantId: 1, productVariantAttributeId: 7 },
-      { id: 3, productVariantId: 2, productVariantAttributeId: 5 },
-      { id: 4, productVariantId: 3, productVariantAttributeId: 5 },
-      { id: 5, productVariantId: 4, productVariantAttributeId: 6 },
-      { id: 6, productVariantId: 4, productVariantAttributeId: 7 },
-      { id: 7, productVariantId: 5, productVariantAttributeId: 6 },
-      { id: 8, productVariantId: 5, productVariantAttributeId: 7 },
-      { id: 9, productVariantId: 6, productVariantAttributeId: 6 },
-      { id: 10, productVariantId: 6, productVariantAttributeId: 7 },
-      { id: 11, productVariantId: 7, productVariantAttributeId: 6 },
-      { id: 12, productVariantId: 7, productVariantAttributeId: 7 },
-      { id: 13, productVariantId: 8, productVariantAttributeId: 6 },
-      { id: 14, productVariantId: 8, productVariantAttributeId: 7 },
-      { id: 15, productVariantId: 9, productVariantAttributeId: 8 },
-      { id: 16, productVariantId: 9, productVariantAttributeId: 9 },
-      { id: 17, productVariantId: 10, productVariantAttributeId: 8 },
-      { id: 18, productVariantId: 10, productVariantAttributeId: 9 },
-      { id: 19, productVariantId: 11, productVariantAttributeId: 8 },
-      { id: 20, productVariantId: 11, productVariantAttributeId: 9 },
-      { id: 21, productVariantId: 11, productVariantAttributeId: 10 },
-      { id: 22, productVariantId: 12, productVariantAttributeId: 8 },
-      { id: 23, productVariantId: 12, productVariantAttributeId: 9 },
-      { id: 24, productVariantId: 12, productVariantAttributeId: 10 },
-      { id: 25, productVariantId: 13, productVariantAttributeId: 8 },
-      { id: 26, productVariantId: 13, productVariantAttributeId: 9 },
-      { id: 27, productVariantId: 14, productVariantAttributeId: 8 },
-      { id: 28, productVariantId: 14, productVariantAttributeId: 9 },
+      { id: 1, productVariantId: 1, attributeId: 6 },
+      { id: 2, productVariantId: 1, attributeId: 7 },
+      { id: 3, productVariantId: 2, attributeId: 5 },
+      { id: 4, productVariantId: 3, attributeId: 5 },
+      { id: 5, productVariantId: 4, attributeId: 6 },
+      { id: 6, productVariantId: 4, attributeId: 7 },
+      { id: 7, productVariantId: 5, attributeId: 6 },
+      { id: 8, productVariantId: 5, attributeId: 7 },
+      { id: 9, productVariantId: 6, attributeId: 6 },
+      { id: 10, productVariantId: 6, attributeId: 7 },
+      { id: 11, productVariantId: 7, attributeId: 6 },
+      { id: 12, productVariantId: 7, attributeId: 7 },
+      { id: 13, productVariantId: 8, attributeId: 6 },
+      { id: 14, productVariantId: 8, attributeId: 7 },
+      { id: 15, productVariantId: 9, attributeId: 8 },
+      { id: 16, productVariantId: 9, attributeId: 9 },
+      { id: 17, productVariantId: 10, attributeId: 8 },
+      { id: 18, productVariantId: 10, attributeId: 9 },
+      { id: 19, productVariantId: 11, attributeId: 8 },
+      { id: 20, productVariantId: 11, attributeId: 9 },
+      { id: 21, productVariantId: 11, attributeId: 10 },
+      { id: 22, productVariantId: 12, attributeId: 8 },
+      { id: 23, productVariantId: 12, attributeId: 9 },
+      { id: 24, productVariantId: 12, attributeId: 10 },
+      { id: 25, productVariantId: 13, attributeId: 8 },
+      { id: 26, productVariantId: 13, attributeId: 9 },
+      { id: 27, productVariantId: 14, attributeId: 8 },
+      { id: 28, productVariantId: 14, attributeId: 9 },
     ];
 
   const discounts: Prisma.DiscountCreateManyInput[] = [
@@ -729,55 +672,157 @@ async function main() {
       { id: 10, discountId: 3, productVariantId: 13 },
     ];
 
-  const result = await db.$transaction(
-    async (trx) => {
-      return Promise.all([
-        trx.user.createMany({ data: users, skipDuplicates: true }),
-        trx.userAccount.createMany({
-          data: userAccounts,
-          skipDuplicates: true,
-        }),
-        trx.token.createMany({ data: tokens, skipDuplicates: true }),
-        trx.userToken.createMany({ data: userTokens, skipDuplicates: true }),
-        trx.userAddress.createMany({
-          data: userAddresses,
-          skipDuplicates: true,
-        }),
-        trx.service.createMany({ data: services, skipDuplicates: true }),
-        trx.productCategory.createMany({
-          skipDuplicates: true,
-          data: productCategories,
-        }),
-        trx.product.createMany({ data: products, skipDuplicates: true }),
-        trx.productService.createMany({
-          skipDuplicates: true,
-          data: productServices,
-        }),
-        trx.productCategoryEntry.createMany({
-          skipDuplicates: true,
-          data: productCategoryEntries,
-        }),
-        trx.productVariantAttribute.createMany({
-          skipDuplicates: true,
-          data: productVariantAttributes,
-        }),
-        trx.productVariant.createMany({
-          skipDuplicates: true,
-          data: productVariants,
-        }),
-        trx.productVariantAttributeEntry.createMany({
-          skipDuplicates: true,
-          data: productVariantAttributeEntries,
-        }),
-        trx.discount.createMany({ data: discounts, skipDuplicates: true }),
-        trx.productVariantDiscount.createMany({
-          skipDuplicates: true,
-          data: productVariantDiscounts,
-        }),
-      ]);
+  const productInventories: Prisma.ProductInventoryCreateManyInput[] = [
+    {
+      id: 1,
+      stock: 0,
+      sku: null,
+      weight: 450,
+      productId: 1,
+      tracker: "inactive",
     },
-    { maxWait: 10_000, timeout: 20_000 },
-  );
+    {
+      id: 2,
+      stock: 0,
+      sku: null,
+      weight: 40,
+      productId: 2,
+      tracker: "inactive",
+    },
+    {
+      id: 3,
+      stock: 0,
+      sku: null,
+      weight: 700,
+      productId: 3,
+      tracker: "inactive",
+    },
+    {
+      id: 4,
+      stock: 0,
+      sku: null,
+      weight: 280,
+      productId: 4,
+      tracker: "inactive",
+    },
+    {
+      id: 5,
+      stock: 0,
+      sku: null,
+      weight: 40,
+      productId: 5,
+      tracker: "inactive",
+    },
+    {
+      id: 6,
+      stock: 0,
+      sku: null,
+      weight: 700,
+      productId: 6,
+      tracker: "inactive",
+    },
+  ];
+
+  const warehouses: Prisma.WarehouseCreateManyInput[] = [
+    {
+      id: 1,
+      status: "active",
+      postalCode: "40791",
+      district: "Lembang",
+      province: "Jawa Barat",
+      code: "kandang-nq-lembang",
+      name: "Kandang NQ Lembang",
+      city: "Kabupaten Bandung Barat",
+      address:
+        "Jalan Raya Lembang Nomor 165, Gudangkahuripan, Lembang, Kabupaten Bandung Barat, Jawa Barat",
+    },
+    {
+      id: 2,
+      status: "active",
+      postalCode: "12920",
+      district: "Setiabudi",
+      code: "kandang-nq-jakarta",
+      name: "Kandang NQ Jakarta",
+      city: "Kota Jakarta Selatan",
+      province: "Daerah Khusus Ibukota Jakarta",
+      address:
+        "Gedung Wira Usaha, Jl. H. R. Rasuna Said No.Kav.C Lantai 1 Unit 104, RW.5, Karet, Kecamatan Setiabudi, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12920",
+    },
+    {
+      id: 3,
+      status: "active",
+      province: "Bali",
+      postalCode: "80361",
+      district: "Kuta Utara",
+      code: "kandang-nq-bali",
+      name: "Kandang NQ Bali",
+      city: "Kabupaten Badung",
+      address:
+        "Jl. Pantai Berawa No.88, Tibubeneng, Kec. Kuta Utara, Kabupaten Badung, Bali 80361",
+    },
+  ];
+
+  const productWarehouses: Prisma.ProductWarehouseCreateManyInput[] = [
+    { id: 1, productId: 1, warehouseId: 1 },
+    { id: 2, productId: 2, warehouseId: 1 },
+    { id: 3, productId: 3, warehouseId: 2 },
+    { id: 4, productId: 4, warehouseId: 3 },
+    { id: 5, productId: 5, warehouseId: 2 },
+    { id: 6, productId: 6, warehouseId: 3 },
+  ];
+
+  const result = await db.$transaction(async (trx) => {
+    return Promise.all([
+      trx.user.createMany({ data: users, skipDuplicates: true }),
+      trx.userAccount.createMany({
+        data: userAccounts,
+        skipDuplicates: true,
+      }),
+      trx.token.createMany({ data: tokens, skipDuplicates: true }),
+      trx.userToken.createMany({ data: userTokens, skipDuplicates: true }),
+      trx.userAddress.createMany({
+        data: userAddresses,
+        skipDuplicates: true,
+      }),
+      trx.service.createMany({ data: services, skipDuplicates: true }),
+      trx.category.createMany({ data: categories, skipDuplicates: true }),
+      trx.product.createMany({ data: products, skipDuplicates: true }),
+      trx.productService.createMany({
+        skipDuplicates: true,
+        data: productServices,
+      }),
+      trx.productCategory.createMany({
+        skipDuplicates: true,
+        data: productCategories,
+      }),
+      trx.attribute.createMany({ data: attributes, skipDuplicates: true }),
+      trx.productVariant.createMany({
+        skipDuplicates: true,
+        data: productVariants,
+      }),
+      trx.productVariantAttribute.createMany({
+        skipDuplicates: true,
+        data: productVariantAttributes,
+      }),
+      trx.discount.createMany({ data: discounts, skipDuplicates: true }),
+      trx.productVariantDiscount.createMany({
+        skipDuplicates: true,
+        data: productVariantDiscounts,
+      }),
+      trx.productInventory.createMany({
+        skipDuplicates: true,
+        data: productInventories,
+      }),
+      trx.warehouse.createMany({
+        skipDuplicates: true,
+        data: warehouses,
+      }),
+      trx.productWarehouse.createMany({
+        skipDuplicates: true,
+        data: productWarehouses,
+      }),
+    ]);
+  });
 
   console.info(
     `\n🔢 Total inserted ${result.reduce((acc, curr) => acc + curr.count, 0)}`,

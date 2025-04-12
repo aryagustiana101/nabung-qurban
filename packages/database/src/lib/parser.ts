@@ -6,6 +6,8 @@ import {
   DISCOUNT_TYPE_MAP,
   type Locale,
   PRODUCT_ATTRIBUTE_KEYS,
+  PRODUCT_INVENTORY_TRACKERS,
+  PRODUCT_INVENTORY_TRACKER_MAP,
   PRODUCT_STATUSES,
   PRODUCT_STATUS_MAP,
   PRODUCT_VARIANT_STATUSES,
@@ -30,6 +32,8 @@ import {
   USER_STATUS_MAP,
   USER_TYPES,
   USER_TYPE_MAP,
+  WAREHOUSE_STATUSES,
+  WAREHOUSE_STATUS_MAP,
   formatDate,
   formatMoney,
   formatNumber,
@@ -293,30 +297,30 @@ export function parseService({
   };
 }
 
-export function parseProductCategory({
+export function parseCategory({
   locale,
   timezone,
-  productCategory,
+  category,
 }: {
   locale: Locale;
   timezone: Timezone;
-  productCategory: Prisma.ProductCategoryGetPayload<object>;
+  category: Prisma.CategoryGetPayload<object>;
 }) {
   return {
-    id: productCategory.id,
-    code: productCategory.code,
-    name: productCategory.name,
-    createdAt: productCategory.createdAt,
-    updatedAt: productCategory.updatedAt,
+    id: category.id,
+    code: category.code,
+    name: category.name,
+    createdAt: category.createdAt,
+    updatedAt: category.updatedAt,
     fmt: {
       createdAt: formatDate(
-        productCategory.createdAt,
+        category.createdAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,
       ),
       updatedAt: formatDate(
-        productCategory.updatedAt,
+        category.updatedAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,
@@ -390,35 +394,31 @@ export function parseProductAttributes({
   );
 }
 
-export function parseProductVariantAttribute({
+export function parseAttribute({
   locale,
   timezone,
-  productVariantAttribute,
+  attribute,
 }: {
   locale: Locale;
   timezone: Timezone;
-  productVariantAttribute: Prisma.ProductVariantAttributeGetPayload<object>;
+  attribute: Prisma.AttributeGetPayload<object>;
 }) {
   return {
-    id: productVariantAttribute.id,
-    code: productVariantAttribute.code,
-    name: productVariantAttribute.name,
-    rule: parseProductVariantAttributeRule({
-      locale,
-      timezone,
-      productVariantAttribute,
-    }),
-    createdAt: productVariantAttribute.createdAt,
-    updatedAt: productVariantAttribute.updatedAt,
+    id: attribute.id,
+    code: attribute.code,
+    name: attribute.name,
+    rule: parseAttributeRule({ locale, timezone, attribute }),
+    createdAt: attribute.createdAt,
+    updatedAt: attribute.updatedAt,
     fmt: {
       createdAt: formatDate(
-        productVariantAttribute.createdAt,
+        attribute.createdAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,
       ),
       updatedAt: formatDate(
-        productVariantAttribute.updatedAt,
+        attribute.updatedAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,
@@ -427,12 +427,12 @@ export function parseProductVariantAttribute({
   };
 }
 
-export function parseProductVariantAttributeRule({
-  productVariantAttribute,
+export function parseAttributeRule({
+  attribute,
 }: {
   locale: Locale;
   timezone: Timezone;
-  productVariantAttribute: Prisma.ProductVariantAttributeGetPayload<object>;
+  attribute: Prisma.AttributeGetPayload<object>;
 }) {
   const rule = z
     .object({
@@ -443,7 +443,7 @@ export function parseProductVariantAttributeRule({
         .object({ min: z.number().nullish(), max: z.number().nullish() })
         .nullish(),
     })
-    .safeParse(productVariantAttribute.rule).data;
+    .safeParse(attribute.rule).data;
 
   return {
     quantity: {
@@ -471,23 +471,11 @@ export function parseProductVariant({
     name: productVariant.name,
     status: z.enum(PRODUCT_VARIANT_STATUSES).parse(productVariant.status),
     price: productVariant.price,
-    sku: productVariant.sku,
-    stock: productVariant.stock,
-    weight: productVariant.weight,
-    location: productVariant.location,
     createdAt: productVariant.createdAt,
     updatedAt: productVariant.updatedAt,
     fmt: {
       status: PRODUCT_VARIANT_STATUS_MAP[productVariant.status],
       price: formatMoney(productVariant.price),
-      sku: productVariant.sku ?? "-",
-      stock: productVariant.stock
-        ? formatNumber(productVariant.stock, locale)
-        : "-",
-      weight: productVariant.weight
-        ? formatNumber(productVariant.weight, locale)
-        : "-",
-      location: productVariant.location ?? "-",
       createdAt: formatDate(
         productVariant.createdAt,
         DATE_FORMAT.NORMAL,
@@ -496,6 +484,44 @@ export function parseProductVariant({
       ),
       updatedAt: formatDate(
         productVariant.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseProductInventory({
+  locale,
+  timezone,
+  productInventory,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  productInventory: Prisma.ProductInventoryGetPayload<object>;
+}) {
+  return {
+    id: productInventory.id,
+    sku: productInventory.sku,
+    tracker: z.enum(PRODUCT_INVENTORY_TRACKERS).parse(productInventory.tracker),
+    stock: productInventory.stock,
+    weight: productInventory.weight,
+    createdAt: productInventory.createdAt,
+    updatedAt: productInventory.updatedAt,
+    fmt: {
+      sku: productInventory.sku ?? "-",
+      tracker: PRODUCT_INVENTORY_TRACKER_MAP[productInventory.tracker],
+      stock: formatNumber(productInventory.stock, locale),
+      weight: formatNumber(productInventory.weight, locale),
+      createdAt: formatDate(
+        productInventory.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        productInventory.updatedAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,
@@ -564,6 +590,45 @@ export function parseDiscountRule({
     quantity: {
       min: rule?.quantity?.min ?? null,
       max: rule?.quantity?.max ?? null,
+    },
+  };
+}
+
+export function parseWarehouse({
+  locale,
+  timezone,
+  warehouse,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  warehouse: Prisma.WarehouseGetPayload<object>;
+}) {
+  return {
+    id: warehouse.id,
+    code: warehouse.code,
+    name: warehouse.name,
+    status: z.enum(WAREHOUSE_STATUSES).parse(warehouse.status),
+    province: warehouse.province,
+    city: warehouse.city,
+    district: warehouse.district,
+    postalCode: warehouse.postalCode,
+    address: warehouse.address,
+    createdAt: warehouse.createdAt,
+    updatedAt: warehouse.updatedAt,
+    fmt: {
+      status: WAREHOUSE_STATUS_MAP[warehouse.status],
+      createdAt: formatDate(
+        warehouse.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        warehouse.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
     },
   };
 }

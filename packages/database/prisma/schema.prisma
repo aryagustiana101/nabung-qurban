@@ -279,9 +279,11 @@ model Product {
   createdAt  DateTime      @default(now()) @map("created_at")
   updatedAt  DateTime      @updatedAt @map("updated_at")
 
-  productServices        ProductService[]
-  productVariants        ProductVariant[]
-  productCategoryEntries ProductCategoryEntry[]
+  productServices    ProductService[]
+  productVariants    ProductVariant[]
+  productCategories  ProductCategory[]
+  productWarehouses  ProductWarehouse[]
+  productInventories ProductInventory[]
 
   @@map("products")
 }
@@ -301,31 +303,31 @@ model ProductService {
   @@map("product_services")
 }
 
-model ProductCategory {
+model Category {
   id        Int      @id @default(autoincrement())
   code      String   @unique
   name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  productCategoryEntries ProductCategoryEntry[]
+  productCategories ProductCategory[]
 
-  @@map("product_categories")
+  @@map("categories")
 }
 
-model ProductCategoryEntry {
-  id                Int      @id @default(autoincrement())
-  productCategoryId Int      @map("product_category_id")
-  productId         Int      @map("product_id")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+model ProductCategory {
+  id         Int      @id @default(autoincrement())
+  productId  Int      @map("product_id")
+  categoryId Int      @map("category_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  product         Product         @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  productCategory ProductCategory @relation(fields: [productCategoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@index([productId])
-  @@index([productCategoryId])
-  @@map("product_category_entries")
+  @@index([categoryId])
+  @@map("product_categories")
 }
 
 enum ProductVariantStatus {
@@ -341,22 +343,18 @@ model ProductVariant {
   name      String
   status    ProductVariantStatus
   price     Int
-  sku       String?
-  stock     Int?
-  weight    Int?
-  location  String?
   createdAt DateTime             @default(now()) @map("created_at")
   updatedAt DateTime             @updatedAt @map("updated_at")
 
-  product                        Product                        @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  productVariantAttributeEntries ProductVariantAttributeEntry[]
-  productVariantDiscounts        ProductVariantDiscount[]
+  product                  Product                   @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productVariantAttributes ProductVariantAttribute[]
+  productVariantDiscounts  ProductVariantDiscount[]
 
   @@index([productId])
   @@map("product_variants")
 }
 
-model ProductVariantAttribute {
+model Attribute {
   id        Int      @id @default(autoincrement())
   code      String   @unique
   name      String
@@ -364,24 +362,24 @@ model ProductVariantAttribute {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  productVariantAttributeEntries ProductVariantAttributeEntry[]
+  productVariantAttributes ProductVariantAttribute[]
 
-  @@map("product_variant_attributes")
+  @@map("attributes")
 }
 
-model ProductVariantAttributeEntry {
-  id                        Int      @id @default(autoincrement())
-  productVariantAttributeId Int      @map("product_variant_attribute_id")
-  productVariantId          Int      @map("product_variant_id")
-  createdAt                 DateTime @default(now()) @map("created_at")
-  updatedAt                 DateTime @updatedAt @map("updated_at")
+model ProductVariantAttribute {
+  id               Int      @id @default(autoincrement())
+  productVariantId Int      @map("product_variant_id")
+  attributeId      Int      @map("attribute_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
-  productVariant          ProductVariant          @relation(fields: [productVariantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  productVariantAttribute ProductVariantAttribute @relation(fields: [productVariantAttributeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  attribute      Attribute      @relation(fields: [attributeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@index([productVariantId])
-  @@index([productVariantAttributeId])
-  @@map("product_variant_attribute_entries")
+  @@index([attributeId])
+  @@map("product_variant_attributes")
 }
 
 enum DiscountLevel {
@@ -425,4 +423,67 @@ model ProductVariantDiscount {
   @@index([productVariantId])
   @@index([discountId])
   @@map("product_variant_discounts")
+}
+
+enum WarehouseStatus {
+  active
+  inactive
+
+  @@map("warehouse_statuses")
+}
+
+model Warehouse {
+  id         Int             @id @default(autoincrement())
+  code       String          @unique
+  name       String
+  status     WarehouseStatus
+  province   String
+  city       String
+  district   String
+  postalCode String          @map("postal_code")
+  address    String          @db.LongText
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+
+  productWarehouses ProductWarehouse[]
+
+  @@map("warehouses")
+}
+
+model ProductWarehouse {
+  id          Int      @id @default(autoincrement())
+  productId   Int      @map("product_id")
+  warehouseId Int      @map("warehouse_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  product   Product   @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([productId])
+  @@index([warehouseId])
+  @@map("product_warehouses")
+}
+
+enum ProductInventoryTracker {
+  active
+  inactive
+
+  @@map("product_inventory_trackers")
+}
+
+model ProductInventory {
+  id        Int                     @id @default(autoincrement())
+  productId Int                     @map("product_id")
+  sku       String?
+  tracker   ProductInventoryTracker
+  stock     Int                     @default(0)
+  weight    Int                     @default(0)
+  createdAt DateTime                @default(now()) @map("created_at")
+  updatedAt DateTime                @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_inventories")
 }

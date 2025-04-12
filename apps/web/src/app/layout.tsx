@@ -1,19 +1,10 @@
 import "~/styles/globals.css";
 
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { site } from "~/lib/constants";
 import { cn, fullUrl } from "~/lib/utils";
-
-const geistSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-geist-mono",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(fullUrl()),
@@ -32,8 +23,8 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          geistSans.variable,
-          geistMono.variable,
+          GeistSans.variable,
+          GeistMono.variable,
         )}
       >
         {children}

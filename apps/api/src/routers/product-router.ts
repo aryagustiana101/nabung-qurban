@@ -32,9 +32,9 @@ app.get(
         services.length > 0
           ? { some: { service: { code: { in: services } } } }
           : undefined,
-      productCategoryEntries:
+      productCategories:
         categories.length > 0
-          ? { some: { productCategory: { code: { in: categories } } } }
+          ? { some: { category: { code: { in: categories } } } }
           : undefined,
     };
 
@@ -44,16 +44,19 @@ app.get(
       orderBy: { id: "desc" },
       skip: page * limit - limit,
       include: {
+        productInventories: { orderBy: { id: "desc" } },
         productServices: { include: { service: true } },
-        productCategoryEntries: { include: { productCategory: true } },
+        productCategories: { include: { category: true } },
+        productWarehouses: {
+          orderBy: { id: "desc" },
+          include: { warehouse: true },
+        },
         productVariants: {
           include: {
+            productVariantAttributes: { include: { attribute: true } },
             productVariantDiscounts: {
               orderBy: { id: "desc" },
               include: { discount: true },
-            },
-            productVariantAttributeEntries: {
-              include: { productVariantAttribute: true },
             },
           },
         },
@@ -93,15 +96,18 @@ app.get(
       where: { id: input.id },
       include: {
         productServices: { include: { service: true } },
-        productCategoryEntries: { include: { productCategory: true } },
+        productInventories: { orderBy: { id: "desc" } },
+        productCategories: { include: { category: true } },
+        productWarehouses: {
+          orderBy: { id: "desc" },
+          include: { warehouse: true },
+        },
         productVariants: {
           include: {
+            productVariantAttributes: { include: { attribute: true } },
             productVariantDiscounts: {
               orderBy: { id: "desc" },
               include: { discount: true },
-            },
-            productVariantAttributeEntries: {
-              include: { productVariantAttribute: true },
             },
           },
         },

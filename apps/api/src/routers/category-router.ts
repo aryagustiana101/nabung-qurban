@@ -1,11 +1,11 @@
 import { zValidator } from "@hono/zod-validator";
 import { computePagination } from "@repo/common";
-import { type Prisma, parseProductCategory } from "@repo/database";
+import { type Prisma, parseCategory } from "@repo/database";
 import { Hono } from "hono";
 import { db } from "~/lib/db";
 import { zodValidatorMiddleware } from "~/lib/middleware";
 import { transformRecord } from "~/lib/utils";
-import { routerSchema } from "~/schemas/product-category-schema";
+import { routerSchema } from "~/schemas/category-schema";
 import type { Env } from "~/types";
 
 const app = new Hono<Env>();
@@ -21,18 +21,18 @@ app.get(
     const keyword = input.keyword;
     const limit = input.limit ?? 10;
 
-    const where: Prisma.ProductCategoryWhereInput = {
+    const where: Prisma.CategoryWhereInput = {
       OR: keyword ? [{ name: { contains: keyword } }] : undefined,
     };
 
-    const productCategories = await db.productCategory.findMany({
+    const categories = await db.category.findMany({
       where,
       take: limit,
       orderBy: { id: "desc" },
       skip: page * limit - limit,
     });
 
-    const count = await db.productCategory.count({ where });
+    const count = await db.category.count({ where });
 
     return c.json(
       {
@@ -42,9 +42,9 @@ app.get(
           pagination: transformRecord(
             computePagination({ type: "offset", count, limit, page }),
           ),
-          records: productCategories.map((productCategory) => {
+          records: categories.map((category) => {
             return transformRecord(
-              parseProductCategory({ locale, timezone, productCategory }),
+              parseCategory({ locale, timezone, category }),
             );
           }),
         },
@@ -61,13 +61,13 @@ app.get(
     const input = c.req.valid("param");
     const { timezone, locale } = c.var;
 
-    const productCategory = await db.productCategory.findUnique({
+    const category = await db.category.findUnique({
       where: { code: input.code },
     });
 
-    if (!productCategory) {
+    if (!category) {
       return c.json(
-        { success: false, message: "Product category not found", result: null },
+        { success: false, message: "Category not found", result: null },
         { status: 404 },
       );
     }
@@ -76,9 +76,7 @@ app.get(
       {
         success: true,
         message: null,
-        result: transformRecord(
-          parseProductCategory({ locale, timezone, productCategory }),
-        ),
+        result: transformRecord(parseCategory({ locale, timezone, category })),
       },
       { status: 200 },
     );

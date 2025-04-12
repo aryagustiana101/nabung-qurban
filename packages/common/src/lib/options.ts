@@ -87,8 +87,17 @@ export const PRODUCT_VARIANT_STATUS_MAP = {
   inactive: "Inactive",
 };
 
+export const PRODUCT_INVENTORY_TRACKERS = ["active", "inactive"] as const;
+export const PRODUCT_INVENTORY_TRACKER_MAP = {
+  active: "Active",
+  inactive: "Inactive",
+};
+
 export const DISCOUNT_LEVELS = ["product_variant"] as const;
 export const DISCOUNT_LEVEL_MAP = { product_variant: "Product Variant" };
 
 export const DISCOUNT_TYPES = ["flat", "percentage"] as const;
 export const DISCOUNT_TYPE_MAP = { flat: "Flat", percentage: "Percentage" };
+
+export const WAREHOUSE_STATUSES = ["active", "inactive"] as const;
+export const WAREHOUSE_STATUS_MAP = { active: "Active", inactive: "Inactive" };

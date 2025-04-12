@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { protect } from "~/lib/middleware";
 import authRouter from "~/routers/auth-router";
+import categoryRouter from "~/routers/category-router";
 import homeRouter from "~/routers/home-router";
-import productCategoryRouter from "~/routers/product-category-router";
 import productRouter from "~/routers/product-router";
 import profileRouter from "~/routers/profile-router";
 import serviceRouter from "~/routers/service-router";
@@ -18,7 +18,7 @@ app.route("/storage", storageRouter);
 
 app.route("/services", serviceRouter);
 app.route("/products", productRouter);
-app.route("/categories", productCategoryRouter);
+app.route("/categories", categoryRouter);
 
 app.on(
   ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
