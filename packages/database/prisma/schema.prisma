@@ -45,6 +45,9 @@ model User {
   userOtpCodes              UserOtpCode[]
   userPasswordResetSessions UserPasswordResetSession[]
   userAddresses             UserAddress[]
+  orderCustomerEntries      OrderCustomerEntry[]
+  userReferrers             UserReferrer[]
+  userAccountApplications   UserApplication[]
 
   @@map("users")
 }
@@ -60,14 +63,55 @@ enum UserAccountType {
 model UserAccount {
   id        Int             @id @default(autoincrement())
   userId    Int             @map("user_id")
-  type      UserAccountType @default(shohibul_qurban)
+  type      UserAccountType
   createdAt DateTime        @default(now()) @map("created_at")
   updatedAt DateTime        @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user                   User                    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userAccountApplication UserAccountApplication?
+  userAccountReferrals   UserAccountReferral[]
 
   @@index([userId])
   @@map("user_accounts")
+}
+
+enum UserAccountReferralStatus {
+  active
+  inactive
+
+  @@map("user_account_referral_statuses")
+}
+
+model UserAccountReferral {
+  id            Int                       @id @default(autoincrement())
+  userAccountId Int                       @map("user_account_id")
+  code          String                    @unique
+  status        UserAccountReferralStatus
+  createdAt     DateTime                  @default(now()) @map("created_at")
+  updatedAt     DateTime                  @updatedAt @map("updated_at")
+
+  userAccount          UserAccount          @relation(fields: [userAccountId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderReferrerEntries OrderReferrerEntry[]
+  userReferrers        UserReferrer[]
+
+  @@index([userAccountId])
+  @@map("user_account_referrals")
+}
+
+model UserReferrer {
+  id                    Int      @id @default(autoincrement())
+  userId                Int      @map("user_id")
+  userAccountReferralId Int?     @map("user_account_referral_id")
+  code                  String
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  user                User                 @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userAccountReferral UserAccountReferral? @relation(fields: [userAccountReferralId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userAccountReferralId])
+  @@map("user_referrers")
 }
 
 enum TokenStatus {
@@ -225,7 +269,8 @@ model UserAddress {
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user                    User                    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderDestinationEntries OrderDestinationEntry[]
 
   @@index([userId])
   @@map("user_addresses")
@@ -284,6 +329,8 @@ model Product {
   productCategories  ProductCategory[]
   productWarehouses  ProductWarehouse[]
   productInventories ProductInventory[]
+  productEntrants    ProductEntrant[]
+  itemEntries        ItemEntry[]
 
   @@map("products")
 }
@@ -341,14 +388,17 @@ model ProductVariant {
   id        Int                  @id @default(autoincrement())
   productId Int                  @map("product_id")
   name      String
+  label     String
   status    ProductVariantStatus
   price     Int
+  rule      Json
   createdAt DateTime             @default(now()) @map("created_at")
   updatedAt DateTime             @updatedAt @map("updated_at")
 
   product                  Product                   @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   productVariantAttributes ProductVariantAttribute[]
   productVariantDiscounts  ProductVariantDiscount[]
+  itemEntries              ItemEntry[]
 
   @@index([productId])
   @@map("product_variants")
@@ -358,11 +408,13 @@ model Attribute {
   id        Int      @id @default(autoincrement())
   code      String   @unique
   name      String
+  label     String
   rule      Json
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   productVariantAttributes ProductVariantAttribute[]
+  itemEntries              ItemEntry[]
 
   @@map("attributes")
 }
@@ -406,6 +458,7 @@ model Discount {
   updatedAt DateTime      @updatedAt @map("updated_at")
 
   productVariantDiscounts ProductVariantDiscount[]
+  itemEntries             ItemEntry[]
 
   @@map("discounts")
 }
@@ -475,10 +528,10 @@ enum ProductInventoryTracker {
 model ProductInventory {
   id        Int                     @id @default(autoincrement())
   productId Int                     @map("product_id")
-  sku       String?
+  sku       String
   tracker   ProductInventoryTracker
-  stock     Int                     @default(0)
-  weight    Int                     @default(0)
+  stock     Int
+  weight    Int
   createdAt DateTime                @default(now()) @map("created_at")
   updatedAt DateTime                @updatedAt @map("updated_at")
 
@@ -486,4 +539,578 @@ model ProductInventory {
 
   @@index([productId])
   @@map("product_inventories")
+}
+
+enum OrderStatus {
+  payment_incomplete
+  payment_complete
+  process
+  delivering
+  delivered
+  completed
+  failed
+  canceled
+
+  @@map("order_statuses")
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  code      String      @unique
+  status    OrderStatus
+  quantity  Int
+  subtotal  Int
+  discount  Int
+  total     Int
+  note      String?
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  orderFees         OrderFee[]
+  orderItems        OrderItem[]
+  orderCustomers    OrderCustomer[]
+  orderHistories    OrderHistory[]
+  orderDestinations OrderDestination[]
+  orderBills        OrderBill[]
+  orderPayments     OrderPayment[]
+  orderSchedules    OrderSchedule[]
+  orderReferrers    OrderReferrer[]
+
+  @@map("orders")
+}
+
+enum OrderFeeType {
+  delivery
+  admin
+
+  @@map("order_fee_types")
+}
+
+model OrderFee {
+  id        Int          @id @default(autoincrement())
+  orderId   Int          @map("order_id")
+  type      OrderFeeType
+  amount    Int
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_fees")
+}
+
+enum OrderHistoryStatus {
+  payment_incomplete
+  payment_complete
+  process
+  delivering
+  delivered
+  completed
+  failed
+  canceled
+
+  @@map("order_history_statuses")
+}
+
+model OrderHistory {
+  id        Int                @id @default(autoincrement())
+  orderId   Int                @map("order_id")
+  status    OrderHistoryStatus
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_histories")
+}
+
+model OrderDestination {
+  id                 Int      @id @default(autoincrement())
+  orderId            Int      @map("order_id")
+  contactName        String   @map("contact_name")
+  contactPhoneNumber String   @map("contact_phone_number")
+  location           Json
+  detail             String   @db.LongText
+  note               String?  @db.LongText
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  order                 Order                  @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderDestinationEntry OrderDestinationEntry?
+
+  @@index([orderId])
+  @@map("order_destinations")
+}
+
+model OrderDestinationEntry {
+  id                 Int      @id @default(autoincrement())
+  orderDestinationId Int      @unique @map("order_destination_id")
+  userAddressId      Int?     @map("user_address_id")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  orderDestination OrderDestination @relation(fields: [orderDestinationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userAddress      UserAddress?     @relation(fields: [userAddressId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  @@index([orderDestinationId])
+  @@index([userAddressId])
+  @@map("order_destination_entries")
+}
+
+model OrderCustomer {
+  id          Int      @id @default(autoincrement())
+  orderId     Int      @map("order_id")
+  name        String
+  phoneNumber String   @map("phone_number")
+  email       String
+  username    String
+  image       String   @db.LongText
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  order              Order               @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderCustomerEntry OrderCustomerEntry?
+
+  @@index([orderId])
+  @@map("order_customers")
+}
+
+model OrderCustomerEntry {
+  id              Int      @id @default(autoincrement())
+  orderCustomerId Int      @unique @map("order_customer_id")
+  userId          Int      @map("user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  orderCustomer OrderCustomer @relation(fields: [orderCustomerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orderCustomerId])
+  @@map("order_customer_entries")
+}
+
+enum OrderItemDiscountType {
+  flat
+  percentage
+
+  @@map("order_item_discount_types")
+}
+
+model OrderItem {
+  id             Int                    @id @default(autoincrement())
+  orderId        Int                    @map("order_id")
+  serviceCode    String                 @map("service_code")
+  serviceName    String                 @map("service_name")
+  name           String
+  sku            String
+  price          Int
+  discountType   OrderItemDiscountType? @map("discount_type")
+  discountValue  Int                    @map("discount_value")
+  quantity       Int
+  weight         Int
+  variantName    String                 @map("variant_name")
+  variantLabel   String                 @map("variant_label")
+  attributeCode  String                 @map("attribute_code")
+  attributeName  String                 @map("attribute_name")
+  attributeLabel String                 @map("attribute_label")
+  image          String                 @db.LongText
+  createdAt      DateTime               @default(now()) @map("created_at")
+  updatedAt      DateTime               @updatedAt @map("updated_at")
+
+  order             Order              @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderItemEntry    OrderItemEntry?
+  orderItemEntrants OrderItemEntrant[]
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model ItemEntry {
+  id               Int      @id @default(autoincrement())
+  productId        Int?     @map("product_id")
+  productVariantId Int?     @map("product_variant_id")
+  attributeId      Int?     @map("attribute_id")
+  discountId       Int?     @map("discount_id")
+  quantity         Int
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  product        Product?        @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  productVariant ProductVariant? @relation(fields: [productVariantId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  attribute      Attribute?      @relation(fields: [attributeId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  discount       Discount?       @relation(fields: [discountId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  orderItemEntry OrderItemEntry?
+
+  @@index([productId])
+  @@index([productVariantId])
+  @@index([attributeId])
+  @@index([discountId])
+  @@map("item_entries")
+}
+
+model OrderItemEntry {
+  id          Int      @id @default(autoincrement())
+  orderItemId Int      @unique @map("order_item_id")
+  itemEntryId Int      @unique @map("item_entry_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  itemEntry ItemEntry @relation(fields: [itemEntryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderItemId])
+  @@index([itemEntryId])
+  @@map("order_item_entries")
+}
+
+enum OrderItemEntrantType {
+  individual
+  institution
+
+  @@map("order_item_entrant_types")
+}
+
+model OrderItemEntrant {
+  id          Int                  @id @default(autoincrement())
+  orderItemId Int                  @map("order_item_id")
+  type        OrderItemEntrantType
+  name        String
+  phoneNumber String               @map("phone_number")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderItemId])
+  @@map("order_item_entrants")
+}
+
+enum OrderBillStatus {
+  pending
+  success
+  failed
+
+  @@map("order_bill_statuses")
+}
+
+model OrderBill {
+  id        Int             @id @default(autoincrement())
+  orderId   Int             @map("order_id")
+  code      String          @unique
+  title     String
+  status    OrderBillStatus
+  amount    Int
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+
+  order              Order              @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderBillInvoices  OrderBillInvoice[]
+  orderBillHistories OrderBillHistory[]
+
+  @@index([orderId])
+  @@map("order_bills")
+}
+
+enum OrderBillHistoryStatus {
+  pending
+  success
+  failed
+
+  @@map("order_bill_history_statuses")
+}
+
+model OrderBillHistory {
+  id          Int                    @id @default(autoincrement())
+  orderBillId Int                    @map("order_bill_id")
+  status      OrderBillHistoryStatus
+  createdAt   DateTime               @default(now()) @map("created_at")
+  updatedAt   DateTime               @updatedAt @map("updated_at")
+
+  orderBill OrderBill @relation(fields: [orderBillId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderBillId])
+  @@map("order_bill_histories")
+}
+
+model OrderBillInvoice {
+  id          Int      @id @default(autoincrement())
+  orderBillId Int      @map("order_bill_id")
+  reference   String
+  status      String
+  url         String   @db.LongText
+  result      Json
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  orderBill OrderBill @relation(fields: [orderBillId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderBillId])
+  @@map("order_bill_invoices")
+}
+
+enum ScheduleStatus {
+  active
+  inactive
+
+  @@map("schedule_statuses")
+}
+
+enum ScheduleType {
+  order_delivery
+
+  @@map("schedule_types")
+}
+
+model Schedule {
+  id        Int            @id @default(autoincrement())
+  label     String
+  status    ScheduleStatus
+  type      ScheduleType
+  date      DateTime
+  options   Json
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  orderScheduleEntries OrderScheduleEntry[]
+
+  @@map("schedules")
+}
+
+model Entrant {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  label       String
+  description String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  productEntrants ProductEntrant[]
+
+  @@map("entrants")
+}
+
+model ProductEntrant {
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id")
+  entrantId Int      @map("entrant_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  entrant Entrant @relation(fields: [entrantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([productId])
+  @@index([entrantId])
+  @@map("product_entrants")
+}
+
+model PaymentOption {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  rule      Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("payment_options")
+}
+
+model OrderPayment {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @map("order_id")
+  code      String
+  name      String
+  label     String
+  count     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_payments")
+}
+
+model OrderSchedule {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @map("order_id")
+  label     String
+  option    String
+  date      DateTime
+  time      Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order                Order                @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderScheduleEntries OrderScheduleEntry[]
+
+  @@index([orderId])
+  @@map("order_schedules")
+}
+
+model OrderScheduleEntry {
+  id              Int      @id @default(autoincrement())
+  orderScheduleId Int      @map("order_schedule_id")
+  scheduleId      Int?     @map("schedule_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  orderSchedule OrderSchedule @relation(fields: [orderScheduleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  schedule      Schedule?     @relation(fields: [scheduleId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  @@index([orderScheduleId])
+  @@index([scheduleId])
+  @@map("order_schedule_entries")
+}
+
+model OrderReferrer {
+  id          Int      @id @default(autoincrement())
+  orderId     Int      @map("order_id")
+  code        String
+  name        String
+  phoneNumber String   @map("phone_number")
+  email       String
+  username    String
+  image       String   @db.LongText
+  commission  Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  order              Order               @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderReferrerEntry OrderReferrerEntry?
+
+  @@index([orderId])
+  @@map("order_referrers")
+}
+
+model OrderReferrerEntry {
+  id                    Int      @id @default(autoincrement())
+  orderReferrerId       Int      @unique @map("order_referrer_id")
+  userAccountReferralId Int      @map("user_account_referral_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  orderReferrer       OrderReferrer       @relation(fields: [orderReferrerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userAccountReferral UserAccountReferral @relation(fields: [userAccountReferralId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([orderReferrerId])
+  @@index([userAccountReferralId])
+  @@map("order_referrer_entries")
+}
+
+enum UserApplicationType {
+  pejuang_qurban
+  antar_qurban
+
+  @@map("user_application_types")
+}
+
+enum UserApplicationLevel {
+  individual
+  institution
+
+  @@map("user_application_levels")
+}
+
+enum UserApplicationStatus {
+  pending
+  process
+  approved
+  rejected
+  canceled
+
+  @@map("user_application_statuses")
+}
+
+enum UserApplicationJacketPickupMethod {
+  pickup
+  delivery
+
+  @@map("user_application_jacket_pickup_methods")
+}
+
+enum UserApplicationJacketPaymentMethod {
+  payment_gateway
+  cash_on_delivery
+
+  @@map("user_application_jacket_payment_methods")
+}
+
+model UserApplication {
+  id                           Int                                @id @default(autoincrement())
+  userId                       Int                                @map("user_id")
+  code                         String                             @unique
+  type                         UserApplicationType
+  level                        UserApplicationLevel
+  status                       UserApplicationStatus
+  name                         String
+  phoneNumber                  String                             @map("phone_number")
+  email                        String
+  address                      String                             @db.LongText
+  bankName                     String                             @map("bank_name")
+  bankAccountNumber            String                             @map("bank_account_number")
+  jacketSize                   String                             @map("jacket_size")
+  jacketPickupMethod           UserApplicationJacketPickupMethod  @map("jacket_pickup_method")
+  jacketPaymentMethod          UserApplicationJacketPaymentMethod @map("jacket_payment_method")
+  identityCardImage            String                             @map("identity_card_image") @db.LongText
+  selfieImage                  String                             @map("selfie_image") @db.LongText
+  institutionName              String                             @map("institution_name")
+  institutionDeedEstablishment String                             @map("institution_deed_establishment")
+  institutionOfficeImage       String                             @map("institution_office_image") @db.LongText
+  vehiclePlateNumber           String                             @map("vehicle_plate_number")
+  vehicleFleetType             String                             @map("vehicle_fleet_type")
+  vehicleCarryingWeight        Int                                @map("vehicle_carrying_weight")
+  vehicleRegistrationImage     String                             @map("vehicle_registration_image") @db.LongText
+  remark                       String?                            @db.LongText
+  createdAt                    DateTime                           @default(now()) @map("created_at")
+  updatedAt                    DateTime                           @updatedAt @map("updated_at")
+
+  user                     User                     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userAccountApplication   UserAccountApplication?
+  userApplicationHistories UserApplicationHistory[]
+
+  @@index([userId])
+  @@map("user_applications")
+}
+
+enum UserApplicationHistoryStatus {
+  pending
+  process
+  approved
+  rejected
+  canceled
+
+  @@map("user_application_history_statuses")
+}
+
+model UserApplicationHistory {
+  id                Int                          @id @default(autoincrement())
+  userApplicationId Int                          @map("user_application_id")
+  status            UserApplicationHistoryStatus
+  createdAt         DateTime                     @default(now()) @map("created_at")
+  updatedAt         DateTime                     @updatedAt @map("updated_at")
+
+  userApplication UserApplication @relation(fields: [userApplicationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([userApplicationId])
+  @@map("user_application_histories")
+}
+
+model UserAccountApplication {
+  id                Int      @id @default(autoincrement())
+  userAccountId     Int      @unique @map("user_id")
+  userApplicationId Int      @unique @map("user_application_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  userAccount     UserAccount     @relation(fields: [userAccountId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userApplication UserApplication @relation(fields: [userApplicationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([userAccountId])
+  @@index([userApplicationId])
+  @@map("user_account_applications")
 }

@@ -5,6 +5,7 @@ import { z } from "zod";
 export const env = createEnv({
   runtimeEnv: dotenv.config({ path: ".env", override: true }).parsed ?? {},
   server: {
+    API_PUBLIC_URL: z.string().url(),
     APP_ENV: z.enum(["development", "production"]).default("development"),
     APP_LOCALE: z.enum(["en", "id"]).default("en"),
     APP_TZ: z.enum(["UTC", "Asia/Jakarta"]),
@@ -24,6 +25,7 @@ export const env = createEnv({
       .min(1)
       .refine((value) => z.number().min(1).safeParse(Number(value)).success)
       .transform((value) => Number(value)),
+    WEB_PUBLIC_URL: z.string().url(),
     WHATSAPP_BUSINESS_OTP_MESSAGE_TEMPLATE_COMPONENTS: z.string().min(1),
     WHATSAPP_BUSINESS_OTP_MESSAGE_TEMPLATE_LANGUAGE: z.string().min(1),
     WHATSAPP_BUSINESS_OTP_MESSAGE_TEMPLATE_NAME: z.string().min(1),

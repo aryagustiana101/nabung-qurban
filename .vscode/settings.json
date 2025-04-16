@@ -19,5 +19,6 @@
     "source.fixAll.biome": "always",
     "source.organizeImports.biome": "always"
   },
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["next/router"]
 }

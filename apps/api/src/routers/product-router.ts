@@ -49,6 +49,7 @@ app.get(
       orderBy: { id: "desc" },
       skip: page * limit - limit,
       include: {
+        productEntrants: { include: { entrant: true } },
         productInventories: { orderBy: { id: "desc" } },
         productServices: { include: { service: true } },
         productCategories: { include: { category: true } },
@@ -100,6 +101,7 @@ app.get(
     const record = await db.product.findUnique({
       where: { id: input.id },
       include: {
+        productEntrants: { include: { entrant: true } },
         productServices: { include: { service: true } },
         productInventories: { orderBy: { id: "desc" } },
         productCategories: { include: { category: true } },

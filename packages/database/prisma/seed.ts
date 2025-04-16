@@ -36,6 +36,125 @@ async function main() {
 
   const userAccounts: Prisma.UserAccountCreateManyInput[] = [
     { id: 1, userId: 2, type: "shohibul_qurban" },
+    { id: 2, userId: 2, type: "pejuang_qurban" },
+    { id: 3, userId: 2, type: "antar_qurban" },
+  ];
+
+  const userApplications: Prisma.UserApplicationCreateManyInput[] = [
+    {
+      id: 1,
+      userId: 2,
+      code: "000000000000",
+      status: "approved",
+      level: "individual",
+      type: "pejuang_qurban",
+      name: env.DB_SEED_USER_NAME,
+      phoneNumber: env.DB_SEED_USER_PHONE_NUMBER,
+      email: env.DB_SEED_USER_EMAIL,
+      address: env.DB_SEED_USER_ADDRESS,
+      bankName: "Bank BCA",
+      bankAccountNumber: "1234567890",
+      jacketSize: "3XL",
+      jacketPickupMethod: "delivery",
+      jacketPaymentMethod: "payment_gateway",
+      identityCardImage:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/placeholder.png",
+      selfieImage:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/placeholder.png",
+      institutionName: "",
+      institutionDeedEstablishment: "",
+      institutionOfficeImage: "",
+      vehiclePlateNumber: "",
+      vehicleFleetType: "",
+      vehicleCarryingWeight: 0,
+      vehicleRegistrationImage: "",
+      remark: null,
+    },
+    {
+      id: 2,
+      userId: 2,
+      code: "000000000001",
+      status: "approved",
+      level: "individual",
+      type: "antar_qurban",
+      name: env.DB_SEED_USER_NAME,
+      phoneNumber: env.DB_SEED_USER_PHONE_NUMBER,
+      email: env.DB_SEED_USER_EMAIL,
+      address: env.DB_SEED_USER_ADDRESS,
+      bankName: "",
+      bankAccountNumber: "",
+      jacketSize: "3XL",
+      jacketPickupMethod: "pickup",
+      jacketPaymentMethod: "cash_on_delivery",
+      identityCardImage:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/placeholder.png",
+      selfieImage:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/placeholder.png",
+      institutionName: "",
+      institutionDeedEstablishment: "",
+      institutionOfficeImage: "",
+      vehiclePlateNumber: "B 1001 ZZZ",
+      vehicleFleetType: "Truck",
+      vehicleCarryingWeight: 1200,
+      vehicleRegistrationImage:
+        "https://nabung-qurban.sgp1.vultrobjects.com/static/placeholder.png",
+      remark: null,
+    },
+  ];
+
+  const userApplicationHistories: Prisma.UserApplicationHistoryCreateManyInput[] =
+    [
+      {
+        id: 1,
+        status: "pending",
+        userApplicationId: 1,
+        createdAt: new Date(2025, 2, 1),
+      },
+      {
+        id: 2,
+        status: "process",
+        userApplicationId: 1,
+        createdAt: new Date(2025, 2, 2),
+      },
+      {
+        id: 3,
+        status: "approved",
+        userApplicationId: 1,
+        createdAt: new Date(2025, 2, 3),
+      },
+      {
+        id: 4,
+        status: "pending",
+        userApplicationId: 2,
+        createdAt: new Date(2025, 3, 1),
+      },
+      {
+        id: 5,
+        status: "process",
+        userApplicationId: 2,
+        createdAt: new Date(2025, 3, 2),
+      },
+      {
+        id: 6,
+        status: "approved",
+        userApplicationId: 2,
+        createdAt: new Date(2025, 3, 3),
+      },
+    ];
+
+  const userAccountApplications: Prisma.UserAccountApplicationCreateManyInput[] =
+    [
+      { id: 1, userAccountId: 2, userApplicationId: 1 },
+      { id: 2, userAccountId: 3, userApplicationId: 2 },
+    ];
+
+  const userAccountReferrals: Prisma.UserAccountReferralCreateManyInput[] = [
+    {
+      id: 1,
+      code: "00000000",
+      status: "active",
+      userAccountId: 2,
+    },
   ];
 
   const tokens: Prisma.TokenCreateManyInput[] = [
@@ -408,6 +527,7 @@ async function main() {
       id: 1,
       code: "1-domba",
       name: "1 Domba",
+      label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
         participant: { min: 1, max: null },
@@ -417,6 +537,7 @@ async function main() {
       id: 2,
       code: "1-unta",
       name: "1 Unta",
+      label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
         participant: { min: 1, max: null },
@@ -426,12 +547,14 @@ async function main() {
       id: 3,
       code: "1-7-unta",
       name: "1/7 Unta",
+      label: "Jenis Hewan Qurban",
       rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
     },
     {
       id: 4,
       code: "1-10-unta",
       name: "1/10 Unta",
+      label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: 1 },
         participant: { min: 10, max: 10 },
@@ -441,6 +564,7 @@ async function main() {
       id: 5,
       code: "1-kambing",
       name: "1 Kambing",
+      label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
         participant: { min: 1, max: null },
@@ -450,6 +574,7 @@ async function main() {
       id: 6,
       code: "1-sapi",
       name: "1 Sapi",
+      label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
         participant: { min: 1, max: null },
@@ -459,12 +584,14 @@ async function main() {
       id: 7,
       code: "1-7-sapi",
       name: "1/7 Sapi",
+      label: "Jenis Hewan Qurban",
       rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
     },
     {
       id: 8,
       code: "1446-H-2025",
       name: "1446 H/2025",
+      label: "Tahun Qurban",
       rule: {
         quantity: { min: 1, max: null },
         participant: { min: 1, max: null },
@@ -474,6 +601,7 @@ async function main() {
       id: 9,
       code: "1447-H-2026",
       name: "1447 H/2026",
+      label: "Tahun Qurban",
       rule: {
         quantity: { min: 1, max: null },
         participant: { min: 1, max: null },
@@ -483,6 +611,7 @@ async function main() {
       id: 10,
       code: "1448-H-2027",
       name: "1448 H/2027",
+      label: "Tahun Qurban",
       rule: {
         quantity: { min: 1, max: null },
         participant: { min: 1, max: null },
@@ -497,6 +626,8 @@ async function main() {
       status: "active",
       price: 30_000_000,
       name: "1446 H/2025",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 2,
@@ -504,6 +635,8 @@ async function main() {
       status: "active",
       price: 5_000_000,
       name: "1446 H/2025",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 3,
@@ -511,6 +644,8 @@ async function main() {
       status: "active",
       price: 4_000_000,
       name: "1447 H/2026",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 4,
@@ -518,6 +653,8 @@ async function main() {
       status: "active",
       price: 70_000_000,
       name: "1446 H/2025",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 5,
@@ -525,6 +662,8 @@ async function main() {
       status: "active",
       price: 65_000_000,
       name: "1447 H/2026",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 6,
@@ -532,6 +671,8 @@ async function main() {
       status: "active",
       price: 55_000_000,
       name: "1448 H/2027",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 7,
@@ -539,6 +680,8 @@ async function main() {
       status: "active",
       price: 25_000_000,
       name: "1446 H/2025",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 8,
@@ -546,6 +689,8 @@ async function main() {
       status: "active",
       price: 20_000_000,
       name: "1447 H/2026",
+      label: "Tahun Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 9,
@@ -553,6 +698,8 @@ async function main() {
       status: "active",
       price: 1_300_000,
       name: "Kambing tipe 1",
+      label: "Jenis Hewan Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 10,
@@ -560,6 +707,8 @@ async function main() {
       status: "active",
       price: 1_500_000,
       name: "Kambing tipe 2",
+      label: "Jenis Hewan Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 11,
@@ -567,6 +716,8 @@ async function main() {
       status: "active",
       price: 3_600_000,
       name: "Sapi tipe 1",
+      label: "Jenis Hewan Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 12,
@@ -574,6 +725,8 @@ async function main() {
       status: "active",
       price: 3_400_000,
       name: "Sapi tipe 2",
+      label: "Jenis Hewan Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 13,
@@ -581,6 +734,8 @@ async function main() {
       status: "active",
       price: 2_600_000,
       name: "Sapi tipe 3",
+      label: "Jenis Hewan Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
     {
       id: 14,
@@ -588,6 +743,8 @@ async function main() {
       status: "active",
       price: 2_400_000,
       name: "Sapi tipe 4",
+      label: "Jenis Hewan Qurban",
+      rule: { year: { min: 2025, max: 2025 } },
     },
   ];
 
@@ -675,48 +832,48 @@ async function main() {
   const productInventories: Prisma.ProductInventoryCreateManyInput[] = [
     {
       id: 1,
+      sku: "",
       stock: 0,
-      sku: null,
       weight: 450,
       productId: 1,
       tracker: "inactive",
     },
     {
       id: 2,
+      sku: "",
       stock: 0,
-      sku: null,
       weight: 40,
       productId: 2,
       tracker: "inactive",
     },
     {
       id: 3,
+      sku: "",
       stock: 0,
-      sku: null,
       weight: 700,
       productId: 3,
       tracker: "inactive",
     },
     {
       id: 4,
+      sku: "",
       stock: 0,
-      sku: null,
       weight: 280,
       productId: 4,
       tracker: "inactive",
     },
     {
       id: 5,
+      sku: "",
       stock: 0,
-      sku: null,
       weight: 40,
       productId: 5,
       tracker: "inactive",
     },
     {
       id: 6,
+      sku: "",
       stock: 0,
-      sku: null,
       weight: 700,
       productId: 6,
       tracker: "inactive",
@@ -771,6 +928,430 @@ async function main() {
     { id: 6, productId: 6, warehouseId: 3 },
   ];
 
+  const entrants: Prisma.EntrantCreateManyInput[] = [
+    {
+      id: 1,
+      name: "Lembaga",
+      label: "Lembaga",
+      code: "institution",
+      description:
+        "Pembelian oleh lembaga misal masjid, yayasan, dan sejenisnya.",
+    },
+    {
+      id: 2,
+      label: "Individu",
+      code: "individual",
+      name: "Individu/Perseorangan",
+      description: "Untuk pembelian oleh  satu atau beberapa individu",
+    },
+  ];
+
+  const productEntrants: Prisma.ProductEntrantCreateManyInput[] = [
+    { id: 1, productId: 1, entrantId: 2 },
+    { id: 2, productId: 1, entrantId: 1 },
+    { id: 3, productId: 2, entrantId: 2 },
+    { id: 4, productId: 2, entrantId: 1 },
+    { id: 5, productId: 3, entrantId: 2 },
+    { id: 6, productId: 3, entrantId: 1 },
+    { id: 7, productId: 4, entrantId: 2 },
+    { id: 8, productId: 4, entrantId: 1 },
+    { id: 9, productId: 5, entrantId: 1 },
+    { id: 10, productId: 6, entrantId: 1 },
+  ];
+
+  const schedules: Prisma.ScheduleCreateManyInput[] = [
+    {
+      id: 1,
+      status: "active",
+      label: "13 Mei 2027",
+      type: "order_delivery",
+      date: new Date(2027, 4, 13),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 2,
+      status: "active",
+      label: "12 Mei 2027",
+      type: "order_delivery",
+      date: new Date(2027, 4, 12),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 3,
+      status: "active",
+      label: "11 Mei 2027",
+      type: "order_delivery",
+      date: new Date(2027, 4, 11),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 4,
+      status: "active",
+      label: "23 Mei 2026",
+      type: "order_delivery",
+      date: new Date(2026, 4, 23),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 5,
+      status: "active",
+      label: "22 Mei 2026",
+      type: "order_delivery",
+      date: new Date(2026, 4, 22),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 6,
+      status: "active",
+      label: "21 Mei 2026",
+      type: "order_delivery",
+      date: new Date(2026, 4, 21),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 7,
+      status: "active",
+      label: "3 Juni 2025",
+      type: "order_delivery",
+      date: new Date(2025, 5, 3),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 8,
+      status: "active",
+      label: "2 Juni 2025",
+      type: "order_delivery",
+      date: new Date(2025, 5, 2),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+    {
+      id: 9,
+      status: "active",
+      label: "1 Juni 2025",
+      type: "order_delivery",
+      date: new Date(2025, 5, 1),
+      options: [
+        {
+          key: "morning",
+          range: "06:00 - 12:00",
+          label: "Pagi (06:00 - 12:00)",
+        },
+        {
+          key: "afternoon",
+          range: "13:00 - 18:00",
+          label: "Siang (13:00 - 18:00)",
+        },
+        {
+          key: "evening",
+          range: "19:00 - 24:00",
+          label: "Malam (19:00 - 24:00)",
+        },
+      ],
+    },
+  ];
+
+  const paymentOptions: Prisma.PaymentOptionCreateManyInput[] = [
+    {
+      id: 1,
+      name: "Cicilan",
+      code: "instalment",
+      rule: {
+        initial: {
+          default: { value: 15, type: "percentage" },
+          terms: [
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 1, max: 10 },
+              min: { value: 15, type: "percentage" },
+              max: null,
+            },
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 10, max: null },
+              min: { value: 25, type: "percentage" },
+              max: null,
+            },
+            {
+              attributes: [
+                "1-unta",
+                "1-7-unta",
+                "1-10-unta",
+                "1-sapi",
+                "1-7-sapi",
+              ],
+              quantity: { min: 1, max: 10 },
+              min: { value: 20, type: "percentage" },
+              max: null,
+            },
+            {
+              attributes: ["1-unta", "1-sapi"],
+              quantity: { min: 10, max: null },
+              min: { value: 35, type: "percentage" },
+              max: null,
+            },
+          ],
+        },
+        settelement: {
+          terms: [
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 1, max: 50 },
+              min: null,
+              max: { day: 7 },
+            },
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 10, max: null },
+              min: null,
+              max: { day: 14 },
+            },
+            {
+              attributes: [
+                "1-unta",
+                "1-7-unta",
+                "1-10-unta",
+                "1-sapi",
+                "1-7-sapi",
+              ],
+              quantity: { min: 1, max: 10 },
+              min: null,
+              max: { day: 7 },
+            },
+            {
+              attributes: ["1-unta", "1-sapi"],
+              quantity: { min: 11, max: 50 },
+              min: null,
+              max: { day: 14 },
+            },
+            {
+              attributes: ["1-unta", "1-sapi"],
+              quantity: { min: 50, max: null },
+              min: null,
+              max: { day: 21 },
+            },
+          ],
+        },
+      },
+    },
+    {
+      id: 2,
+      name: "DP dan Pelunasan",
+      code: "down_payment_and_settlement",
+      rule: {
+        initial: {
+          default: { value: 15, type: "percentage" },
+          terms: [
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 1, max: 10 },
+              min: { value: 15, type: "percentage" },
+              max: null,
+            },
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 10, max: null },
+              min: { value: 25, type: "percentage" },
+              max: null,
+            },
+            {
+              attributes: [
+                "1-unta",
+                "1-7-unta",
+                "1-10-unta",
+                "1-sapi",
+                "1-7-sapi",
+              ],
+              quantity: { min: 1, max: 10 },
+              min: { value: 20, type: "percentage" },
+              max: null,
+            },
+            {
+              attributes: ["1-unta", "1-sapi"],
+              quantity: { min: 10, max: null },
+              min: { value: 35, type: "percentage" },
+              max: null,
+            },
+          ],
+        },
+      },
+    },
+    {
+      id: 3,
+      code: "full_payment",
+      name: "Langsung Lunas",
+      rule: {
+        settelement: {
+          terms: [
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 1, max: 50 },
+              min: null,
+              max: { day: 7 },
+            },
+            {
+              attributes: ["1-domba", "1-kambing"],
+              quantity: { min: 10, max: null },
+              min: null,
+              max: { day: 14 },
+            },
+            {
+              attributes: [
+                "1-unta",
+                "1-7-unta",
+                "1-10-unta",
+                "1-sapi",
+                "1-7-sapi",
+              ],
+              quantity: { min: 1, max: 10 },
+              min: null,
+              max: { day: 7 },
+            },
+            {
+              attributes: ["1-unta", "1-sapi"],
+              quantity: { min: 11, max: 50 },
+              min: null,
+              max: { day: 14 },
+            },
+            {
+              attributes: ["1-unta", "1-sapi"],
+              quantity: { min: 50, max: null },
+              min: null,
+              max: { day: 21 },
+            },
+          ],
+        },
+      },
+    },
+  ];
+
   const result = await db.$transaction(async (trx) => {
     return Promise.all([
       trx.user.createMany({ data: users, skipDuplicates: true }),
@@ -813,13 +1394,36 @@ async function main() {
         skipDuplicates: true,
         data: productInventories,
       }),
-      trx.warehouse.createMany({
-        skipDuplicates: true,
-        data: warehouses,
-      }),
+      trx.warehouse.createMany({ data: warehouses, skipDuplicates: true }),
       trx.productWarehouse.createMany({
         skipDuplicates: true,
         data: productWarehouses,
+      }),
+      trx.entrant.createMany({ data: entrants, skipDuplicates: true }),
+      trx.productEntrant.createMany({
+        skipDuplicates: true,
+        data: productEntrants,
+      }),
+      trx.schedule.createMany({ data: schedules, skipDuplicates: true }),
+      trx.paymentOption.createMany({
+        data: paymentOptions,
+        skipDuplicates: true,
+      }),
+      trx.userAccountReferral.createMany({
+        skipDuplicates: true,
+        data: userAccountReferrals,
+      }),
+      trx.userApplication.createMany({
+        skipDuplicates: true,
+        data: userApplications,
+      }),
+      trx.userAccountApplication.createMany({
+        skipDuplicates: true,
+        data: userAccountApplications,
+      }),
+      trx.userApplicationHistory.createMany({
+        skipDuplicates: true,
+        data: userApplicationHistories,
       }),
     ]);
   });

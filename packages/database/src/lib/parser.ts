@@ -4,6 +4,7 @@ import {
   DISCOUNT_LEVEL_MAP,
   DISCOUNT_TYPES,
   DISCOUNT_TYPE_MAP,
+  ENTRANT_TYPES,
   type Locale,
   PRODUCT_ATTRIBUTE_KEYS,
   PRODUCT_INVENTORY_TRACKERS,
@@ -20,10 +21,24 @@ import {
   TOKEN_STATUSES,
   TOKEN_STATUS_MAP,
   type Timezone,
+  USER_ACCOUNT_REFERRAL_STATUSES,
+  USER_ACCOUNT_REFERRAL_STATUS_MAP,
   USER_ACCOUNT_TYPES,
   USER_ACCOUNT_TYPE_MAP,
   USER_ADDRESS_TYPES,
   USER_ADDRESS_TYPE_MAP,
+  USER_APPLICATION_HISTORY_STATUSES,
+  USER_APPLICATION_HISTORY_STATUS_MAP,
+  USER_APPLICATION_JACKET_PAYMENT_METHODS,
+  USER_APPLICATION_JACKET_PAYMENT_METHOD_MAP,
+  USER_APPLICATION_JACKET_PICKUP_METHODS,
+  USER_APPLICATION_JACKET_PICKUP_METHOD_MAP,
+  USER_APPLICATION_LEVELS,
+  USER_APPLICATION_LEVEL_MAP,
+  USER_APPLICATION_STATUSES,
+  USER_APPLICATION_STATUS_MAP,
+  USER_APPLICATION_TYPES,
+  USER_APPLICATION_TYPE_MAP,
   USER_PASSWORD_RESET_SESSION_ACTIONS,
   USER_PASSWORD_RESET_SESSION_ACTION_MAP,
   USER_PASSWORD_RESET_SESSION_STATUSES,
@@ -407,6 +422,7 @@ export function parseAttribute({
     id: attribute.id,
     code: attribute.code,
     name: attribute.name,
+    label: attribute.label,
     rule: parseAttributeRule({ locale, timezone, attribute }),
     createdAt: attribute.createdAt,
     updatedAt: attribute.updatedAt,
@@ -442,6 +458,9 @@ export function parseAttributeRule({
       participant: z
         .object({ min: z.number().nullish(), max: z.number().nullish() })
         .nullish(),
+      schedule: z.object({
+        year: z.number().nullish(),
+      }),
     })
     .safeParse(attribute.rule).data;
 
@@ -453,6 +472,9 @@ export function parseAttributeRule({
     participant: {
       min: rule?.participant?.min ?? null,
       max: rule?.participant?.max ?? null,
+    },
+    schedule: {
+      year: rule?.schedule?.year ?? null,
     },
   };
 }
@@ -469,6 +491,7 @@ export function parseProductVariant({
   return {
     id: productVariant.id,
     name: productVariant.name,
+    label: productVariant.label,
     status: z.enum(PRODUCT_VARIANT_STATUSES).parse(productVariant.status),
     price: productVariant.price,
     createdAt: productVariant.createdAt,
@@ -510,7 +533,7 @@ export function parseProductInventory({
     createdAt: productInventory.createdAt,
     updatedAt: productInventory.updatedAt,
     fmt: {
-      sku: productInventory.sku ?? "-",
+      sku: productInventory.sku.length <= 0 ? "-" : productInventory.sku,
       tracker: PRODUCT_INVENTORY_TRACKER_MAP[productInventory.tracker],
       stock: formatNumber(productInventory.stock, locale),
       weight: formatNumber(productInventory.weight, locale),
@@ -625,6 +648,230 @@ export function parseWarehouse({
       ),
       updatedAt: formatDate(
         warehouse.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseEntrant({
+  locale,
+  entrant,
+  timezone,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  entrant: Prisma.EntrantGetPayload<object>;
+}) {
+  return {
+    id: entrant.id,
+    code: z.enum(ENTRANT_TYPES).parse(entrant.code),
+    name: entrant.name,
+    label: entrant.label,
+    description: entrant.description,
+    createdAt: entrant.createdAt,
+    updatedAt: entrant.updatedAt,
+    fmt: {
+      createdAt: formatDate(
+        entrant.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        entrant.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseUserAccountReferral({
+  locale,
+  timezone,
+  userAccountReferral,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  userAccountReferral: Prisma.UserAccountReferralGetPayload<object>;
+}) {
+  return {
+    id: userAccountReferral.id,
+    code: userAccountReferral.code,
+    status: z
+      .enum(USER_ACCOUNT_REFERRAL_STATUSES)
+      .parse(userAccountReferral.status),
+    createdAt: userAccountReferral.createdAt,
+    updatedAt: userAccountReferral.updatedAt,
+    fmt: {
+      status: USER_ACCOUNT_REFERRAL_STATUS_MAP[userAccountReferral.status],
+      createdAt: formatDate(
+        userAccountReferral.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        userAccountReferral.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseUserApplication({
+  locale,
+  timezone,
+  userApplication,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  userApplication: Prisma.UserApplicationGetPayload<object>;
+}) {
+  const bank =
+    userApplication.bankName !== "" && userApplication.bankAccountNumber !== ""
+      ? {
+          name: userApplication.bankName,
+          accountNumber: userApplication.bankAccountNumber,
+        }
+      : null;
+
+  const jacket = {
+    size: userApplication.jacketSize,
+    pickupMethod: z
+      .enum(USER_APPLICATION_JACKET_PICKUP_METHODS)
+      .parse(userApplication.jacketPickupMethod),
+    paymentMethod: z
+      .enum(USER_APPLICATION_JACKET_PAYMENT_METHODS)
+      .parse(userApplication.jacketPaymentMethod),
+    fmt: {
+      pickupMethod:
+        USER_APPLICATION_JACKET_PICKUP_METHOD_MAP[
+          userApplication.jacketPickupMethod
+        ],
+      paymentMethod:
+        USER_APPLICATION_JACKET_PAYMENT_METHOD_MAP[
+          userApplication.jacketPaymentMethod
+        ],
+    },
+  };
+
+  const vehicle =
+    userApplication.vehicleFleetType !== "" &&
+    userApplication.vehiclePlateNumber !== "" &&
+    userApplication.vehicleCarryingWeight > 0 &&
+    userApplication.vehicleRegistrationImage !== ""
+      ? {
+          plateNumber: userApplication.vehiclePlateNumber,
+          fleetType: userApplication.vehicleFleetType,
+          carryingWeight: userApplication.vehicleCarryingWeight,
+          registrationImage: userApplication.vehicleRegistrationImage,
+          fmt: {
+            carryingWeight: `${formatNumber(
+              userApplication.vehicleCarryingWeight,
+              locale,
+            )} KG`,
+          },
+        }
+      : null;
+
+  const individual =
+    userApplication.selfieImage !== "" &&
+    userApplication.level === "individual" &&
+    userApplication.identityCardImage !== ""
+      ? {
+          name: userApplication.name,
+          phoneNumber: userApplication.phoneNumber,
+          email: userApplication.email,
+          address: userApplication.address,
+          identityCardImage: userApplication.identityCardImage,
+          selfieImage: userApplication.selfieImage,
+        }
+      : null;
+
+  const institution =
+    userApplication.institutionName !== "" &&
+    userApplication.level === "institution" &&
+    userApplication.institutionOfficeImage !== "" &&
+    userApplication.institutionDeedEstablishment !== ""
+      ? {
+          name: userApplication.institutionName,
+          picName: userApplication.name,
+          phoneNumber: userApplication.phoneNumber,
+          email: userApplication.email,
+          address: userApplication.address,
+          deedEstablishment: userApplication.institutionDeedEstablishment,
+          officeImage: userApplication.institutionOfficeImage,
+        }
+      : null;
+
+  return {
+    id: userApplication.id,
+    type: z.enum(USER_APPLICATION_TYPES).parse(userApplication.type),
+    level: z.enum(USER_APPLICATION_LEVELS).parse(userApplication.level),
+    status: z.enum(USER_APPLICATION_STATUSES).parse(userApplication.status),
+    individual,
+    institution,
+    bank,
+    jacket,
+    vehicle,
+    remark: userApplication.remark,
+    createdAt: userApplication.createdAt,
+    updatedAt: userApplication.updatedAt,
+    fmt: {
+      type: USER_APPLICATION_TYPE_MAP[userApplication.type],
+      level: USER_APPLICATION_LEVEL_MAP[userApplication.level],
+      status: USER_APPLICATION_STATUS_MAP[userApplication.status],
+      remark: userApplication.remark ?? "-",
+      createdAt: formatDate(
+        userApplication.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        userApplication.updatedAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+    },
+  };
+}
+
+export function parseUserApplicationHistory({
+  locale,
+  timezone,
+  userApplicationHistory,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  userApplicationHistory: Prisma.UserApplicationHistoryGetPayload<object>;
+}) {
+  return {
+    id: userApplicationHistory.id,
+    status: z
+      .enum(USER_APPLICATION_HISTORY_STATUSES)
+      .parse(userApplicationHistory.status),
+    createdAt: userApplicationHistory.createdAt,
+    updatedAt: userApplicationHistory.updatedAt,
+    fmt: {
+      status:
+        USER_APPLICATION_HISTORY_STATUS_MAP[userApplicationHistory.status],
+      createdAt: formatDate(
+        userApplicationHistory.createdAt,
+        DATE_FORMAT.NORMAL,
+        locale,
+        timezone,
+      ),
+      updatedAt: formatDate(
+        userApplicationHistory.updatedAt,
         DATE_FORMAT.NORMAL,
         locale,
         timezone,

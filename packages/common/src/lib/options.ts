@@ -21,6 +21,75 @@ export const USER_ACCOUNT_TYPE_MAP = {
   shohibul_qurban: "Shohibul Qurban",
 };
 
+export const USER_APPLICATION_TYPES = [
+  "antar_qurban",
+  "pejuang_qurban",
+] as const;
+export const USER_APPLICATION_TYPE_MAP = {
+  antar_qurban: "Antar Qurban",
+  pejuang_qurban: "Pejuang Qurban",
+};
+
+export const USER_APPLICATION_LEVELS = ["individual", "institution"] as const;
+export const USER_APPLICATION_LEVEL_MAP = {
+  individual: "Individual",
+  institution: "Institution",
+};
+
+export const USER_APPLICATION_STATUSES = [
+  "pending",
+  "process",
+  "approved",
+  "rejected",
+  "canceled",
+] as const;
+export const USER_APPLICATION_STATUS_MAP = {
+  pending: "Pending",
+  process: "Process",
+  approved: "Approved",
+  rejected: "Rejected",
+  canceled: "Canceled",
+};
+
+export const USER_APPLICATION_JACKET_PICKUP_METHODS = [
+  "pickup",
+  "delivery",
+] as const;
+export const USER_APPLICATION_JACKET_PICKUP_METHOD_MAP = {
+  pickup: "Pickup",
+  delivery: "Delivery",
+};
+
+export const USER_APPLICATION_JACKET_PAYMENT_METHODS = [
+  "payment_gateway",
+  "cash_on_delivery",
+] as const;
+export const USER_APPLICATION_JACKET_PAYMENT_METHOD_MAP = {
+  payment_gateway: "Payment Gateway",
+  cash_on_delivery: "Cash on Delivery",
+};
+
+export const USER_APPLICATION_HISTORY_STATUSES = [
+  "pending",
+  "process",
+  "approved",
+  "rejected",
+  "canceled",
+] as const;
+export const USER_APPLICATION_HISTORY_STATUS_MAP = {
+  pending: "Pending",
+  process: "Process",
+  approved: "Approved",
+  rejected: "Rejected",
+  canceled: "Canceled",
+};
+
+export const USER_ACCOUNT_REFERRAL_STATUSES = ["active", "inactive"] as const;
+export const USER_ACCOUNT_REFERRAL_STATUS_MAP = {
+  active: "Active",
+  inactive: "Inactive",
+};
+
 export const USER_PASSWORD_RESET_SESSION_ACTIONS = ["forgot_password"] as const;
 export const USER_PASSWORD_RESET_SESSION_ACTION_MAP = {
   forgot_password: "Forgot Password",
@@ -101,3 +170,10 @@ export const DISCOUNT_TYPE_MAP = { flat: "Flat", percentage: "Percentage" };
 
 export const WAREHOUSE_STATUSES = ["active", "inactive"] as const;
 export const WAREHOUSE_STATUS_MAP = { active: "Active", inactive: "Inactive" };
+
+export const ENTRANT_TYPES = ["individual", "institution"] as const;
+export const SCHEDULE_OPTION_KEYS = [
+  "morning",
+  "afternoon",
+  "evening",
+] as const;

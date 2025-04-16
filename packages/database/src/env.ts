@@ -9,6 +9,7 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     DB_SEED_ROOT_PASSWORD: z.string().min(1),
+    DB_SEED_USER_ADDRESS: z.string().min(1),
     DB_SEED_USER_NAME: z.string().min(1),
     DB_SEED_USER_EMAIL: z.string().email(),
     DB_SEED_USER_PASSWORD: z.string().min(1),

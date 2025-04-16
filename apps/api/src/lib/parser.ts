@@ -4,6 +4,7 @@ import {
   parseAttribute,
   parseCategory,
   parseDiscount,
+  parseEntrant,
   parseProduct,
   parseProductInventory,
   parseProductVariant,
@@ -11,8 +12,12 @@ import {
   type parseToken,
   parseUser,
   parseUserAccount,
+  parseUserAccountReferral,
+  parseUserApplication,
+  parseUserApplicationHistory,
   parseWarehouse,
 } from "@repo/database";
+import { env } from "~/env";
 
 export type UserRecord = ReturnType<typeof parseUser>;
 
@@ -27,7 +32,16 @@ export function parseUserRecord({
   locale: Locale;
   timezone: Timezone;
   defaultValue: { image: string };
-  record: Prisma.UserGetPayload<{ include: { userAccounts: true } }>;
+  record: Prisma.UserGetPayload<{
+    include: {
+      userAccounts: {
+        include: {
+          userAccountReferrals: true;
+          userAccountApplication: { include: { userApplication: true } };
+        };
+      };
+    };
+  }>;
 }) {
   const user = parseUser({ user: record, locale, timezone, defaultValue });
 
@@ -46,7 +60,48 @@ export function parseUserRecord({
     updatedAt: user.updatedAt,
     fmt: user.fmt,
     accounts: record.userAccounts.map((userAccount) => {
-      return parseUserAccount({ userAccount, locale, timezone });
+      const account = parseUserAccount({
+        locale,
+        timezone,
+        userAccount,
+      });
+
+      const userApplication =
+        userAccount?.userAccountApplication?.userApplication;
+
+      return {
+        id: account.id,
+        type: account.type,
+        createdAt: account.createdAt,
+        updatedAt: account.updatedAt,
+        fmt: account.fmt,
+        application: userApplication
+          ? parseUserApplication({ locale, timezone, userApplication })
+          : null,
+        referrals: userAccount.userAccountReferrals.map(
+          (userAccountReferral) => {
+            const referral = parseUserAccountReferral({
+              locale,
+              timezone,
+              userAccountReferral: userAccountReferral,
+            });
+
+            return {
+              id: referral.id,
+              code: referral.code,
+              status: referral.status,
+              createdAt: referral.createdAt,
+              updatedAt: referral.updatedAt,
+              fmt: {
+                url: `${env.WEB_PUBLIC_URL}/register?ref=${referral.code}`,
+                status: referral.fmt.status,
+                createdAt: referral.fmt.createdAt,
+                updatedAt: referral.fmt.updatedAt,
+              },
+            };
+          },
+        ),
+      };
     }),
   };
 }
@@ -61,6 +116,7 @@ export function parseProductRecord({
   record: Prisma.ProductGetPayload<{
     include: {
       productInventories: true;
+      productEntrants: { include: { entrant: true } };
       productServices: { include: { service: true } };
       productCategories: { include: { category: true } };
       productWarehouses: { include: { warehouse: true } };
@@ -107,6 +163,13 @@ export function parseProductRecord({
         locale,
         timezone,
         warehouse: productWarehouse.warehouse,
+      });
+    }),
+    entrants: record.productEntrants.map((productEntrant) => {
+      return parseEntrant({
+        locale,
+        timezone,
+        entrant: productEntrant.entrant,
       });
     }),
     variants: record.productVariants.map((productVariant) => {
@@ -163,5 +226,46 @@ export function parseProductVariantRecord({
         });
       },
     ),
+  };
+}
+
+export function parseUserApplicationRecord({
+  record,
+  locale,
+  timezone,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  record: Prisma.UserApplicationGetPayload<{
+    include: { userApplicationHistories: true };
+  }>;
+}) {
+  const userApplication = parseUserApplication({
+    locale,
+    timezone,
+    userApplication: record,
+  });
+
+  return {
+    id: userApplication.id,
+    type: userApplication.type,
+    level: userApplication.level,
+    status: userApplication.status,
+    individual: userApplication.individual,
+    institution: userApplication.institution,
+    bank: userApplication.bank,
+    jacket: userApplication.jacket,
+    vehicle: userApplication.vehicle,
+    remark: userApplication.remark,
+    createdAt: userApplication.createdAt,
+    updatedAt: userApplication.updatedAt,
+    fmt: userApplication.fmt,
+    histories: record.userApplicationHistories.map((userApplicationHistory) => {
+      return parseUserApplicationHistory({
+        locale,
+        timezone,
+        userApplicationHistory,
+      });
+    }),
   };
 }

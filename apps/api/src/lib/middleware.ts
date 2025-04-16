@@ -89,8 +89,15 @@ export const protect = createMiddleware<Env>(async (c, next) => {
   }
 
   const _user = await db.user.findFirst({
-    include: { userAccounts: true },
     where: { userTokens: { some: { tokenId: token.id } } },
+    include: {
+      userAccounts: {
+        include: {
+          userAccountReferrals: true,
+          userAccountApplication: { include: { userApplication: true } },
+        },
+      },
+    },
   });
 
   const user = _user
