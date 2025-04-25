@@ -2,7 +2,7 @@
   "name": "nabung-qurban",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "pnpm@10.8.1",
+  "packageManager": "pnpm@10.9.0",
   "engines": {
     "node": ">=22",
     "pnpm": ">=10",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "turbo": "^2.5.0",
+    "turbo": "^2.5.2",
     "typescript": "^5.8.3"
   }
 }
