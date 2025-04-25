@@ -1,5 +1,4 @@
 .env
 .turbo/
-dist/
-node_modules/
 generated/
+node_modules/

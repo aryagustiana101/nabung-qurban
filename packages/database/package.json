@@ -2,17 +2,14 @@
   "name": "@repo/database",
   "version": "0.0.0",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "prisma": {
-    "seed": "tsx ./prisma/seed.ts"
-  },
   "publishConfig": {
     "access": "public"
   },
   "exports": {
     ".": "./src/index.ts"
+  },
+  "prisma": {
+    "seed": "tsx ./prisma/seed.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

@@ -627,7 +627,7 @@ async function main() {
       price: 30_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 2,
@@ -636,7 +636,7 @@ async function main() {
       price: 5_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 3,
@@ -645,7 +645,7 @@ async function main() {
       price: 4_000_000,
       name: "1447 H/2026",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2026 } },
     },
     {
       id: 4,
@@ -654,7 +654,7 @@ async function main() {
       price: 70_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 5,
@@ -663,7 +663,7 @@ async function main() {
       price: 65_000_000,
       name: "1447 H/2026",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2026 } },
     },
     {
       id: 6,
@@ -672,7 +672,7 @@ async function main() {
       price: 55_000_000,
       name: "1448 H/2027",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2027 } },
     },
     {
       id: 7,
@@ -681,7 +681,7 @@ async function main() {
       price: 25_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 8,
@@ -690,7 +690,7 @@ async function main() {
       price: 20_000_000,
       name: "1447 H/2026",
       label: "Tahun Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2026 } },
     },
     {
       id: 9,
@@ -699,7 +699,7 @@ async function main() {
       price: 1_300_000,
       name: "Kambing tipe 1",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 10,
@@ -708,7 +708,7 @@ async function main() {
       price: 1_500_000,
       name: "Kambing tipe 2",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 11,
@@ -717,7 +717,7 @@ async function main() {
       price: 3_600_000,
       name: "Sapi tipe 1",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 12,
@@ -726,7 +726,7 @@ async function main() {
       price: 3_400_000,
       name: "Sapi tipe 2",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 13,
@@ -735,7 +735,7 @@ async function main() {
       price: 2_600_000,
       name: "Sapi tipe 3",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
     {
       id: 14,
@@ -744,7 +744,7 @@ async function main() {
       price: 2_400_000,
       name: "Sapi tipe 4",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: 2025, max: 2025 } },
+      rule: { year: { min: null, max: 2025 } },
     },
   ];
 
