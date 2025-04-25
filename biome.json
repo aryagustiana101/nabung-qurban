@@ -25,7 +25,8 @@
       "correctness": {
         "noUnusedVariables": "error",
         "noUnusedImports": { "fix": "none", "level": "error" }
-      }
+      },
+      "a11y": { "useValidAnchor": "off", "useFocusableInteractive": "off" }
     }
   },
   "javascript": {
