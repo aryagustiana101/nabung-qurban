@@ -7,6 +7,7 @@ import {
   id as dateFnsLocaleId,
 } from "date-fns/locale";
 import { customAlphabet, nanoid } from "nanoid";
+import { objectToCamel, objectToSnake } from "ts-case-convert";
 
 export function formatDate(
   value: Date,
@@ -119,4 +120,23 @@ export function computeDiscount({
       fmt: { original: formatMoney(price), final: formatMoney(final) },
     },
   };
+}
+
+export function transformRecord<T extends object>(
+  record: T,
+  format?: "snake",
+): ReturnType<typeof objectToSnake<T>>;
+export function transformRecord<T extends object>(
+  record: T,
+  format?: "camel",
+): ReturnType<typeof objectToCamel<T>>;
+export function transformRecord<T extends object>(
+  record: T,
+  format: "snake" | "camel" = "snake",
+) {
+  if (format === "camel") {
+    return objectToCamel<T>(record);
+  }
+
+  return objectToSnake<T>(record);
 }

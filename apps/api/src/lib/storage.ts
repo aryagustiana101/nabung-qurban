@@ -1,8 +1,11 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import {
+  getS3PublicUrl,
+  getS3UploadPresignedUrl,
+  makeS3Client,
+} from "@repo/storage";
 import { env } from "~/env";
 
-export const s3 = new S3Client({
+export const s3 = makeS3Client({
   region: env.AWS_DEFAULT_REGION,
   endpoint: env.AWS_ENDPOINT_URL,
   credentials: {
@@ -15,17 +18,18 @@ export async function getUploadPresignedUrl(
   file: string,
   opts?: { bucket?: string; expires?: number },
 ) {
-  const expires = opts?.expires ?? 3600;
-  const bucket = opts?.bucket ?? env.AWS_BUCKET;
-
-  return await getSignedUrl(
+  return await getS3UploadPresignedUrl({
     s3,
-    new PutObjectCommand({ Key: file, ACL: "public-read", Bucket: bucket }),
-    { expiresIn: expires },
-  );
+    file,
+    expires: opts?.expires ?? 3600,
+    bucket: opts?.bucket ?? env.AWS_BUCKET,
+  });
 }
 
-export function getPublicUrl(file?: string) {
-  const endpoint = new URL(env.AWS_ENDPOINT_URL);
-  return `${endpoint.protocol}//${env.AWS_BUCKET}.${endpoint.hostname}${file ? `/${file}` : ""}`;
+export function getPublicUrl(file?: string, opts?: { bucket?: string }) {
+  return getS3PublicUrl({
+    file,
+    url: new URL(env.AWS_ENDPOINT_URL),
+    bucket: opts?.bucket ?? env.AWS_BUCKET,
+  });
 }

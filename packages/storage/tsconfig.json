@@ -1,16 +1,16 @@
 {
-  "extends": "@repo/typescript-config/hono.json",
+  "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
+    "lib": ["esnext"],
+    "forceConsistentCasingInFileNames": true,
+    "preserveWatchOutput": true,
+    "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"],
       "@repo/common": ["../../packages/common/src/index"],
       "@repo/common/*": ["../../packages/common/src/*"],
-      "@repo/database": ["../../packages/database/src/index"],
-      "@repo/database/*": ["../../packages/database/src/*"],
       "@repo/storage": ["../../packages/storage/src/index"],
       "@repo/storage/*": ["../../packages/storage/src/*"]
     }
   },
-  "exclude": ["node_modules"]
+  "include": ["**/*.ts"]
 }
