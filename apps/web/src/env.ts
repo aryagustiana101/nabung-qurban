@@ -23,6 +23,10 @@ export const env = createEnv({
     AWS_ENDPOINT_URL: z.string().url(),
     AWS_SECRET_ACCESS_KEY: z.string().min(1),
     DATABASE_URL: z.string().url(),
+    DISABLE_IMAGE_OPTIMIZATION: z
+      .string()
+      .min(1)
+      .transform((value) => value.toLowerCase() === "true"),
   },
   runtimeEnv: {
     AUTH_COOKIE_PREFIX: process.env.AUTH_COOKIE_PREFIX,
@@ -34,6 +38,7 @@ export const env = createEnv({
     AWS_ENDPOINT_URL: process.env.AWS_ENDPOINT_URL,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
+    DISABLE_IMAGE_OPTIMIZATION: process.env.DISABLE_IMAGE_OPTIMIZATION,
     NEXT_PUBLIC_APP_CURRENCY: process.env.NEXT_PUBLIC_APP_CURRENCY,
     NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
     NEXT_PUBLIC_APP_LOCALE: process.env.NEXT_PUBLIC_APP,

@@ -110,12 +110,21 @@ export function Provider({ children }: React.PropsWithChildren) {
 }
 
 function TopLoader() {
-  const { theme } = useTheme();
+  const { theme, systemTheme } = useTheme();
+  const [isMounted, setMounted] = React.useState(false);
 
-  return (
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return isMounted ? (
     <NextTopLoader
       showSpinner={false}
-      color={theme === "dark" ? "#E5E5E5" : "#171717"}
+      color={
+        theme === "dark" || (theme === "system" && systemTheme === "dark")
+          ? "#E5E5E5"
+          : "#171717"
+      }
     />
-  );
+  ) : null;
 }

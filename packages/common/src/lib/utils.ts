@@ -6,6 +6,7 @@ import type {
   RouteParams,
   Timezone,
 } from "@repo/common/types";
+import * as changeCase from "change-case";
 import { format as _formatDate, parse as _parseDate } from "date-fns";
 import {
   enUS as dateFnsLocaleEn,
@@ -13,6 +14,7 @@ import {
 } from "date-fns/locale";
 import { customAlphabet, nanoid } from "nanoid";
 import { match } from "path-to-regexp";
+import queryString, { type IParseOptions, type IStringifyOptions } from "qs";
 import { objectToCamel, objectToSnake } from "ts-case-convert";
 
 export function formatDate(
@@ -155,3 +157,29 @@ export function routeParams<Path extends string>(path: Path, route: string) {
     {} as Record<string, string | string[]>,
   ) as RouteParams<Path>;
 }
+
+export function getInitial(value: string) {
+  const chars = value.trim().split(" ") ?? [];
+
+  return chars
+    ?.reduce((acc, curr, i) => {
+      return i === 0 || i === chars.length - 1
+        ? `${acc}${curr.charAt(0).toUpperCase()}`
+        : acc;
+    }, "")
+    .replaceAll(/[^a-zA-Z]/g, "");
+}
+
+export function convertCase(
+  value: string,
+  format: "capitalCase" = "capitalCase",
+) {
+  return changeCase[format](value);
+}
+
+export const qs = {
+  stringify: (value: Record<string, unknown>, options?: IStringifyOptions) =>
+    queryString.stringify(value, { encodeValuesOnly: true, ...options }),
+  parse: (value: string | Record<string, string>, options?: IParseOptions) =>
+    queryString.parse(value, options),
+};

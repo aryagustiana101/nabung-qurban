@@ -1,3 +1,4 @@
+import * as React from "react";
 import { LogoutForm } from "~/components/forms/auth-form";
 import { Card, CardContent } from "~/components/ui/card";
 
@@ -17,7 +18,7 @@ export default function LogoutPage() {
         </div>
         <Card>
           <CardContent>
-            <LogoutForm />
+            <LogoutForm className="w-full" />
           </CardContent>
         </Card>
       </div>

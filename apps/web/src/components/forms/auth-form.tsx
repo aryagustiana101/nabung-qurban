@@ -4,13 +4,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type FormSchema, formSchema } from "@repo/common/schemas/auth-schema";
 import { useMutation } from "@tanstack/react-query";
 import { signIn, signOut } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useTopLoader } from "nextjs-toploader";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
-
 import {
   Form,
   FormControl,
@@ -20,12 +29,11 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import PasswordInput, { Input } from "~/components/ui/input";
-import { fullUrl } from "~/lib/utils";
+import { cn, fullUrl } from "~/lib/utils";
 
-export function LoginForm() {
+export function LoginForm({ redirect }: { redirect?: string | null }) {
   const router = useRouter();
   const loader = useTopLoader();
-  const searchParams = useSearchParams();
 
   const mutation = useMutation({
     mutationFn: async (input: FormSchema["login"]) => {
@@ -40,7 +48,7 @@ export function LoginForm() {
 
       loader.start();
       toast("Login Success");
-      router.replace(searchParams?.get("from") ?? "/dashboard");
+      router.replace(redirect ?? "/dashboard");
     },
     onError: (error) => {
       console.error(error);
@@ -107,14 +115,27 @@ export function LoginForm() {
   );
 }
 
-export function LogoutForm() {
+export function LogoutForm({
+  className,
+  setDisabled,
+  disabled: _disabled,
+}: {
+  disabled?: boolean;
+  className?: string;
+  setDisabled?: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const loader = useTopLoader();
 
   const mutation = useMutation({
+    onMutate: () => {
+      setDisabled?.(true);
+      loader.start();
+    },
     mutationFn: async () => {
       return await signOut({ redirect: true, redirectTo: fullUrl("/login") });
     },
     onError: (error) => {
+      setDisabled?.(false);
       console.error(error);
       toast("Logout Failed");
       mutation.reset();
@@ -122,22 +143,57 @@ export function LogoutForm() {
   });
 
   const disabled = React.useMemo(
-    () => mutation.isPending || mutation.isSuccess,
-    [mutation.isPending, mutation.isSuccess],
+    () => mutation.isPending || mutation.isSuccess || _disabled,
+    [mutation.isPending, mutation.isSuccess, _disabled],
   );
 
   return (
     <Button
       type="button"
-      className="w-full"
       disabled={disabled}
+      className={cn(className)}
       loading={mutation.isPending}
       onClick={() => {
-        loader.start();
         mutation.mutate();
       }}
     >
       Logout
     </Button>
+  );
+}
+
+export function LogoutDialogForm({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const [disabled, setDisabled] = React.useState(false);
+
+  return (
+    <AlertDialog
+      open={open}
+      onOpenChange={() => {
+        if (!disabled) {
+          setOpen((prev) => !prev);
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Logout</AlertDialogTitle>
+          <AlertDialogDescription>
+            You are about to terminate your session, are you sure?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={disabled}>Cancel</AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <LogoutForm disabled={disabled} setDisabled={setDisabled} />
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

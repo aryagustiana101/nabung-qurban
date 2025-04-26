@@ -105,7 +105,7 @@ export const protect = createMiddleware<Env>(async (c, next) => {
         locale,
         timezone,
         record: _user,
-        defaultValue: { image: getPublicUrl("static/avatar.png") },
+        defaultValue: { image: getPublicUrl("/static/avatar.png") },
       })
     : null;
 

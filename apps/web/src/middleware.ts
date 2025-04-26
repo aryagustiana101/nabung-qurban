@@ -1,4 +1,5 @@
 import { routeParams } from "@repo/common";
+import { qs } from "@repo/common";
 import { type NextRequest, NextResponse } from "next/server";
 import { fullUrl } from "~/lib/utils";
 import type { User } from "~/types";
@@ -21,7 +22,9 @@ export async function middleware(req: NextRequest) {
   ) {
     return NextResponse.redirect(
       new URL(
-        `/login?from=${encodeURIComponent(`${pathname}${req.nextUrl.search}`)}`,
+        `/login?${qs.stringify({
+          from: encodeURIComponent(`${pathname}${req.nextUrl.search}`),
+        })}`,
         req.url,
       ),
       req,

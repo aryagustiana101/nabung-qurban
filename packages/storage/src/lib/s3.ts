@@ -36,5 +36,5 @@ export function getS3PublicUrl({
   file?: string;
   bucket?: string;
 }) {
-  return `${url.protocol}//${bucket}.${url.hostname}${file ? `/${file}` : ""}`;
+  return `${url.protocol}//${bucket}.${url.hostname}${!file?.startsWith?.("/") ? "/" : ""}${file ? `${file}` : ""}`;
 }

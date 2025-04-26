@@ -1,11 +1,18 @@
+import type { SearchParams } from "nuqs/server";
+import * as React from "react";
 import { LoginForm } from "~/components/forms/auth-form";
 import { Card, CardContent } from "~/components/ui/card";
+import { searchParamsCache } from "~/server/search-params";
 
 export const metadata = {
   title: "Login",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: { searchParams: Promise<SearchParams> }) {
+  const input = await searchParamsCache.parse(searchParams);
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -17,7 +24,9 @@ export default function LoginPage() {
         </div>
         <Card>
           <CardContent>
-            <LoginForm />
+            <LoginForm
+              redirect={input.from ? decodeURIComponent(input.from) : null}
+            />
           </CardContent>
         </Card>
       </div>

@@ -72,7 +72,7 @@ const {
                 user,
                 timezone: APP_TZ,
                 locale: APP_LOCALE,
-                defaultValue: { image: getPublicUrl("static/avatar.png") },
+                defaultValue: { image: getPublicUrl("/static/avatar.png") },
               }),
               password: undefined,
             },
