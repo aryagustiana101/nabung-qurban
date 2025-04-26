@@ -8,6 +8,13 @@ export async function middleware(req: NextRequest) {
   const cookie = req.headers.get("cookie");
   const user = cookie ? await getUser(cookie) : null;
 
+  if (pathname === "/") {
+    return NextResponse.redirect(
+      new URL(user ? "/dashboard" : "/login", req.url),
+      req,
+    );
+  }
+
   if (
     !user &&
     resolveRouteRecord(pathname, ["/logout", "/dashboard", "/dashboard/*path"])
@@ -27,6 +34,10 @@ export async function middleware(req: NextRequest) {
     resolveRouteRecord(pathname, ["/dashboard", "/dashboard/*path"])
   ) {
     return NextResponse.redirect(new URL("/logout", req.url), req);
+  }
+
+  if (user && resolveRouteRecord(pathname, ["/login"])) {
+    return NextResponse.redirect(new URL("/dashboard", req.url), req);
   }
 
   return NextResponse.next();

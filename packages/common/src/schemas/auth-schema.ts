@@ -74,3 +74,11 @@ export const apiRouterSchema = {
 export const webRouterSchema = {
   login: z.object({ username: field.username, password: field.password }),
 };
+
+export const formSchema = {
+  login: z.object({ username: field.username, password: field.password }),
+};
+
+export type FormSchema = {
+  [K in keyof typeof formSchema]: z.infer<(typeof formSchema)[K]>;
+};

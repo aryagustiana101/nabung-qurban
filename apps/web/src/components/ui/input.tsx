@@ -1,3 +1,4 @@
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "~/lib/utils";
@@ -15,6 +16,30 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       )}
       {...props}
     />
+  );
+}
+
+export default function PasswordInput({
+  className,
+  ...props
+}: React.ComponentProps<"input">) {
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  return (
+    <div className="relative">
+      <Input
+        {...props}
+        className={cn("pe-9", className)}
+        type={isVisible ? "text" : "password"}
+      />
+      <button
+        type="button"
+        className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+        onClick={() => setIsVisible((prevState) => !prevState)}
+      >
+        {isVisible ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+      </button>
+    </div>
   );
 }
 
