@@ -13,7 +13,7 @@ async function main() {
   const users: Prisma.UserCreateManyInput[] = [
     {
       id: 1,
-      name: "Root",
+      name: "Admin",
       type: "internal",
       username: "root",
       status: "active",
