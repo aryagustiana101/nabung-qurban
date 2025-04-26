@@ -26,7 +26,14 @@
         "noUnusedVariables": "error",
         "noUnusedImports": { "fix": "none", "level": "error" }
       },
-      "a11y": { "useValidAnchor": "off", "useFocusableInteractive": "off" }
+      "a11y": { "useValidAnchor": "off", "useFocusableInteractive": "off" },
+      "nursery": {
+        "useSortedClasses": {
+          "fix": "safe",
+          "level": "error",
+          "options": { "functions": ["cn", "cva"], "attributes": ["tw"] }
+        }
+      }
     }
   },
   "javascript": {

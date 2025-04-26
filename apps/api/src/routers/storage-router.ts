@@ -15,15 +15,14 @@ app.get(
     const input = c.req.valid("query");
     const file = `upload/${randomString()}.${input.file.match(/\.(\w+)$/)?.[1] ?? "png"}`;
 
-    const upload = await getUploadPresignedUrl(file, {
-      expires: input.expires,
-    });
-
     return c.json(
       {
         success: true,
         message: null,
-        result: { upload, public: getPublicUrl(file) },
+        result: {
+          public: getPublicUrl(file),
+          upload: await getUploadPresignedUrl(file, { expires: input.expires }),
+        },
       },
       { status: 200 },
     );

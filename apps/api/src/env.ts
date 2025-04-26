@@ -6,6 +6,7 @@ export const env = createEnv({
   runtimeEnv: dotenv.config({ path: ".env", override: true }).parsed ?? {},
   server: {
     API_PUBLIC_URL: z.string().url(),
+    APP_CURRENCY: z.enum(["idr"]).default("idr"),
     APP_ENV: z.enum(["development", "production"]).default("development"),
     APP_LOCALE: z.enum(["en", "id"]).default("en"),
     APP_TZ: z.enum(["UTC", "Asia/Jakarta"]),

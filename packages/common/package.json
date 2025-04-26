@@ -15,6 +15,7 @@
     "@date-fns/tz": "^1.2.0",
     "date-fns": "^4.1.0",
     "nanoid": "^5.1.5",
+    "path-to-regexp": "^8.2.0",
     "ts-case-convert": "^2.1.0",
     "zod": "^3.24.3"
   },

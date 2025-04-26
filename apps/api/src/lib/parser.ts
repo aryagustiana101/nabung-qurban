@@ -9,7 +9,6 @@ import {
   parseProductInventory,
   parseProductVariant,
   parseService,
-  type parseToken,
   parseUser,
   parseUserAccount,
   parseUserAccountReferral,
@@ -19,9 +18,7 @@ import {
 } from "@repo/database";
 import { env } from "~/env";
 
-export type UserRecord = ReturnType<typeof parseUser>;
-
-export type TokenRecord = ReturnType<typeof parseToken>;
+export type UserRecord = ReturnType<typeof parseUserRecord>;
 
 export function parseUserRecord({
   record,

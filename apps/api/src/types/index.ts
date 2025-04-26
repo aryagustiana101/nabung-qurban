@@ -1,5 +1,6 @@
 import type { Currency, Locale, Timezone } from "@repo/common";
-import type { TokenRecord, UserRecord } from "~/lib/parser";
+import type { parseToken } from "@repo/database";
+import type { UserRecord } from "~/lib/parser";
 
 export type Env = {
   Variables: {
@@ -7,6 +8,6 @@ export type Env = {
     currency: Currency;
     timezone: Timezone;
     user?: UserRecord | null;
-    token?: TokenRecord | null;
+    token?: ReturnType<typeof parseToken> | null;
   };
 };

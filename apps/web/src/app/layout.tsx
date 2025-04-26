@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
+import { Provider } from "~/components/provider";
 import { site } from "~/lib/constants";
 import { cn, fullUrl } from "~/lib/utils";
 
@@ -27,7 +28,7 @@ export default function RootLayout({
           GeistMono.variable,
         )}
       >
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );

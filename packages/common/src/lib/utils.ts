@@ -1,12 +1,18 @@
 import { TZDate } from "@date-fns/tz";
 import { DATE_FORMAT } from "@repo/common/lib/constants";
-import type { Currency, Locale, Timezone } from "@repo/common/types";
+import type {
+  Currency,
+  Locale,
+  RouteParams,
+  Timezone,
+} from "@repo/common/types";
 import { format as _formatDate, parse as _parseDate } from "date-fns";
 import {
   enUS as dateFnsLocaleEn,
   id as dateFnsLocaleId,
 } from "date-fns/locale";
 import { customAlphabet, nanoid } from "nanoid";
+import { match } from "path-to-regexp";
 import { objectToCamel, objectToSnake } from "ts-case-convert";
 
 export function formatDate(
@@ -139,4 +145,13 @@ export function transformRecord<T extends object>(
   }
 
   return objectToSnake<T>(record);
+}
+
+export function routeParams<Path extends string>(path: Path, route: string) {
+  const result = match<RouteParams<Path>>(path)(route);
+
+  return Object.entries(result ? (result?.params ?? {}) : {}).reduce(
+    (acc, [key, value]) => ({ ...(acc ?? {}), [key]: value }),
+    {} as Record<string, string | string[]>,
+  ) as RouteParams<Path>;
 }

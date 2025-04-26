@@ -1,21 +1,6 @@
-import type {
-  CURRENCIES,
-  LOCALES,
-  TIMEZONES,
-} from "@repo/common/lib/constants";
-import type { PRODUCT_ATTRIBUTE_KEYS } from "@repo/common/lib/options";
+import type { parseUser } from "@repo/database";
 
-export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
-
-export type Needed<T, K extends keyof T> = Pick<Required<T>, K>;
-
-export type Timezone = (typeof TIMEZONES)[number];
-
-export type Locale = (typeof LOCALES)[number];
-
-export type Currency = (typeof CURRENCIES)[number];
-
-export type ProductAttributeKey = (typeof PRODUCT_ATTRIBUTE_KEYS)[number];
+export type User = Omit<ReturnType<typeof parseUser>, "password">;
 
 export type RemoveBraces<T extends string> =
   T extends `${infer Name}{${infer _}}`

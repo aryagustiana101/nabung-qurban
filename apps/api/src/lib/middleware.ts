@@ -123,7 +123,7 @@ export const protect = createMiddleware<Env>(async (c, next) => {
 });
 
 export const context = createMiddleware<Env>(async (c, next) => {
-  c.set("currency", "idr");
+  c.set("currency", env.APP_CURRENCY);
   c.set("timezone", env.APP_TZ);
   c.set("locale", env.APP_LOCALE);
 
