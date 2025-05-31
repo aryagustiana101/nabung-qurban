@@ -20,19 +20,19 @@
   },
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
-    "@prisma/client": "^6.6.0",
+    "@prisma/client": "^6.8.2",
     "@repo/common": "workspace:*",
-    "@t3-oss/env-core": "^0.13.0",
+    "@t3-oss/env-core": "^0.13.6",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
-    "zod": "^3.24.3"
+    "zod": "^3.25.42"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^22.15.2",
+    "@types/node": "^22.15.29",
     "dotenv-cli": "^8.0.0",
-    "prisma": "^6.6.0",
-    "tsx": "^4.19.3",
+    "prisma": "^6.8.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
 }
