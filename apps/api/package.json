@@ -20,10 +20,10 @@
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
-    "hono": "^4.7.10",
+    "hono": "^4.7.11",
     "jsonwebtoken": "^9.0.2",
     "ts-case-convert": "^2.1.0",
-    "zod": "^3.25.42"
+    "zod": "^3.25.51"
   },
   "devDependencies": {
     "@hono/vite-build": "^1.6.2",
