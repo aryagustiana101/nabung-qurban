@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import { type SafeParseReturnType, z } from "zod";
 import { env } from "~/env";
 import { db } from "~/lib/db";
-import { parseUserRecord } from "~/lib/parser";
+import { serializeUser } from "~/lib/serializer";
 import { getPublicUrl } from "~/lib/storage";
 import type { Env } from "~/types";
 
@@ -101,7 +101,7 @@ export const protect = createMiddleware<Env>(async (c, next) => {
   });
 
   const user = _user
-    ? parseUserRecord({
+    ? serializeUser({
         locale,
         timezone,
         record: _user,

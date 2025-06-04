@@ -18,9 +18,7 @@ import {
 } from "@repo/database";
 import { env } from "~/env";
 
-export type UserRecord = ReturnType<typeof parseUserRecord>;
-
-export function parseUserRecord({
+export function serializeUser({
   record,
   locale,
   timezone,
@@ -103,7 +101,7 @@ export function parseUserRecord({
   };
 }
 
-export function parseProductRecord({
+export function serializeProduct({
   record,
   locale,
   timezone,
@@ -170,7 +168,7 @@ export function parseProductRecord({
       });
     }),
     variants: record.productVariants.map((productVariant) => {
-      return parseProductVariantRecord({
+      return serializeProductVariant({
         locale,
         timezone,
         record: productVariant,
@@ -179,7 +177,7 @@ export function parseProductRecord({
   };
 }
 
-export function parseProductVariantRecord({
+export function serializeProductVariant({
   record,
   locale,
   timezone,
@@ -209,6 +207,7 @@ export function parseProductVariantRecord({
     name: productVariant.name,
     status: productVariant.status,
     price: productVariant.price,
+    rule: productVariant.rule,
     createdAt: productVariant.createdAt,
     updatedAt: productVariant.updatedAt,
     fmt: productVariant.fmt,
@@ -226,7 +225,7 @@ export function parseProductVariantRecord({
   };
 }
 
-export function parseUserApplicationRecord({
+export function serializeUserApplication({
   record,
   locale,
   timezone,

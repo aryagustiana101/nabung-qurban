@@ -172,7 +172,7 @@ export function getInitial(value: string) {
 
 export function convertCase(
   value: string,
-  format: "capitalCase" = "capitalCase",
+  format: "capitalCase" | "sentenceCase" | "snakeCase" = "capitalCase",
 ) {
   return changeCase[format](value);
 }

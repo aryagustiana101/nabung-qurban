@@ -4,7 +4,7 @@ import type { Prisma } from "@repo/database";
 import { Hono } from "hono";
 import { db } from "~/lib/db";
 import { zodValidatorMiddleware } from "~/lib/middleware";
-import { parseProductRecord } from "~/lib/parser";
+import { serializeProduct } from "~/lib/serializer";
 import { transformRecord } from "~/lib/utils";
 import { routerSchema } from "~/schemas/product-schema";
 import type { Env } from "~/types";
@@ -81,7 +81,7 @@ app.get(
           ),
           records: records.map((record) => {
             return transformRecord(
-              parseProductRecord({ locale, timezone, record }),
+              serializeProduct({ locale, timezone, record }),
             );
           }),
         },
@@ -132,9 +132,7 @@ app.get(
       {
         success: true,
         message: null,
-        result: transformRecord(
-          parseProductRecord({ locale, timezone, record }),
-        ),
+        result: transformRecord(serializeProduct({ locale, timezone, record })),
       },
       { status: 200 },
     );

@@ -1,54 +1,33 @@
 import {
   DATE_FORMAT,
   DISCOUNT_LEVELS,
-  DISCOUNT_LEVEL_MAP,
   DISCOUNT_TYPES,
-  DISCOUNT_TYPE_MAP,
   ENTRANT_TYPES,
   type Locale,
   PRODUCT_ATTRIBUTE_KEYS,
   PRODUCT_INVENTORY_TRACKERS,
-  PRODUCT_INVENTORY_TRACKER_MAP,
   PRODUCT_STATUSES,
-  PRODUCT_STATUS_MAP,
   PRODUCT_VARIANT_STATUSES,
-  PRODUCT_VARIANT_STATUS_MAP,
   SERVICE_CODES,
   SERVICE_LEVELS,
-  SERVICE_LEVEL_MAP,
   SERVICE_STATUSES,
-  SERVICE_STATUS_MAP,
   TOKEN_STATUSES,
-  TOKEN_STATUS_MAP,
   type Timezone,
   USER_ACCOUNT_REFERRAL_STATUSES,
-  USER_ACCOUNT_REFERRAL_STATUS_MAP,
   USER_ACCOUNT_TYPES,
-  USER_ACCOUNT_TYPE_MAP,
   USER_ADDRESS_TYPES,
-  USER_ADDRESS_TYPE_MAP,
   USER_APPLICATION_HISTORY_STATUSES,
-  USER_APPLICATION_HISTORY_STATUS_MAP,
   USER_APPLICATION_JACKET_PAYMENT_METHODS,
-  USER_APPLICATION_JACKET_PAYMENT_METHOD_MAP,
   USER_APPLICATION_JACKET_PICKUP_METHODS,
-  USER_APPLICATION_JACKET_PICKUP_METHOD_MAP,
   USER_APPLICATION_LEVELS,
-  USER_APPLICATION_LEVEL_MAP,
   USER_APPLICATION_STATUSES,
-  USER_APPLICATION_STATUS_MAP,
   USER_APPLICATION_TYPES,
-  USER_APPLICATION_TYPE_MAP,
   USER_PASSWORD_RESET_SESSION_ACTIONS,
-  USER_PASSWORD_RESET_SESSION_ACTION_MAP,
   USER_PASSWORD_RESET_SESSION_STATUSES,
-  USER_PASSWORD_RESET_SESSION_STATUS_MAP,
   USER_STATUSES,
-  USER_STATUS_MAP,
   USER_TYPES,
-  USER_TYPE_MAP,
   WAREHOUSE_STATUSES,
-  WAREHOUSE_STATUS_MAP,
+  convertCase,
   formatDate,
   formatMoney,
   formatNumber,
@@ -81,8 +60,8 @@ export function parseUser({
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     fmt: {
-      status: USER_STATUS_MAP[user.status],
-      type: USER_TYPE_MAP[user.type],
+      status: convertCase(user.status),
+      type: convertCase(user.type),
       image: user.image ?? defaultValue.image,
       verifiedAt: user.verifiedAt
         ? formatDate(user.verifiedAt, DATE_FORMAT.NORMAL, locale, timezone)
@@ -118,7 +97,7 @@ export function parseUserAccount({
     createdAt: userAccount.createdAt,
     updatedAt: userAccount.updatedAt,
     fmt: {
-      type: USER_ACCOUNT_TYPE_MAP[userAccount.type],
+      type: convertCase(userAccount.type),
       createdAt: formatDate(
         userAccount.createdAt,
         DATE_FORMAT.NORMAL,
@@ -154,7 +133,7 @@ export function parseToken({
     createdAt: token.createdAt,
     updatedAt: token.updatedAt,
     fmt: {
-      status: TOKEN_STATUS_MAP[token.status],
+      status: convertCase(token.status),
       expiredAt: token.expiredAt
         ? formatDate(token.expiredAt, DATE_FORMAT.NORMAL, locale, timezone)
         : "-",
@@ -196,10 +175,8 @@ export function parseUserPasswordResetSession({
     createdAt: userPasswordResetSession.createdAt,
     updatedAt: userPasswordResetSession.updatedAt,
     fmt: {
-      action:
-        USER_PASSWORD_RESET_SESSION_ACTION_MAP[userPasswordResetSession.action],
-      status:
-        USER_PASSWORD_RESET_SESSION_STATUS_MAP[userPasswordResetSession.status],
+      action: convertCase(userPasswordResetSession.action),
+      status: convertCase(userPasswordResetSession.status),
       expiredAt: formatDate(
         userPasswordResetSession.expiredAt,
         DATE_FORMAT.NORMAL,
@@ -255,7 +232,7 @@ export function parseUserAddress({
     createdAt: userAddress.createdAt,
     updatedAt: userAddress.updatedAt,
     fmt: {
-      type: USER_ADDRESS_TYPE_MAP[userAddress.type],
+      type: convertCase(userAddress.type),
       note: userAddress.note,
       createdAt: formatDate(
         userAddress.createdAt,
@@ -293,8 +270,8 @@ export function parseService({
     createdAt: service.createdAt,
     updatedAt: service.updatedAt,
     fmt: {
-      status: SERVICE_STATUS_MAP[service.status],
-      level: SERVICE_LEVEL_MAP[service.level],
+      status: convertCase(service.status),
+      level: convertCase(service.level),
       description: service.description ?? "-",
       createdAt: formatDate(
         service.createdAt,
@@ -363,7 +340,7 @@ export function parseProduct({
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
     fmt: {
-      status: PRODUCT_STATUS_MAP[product.status],
+      status: convertCase(product.status),
       createdAt: formatDate(
         product.createdAt,
         DATE_FORMAT.NORMAL,
@@ -458,9 +435,6 @@ export function parseAttributeRule({
       participant: z
         .object({ min: z.number().nullish(), max: z.number().nullish() })
         .nullish(),
-      schedule: z.object({
-        year: z.number().nullish(),
-      }),
     })
     .safeParse(attribute.rule).data;
 
@@ -472,9 +446,6 @@ export function parseAttributeRule({
     participant: {
       min: rule?.participant?.min ?? null,
       max: rule?.participant?.max ?? null,
-    },
-    schedule: {
-      year: rule?.schedule?.year ?? null,
     },
   };
 }
@@ -494,10 +465,11 @@ export function parseProductVariant({
     label: productVariant.label,
     status: z.enum(PRODUCT_VARIANT_STATUSES).parse(productVariant.status),
     price: productVariant.price,
+    rule: parseProductVariantRule({ locale, timezone, productVariant }),
     createdAt: productVariant.createdAt,
     updatedAt: productVariant.updatedAt,
     fmt: {
-      status: PRODUCT_VARIANT_STATUS_MAP[productVariant.status],
+      status: convertCase(productVariant.status),
       price: formatMoney(productVariant.price),
       createdAt: formatDate(
         productVariant.createdAt,
@@ -512,6 +484,26 @@ export function parseProductVariant({
         timezone,
       ),
     },
+  };
+}
+
+export function parseProductVariantRule({
+  productVariant,
+}: {
+  locale: Locale;
+  timezone: Timezone;
+  productVariant: Prisma.ProductVariantGetPayload<object>;
+}) {
+  const rule = z
+    .object({
+      year: z
+        .object({ min: z.number().nullish(), max: z.number().nullish() })
+        .nullish(),
+    })
+    .safeParse(productVariant.rule).data;
+
+  return {
+    year: { min: rule?.year?.min ?? null, max: rule?.year?.max ?? null },
   };
 }
 
@@ -534,7 +526,7 @@ export function parseProductInventory({
     updatedAt: productInventory.updatedAt,
     fmt: {
       sku: productInventory.sku.length <= 0 ? "-" : productInventory.sku,
-      tracker: PRODUCT_INVENTORY_TRACKER_MAP[productInventory.tracker],
+      tracker: convertCase(productInventory.tracker),
       stock: formatNumber(productInventory.stock, locale),
       weight: formatNumber(productInventory.weight, locale),
       createdAt: formatDate(
@@ -572,8 +564,8 @@ export function parseDiscount({
     createdAt: discount.createdAt,
     updatedAt: discount.updatedAt,
     fmt: {
-      level: DISCOUNT_LEVEL_MAP[discount.level],
-      type: DISCOUNT_TYPE_MAP[discount.type],
+      level: convertCase(discount.level),
+      type: convertCase(discount.type),
       value:
         discount.type === "percentage"
           ? `${discount.value}%`
@@ -639,7 +631,7 @@ export function parseWarehouse({
     createdAt: warehouse.createdAt,
     updatedAt: warehouse.updatedAt,
     fmt: {
-      status: WAREHOUSE_STATUS_MAP[warehouse.status],
+      status: convertCase(warehouse.status),
       createdAt: formatDate(
         warehouse.createdAt,
         DATE_FORMAT.NORMAL,
@@ -708,7 +700,7 @@ export function parseUserAccountReferral({
     createdAt: userAccountReferral.createdAt,
     updatedAt: userAccountReferral.updatedAt,
     fmt: {
-      status: USER_ACCOUNT_REFERRAL_STATUS_MAP[userAccountReferral.status],
+      status: convertCase(userAccountReferral.status),
       createdAt: formatDate(
         userAccountReferral.createdAt,
         DATE_FORMAT.NORMAL,
@@ -751,14 +743,8 @@ export function parseUserApplication({
       .enum(USER_APPLICATION_JACKET_PAYMENT_METHODS)
       .parse(userApplication.jacketPaymentMethod),
     fmt: {
-      pickupMethod:
-        USER_APPLICATION_JACKET_PICKUP_METHOD_MAP[
-          userApplication.jacketPickupMethod
-        ],
-      paymentMethod:
-        USER_APPLICATION_JACKET_PAYMENT_METHOD_MAP[
-          userApplication.jacketPaymentMethod
-        ],
+      pickupMethod: convertCase(userApplication.jacketPickupMethod),
+      paymentMethod: convertCase(userApplication.jacketPaymentMethod),
     },
   };
 
@@ -825,9 +811,9 @@ export function parseUserApplication({
     createdAt: userApplication.createdAt,
     updatedAt: userApplication.updatedAt,
     fmt: {
-      type: USER_APPLICATION_TYPE_MAP[userApplication.type],
-      level: USER_APPLICATION_LEVEL_MAP[userApplication.level],
-      status: USER_APPLICATION_STATUS_MAP[userApplication.status],
+      type: convertCase(userApplication.type),
+      level: convertCase(userApplication.level),
+      status: convertCase(userApplication.status),
       remark: userApplication.remark ?? "-",
       createdAt: formatDate(
         userApplication.createdAt,
@@ -862,8 +848,7 @@ export function parseUserApplicationHistory({
     createdAt: userApplicationHistory.createdAt,
     updatedAt: userApplicationHistory.updatedAt,
     fmt: {
-      status:
-        USER_APPLICATION_HISTORY_STATUS_MAP[userApplicationHistory.status],
+      status: convertCase(userApplicationHistory.status),
       createdAt: formatDate(
         userApplicationHistory.createdAt,
         DATE_FORMAT.NORMAL,

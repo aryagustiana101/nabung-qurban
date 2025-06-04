@@ -4,7 +4,7 @@ import type { Prisma } from "@repo/database";
 import { Hono } from "hono";
 import { db } from "~/lib/db";
 import { zodValidatorMiddleware } from "~/lib/middleware";
-import { parseUserApplicationRecord } from "~/lib/parser";
+import { serializeUserApplication } from "~/lib/serializer";
 import { transformRecord } from "~/lib/utils";
 import { routerSchema } from "~/schemas/user-application-schema";
 import type { Env } from "~/types";
@@ -75,7 +75,7 @@ app.get(
           ),
           records: userApplications.map((record) => {
             return transformRecord(
-              parseUserApplicationRecord({ locale, record, timezone }),
+              serializeUserApplication({ locale, record, timezone }),
             );
           }),
         },
@@ -116,7 +116,7 @@ app.get(
         success: true,
         message: null,
         result: transformRecord(
-          parseUserApplicationRecord({
+          serializeUserApplication({
             locale,
             timezone,
             record,
