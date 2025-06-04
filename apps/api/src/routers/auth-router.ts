@@ -1,6 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
 import { CHARACTERS, randomString } from "@repo/common";
-import { apiRouterSchema as routerSchema } from "@repo/common/schemas/auth-schema";
 import { parseToken, parseUserPasswordResetSession } from "@repo/database";
 import bcrypt from "bcryptjs";
 import { addMinutes, addMonths, isAfter } from "date-fns";
@@ -12,6 +11,7 @@ import { decrypt, encrypt } from "~/lib/encryption";
 import { sendOtp } from "~/lib/meta";
 import { protect, zodValidatorMiddleware } from "~/lib/middleware";
 import { transformRecord } from "~/lib/utils";
+import { routerSchema } from "~/schemas/auth-schema";
 import type { Env } from "~/types";
 
 const app = new Hono<Env>();

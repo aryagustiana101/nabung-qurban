@@ -1,5 +1,5 @@
 import { randomString } from "@repo/common";
-import { routerSchema } from "@repo/common/schemas/storage-schema";
+import { routerSchema } from "~/schemas/storage-schema";
 import { getPublicUrl, getUploadPresignedUrl } from "~/server/storage";
 import { createTRPCRouter, publicProcedure } from "~/trpc/init";
 

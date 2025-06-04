@@ -1,6 +1,5 @@
 import "server-only";
 
-import { webRouterSchema as routerSchema } from "@repo/common/schemas/auth-schema";
 import { parseUser } from "@repo/database";
 import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
@@ -10,6 +9,7 @@ import { cache } from "react";
 import { env } from "~/env";
 import { APP_LOCALE, APP_TZ } from "~/lib/constants";
 import { fullUrl } from "~/lib/utils";
+import { routerSchema } from "~/schemas/auth-schema";
 import { db } from "~/server/db";
 import { getPublicUrl } from "~/server/storage";
 

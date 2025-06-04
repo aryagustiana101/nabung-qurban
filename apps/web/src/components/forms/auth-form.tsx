@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type FormSchema, formSchema } from "@repo/common/schemas/auth-schema";
 import { useMutation } from "@tanstack/react-query";
 import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -30,6 +29,7 @@ import {
 } from "~/components/ui/form";
 import PasswordInput, { Input } from "~/components/ui/input";
 import { cn, fullUrl } from "~/lib/utils";
+import { type FormSchema, formSchema } from "~/schemas/auth-schema";
 
 export function LoginForm({ redirect }: { redirect?: string | null }) {
   const router = useRouter();
