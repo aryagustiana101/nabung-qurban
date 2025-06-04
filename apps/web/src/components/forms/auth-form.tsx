@@ -106,7 +106,7 @@ export function LoginForm({ redirect }: { redirect?: string | null }) {
           type="submit"
           className="w-full"
           disabled={disabled}
-          loading={mutation.isPending}
+          isLoading={mutation.isPending}
         >
           Login
         </Button>
@@ -152,7 +152,7 @@ export function LogoutForm({
       type="button"
       disabled={disabled}
       className={cn(className)}
-      loading={mutation.isPending}
+      isLoading={mutation.isPending}
       onClick={() => {
         mutation.mutate();
       }}

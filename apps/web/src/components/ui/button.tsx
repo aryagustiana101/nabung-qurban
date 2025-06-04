@@ -40,13 +40,13 @@ function Button({
   className,
   variant,
   size,
-  loading,
   asChild = false,
+  isLoading = false,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    loading?: boolean;
     asChild?: boolean;
+    isLoading?: boolean;
   }) {
   const Comp = asChild ? Slot : "button";
 
@@ -56,7 +56,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     >
-      {loading ? (
+      {isLoading ? (
         <Spinner
           variant={!variant || variant === "default" ? "secondary" : "default"}
         />

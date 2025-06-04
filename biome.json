@@ -33,7 +33,8 @@
           "level": "error",
           "options": { "functions": ["cn", "cva"], "attributes": ["tw"] }
         }
-      }
+      },
+      "suspicious": { "noArrayIndexKey": "off" }
     }
   },
   "javascript": {
