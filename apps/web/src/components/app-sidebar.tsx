@@ -84,10 +84,7 @@ export type SidebarNavigation = {
   }[];
 };
 
-export function AppSidebar({
-  logo,
-  user: _user,
-}: { user: User; logo: { alt: string; src: string } }) {
+export function AppSidebar({ user: _user }: { user: User }) {
   const session = useSession();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
@@ -135,9 +132,9 @@ export function AppSidebar({
                   <div className="relative size-8 rounded-sm border bg-neutral-50">
                     <Image
                       fill
+                      alt="Logo"
                       sizes="50vw"
-                      alt={logo.alt}
-                      src={logo.src}
+                      src="/static/logo.png"
                       className="object-contain p-0.5"
                     />
                   </div>
@@ -157,7 +154,7 @@ export function AppSidebar({
         <SidebarContent>
           <ScrollArea>
             {navigation.groups.map((group, i) => (
-              <SidebarGroup key={String(i)}>
+              <SidebarGroup key={i}>
                 <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
                 <SidebarMenu>
                   {group.menus.map((menu, j) => {
@@ -169,7 +166,7 @@ export function AppSidebar({
                     ];
 
                     return (
-                      <React.Fragment key={String(j)}>
+                      <React.Fragment key={j}>
                         {menu?.items?.length > 0 ? (
                           <Collapsible
                             asChild
@@ -214,7 +211,7 @@ export function AppSidebar({
                                     const itemActiveDir = item?.active ?? [];
 
                                     return (
-                                      <SidebarMenuSubItem key={String(k)}>
+                                      <SidebarMenuSubItem key={k}>
                                         <SidebarMenuSubButton
                                           asChild
                                           isActive={
@@ -373,7 +370,7 @@ export function AppSidebarShell({
               {breadcrumb?.items?.map((item, i) => {
                 const isLast = i === breadcrumb?.items?.length - 1;
                 return (
-                  <React.Fragment key={String(i)}>
+                  <React.Fragment key={i}>
                     <BreadcrumbItem
                       className={cn(isLast ? "block" : "hidden md:block")}
                     >

@@ -57,10 +57,20 @@ export const TOKEN_STATUSES = ["active", "inactive"] as const;
 export const SERVICE_STATUSES = ["active", "inactive"] as const;
 
 export const SERVICE_LEVELS = ["main", "alternative"] as const;
+
 export const SERVICE_CODES = [
   "daftar-antar-qurban",
   "daftar-pejuang-qurban",
   "ppob",
+  "cicilan-qurban",
+  "beli-qurban-tunai",
+  "tebar-qurban-voucher-cicilan",
+  "tebar-qurban-voucher-beli",
+  "tebar-qurban-cicilan",
+  "tebar-qurban-pembelian",
+] as const;
+
+export const MAIN_SERVICE_CODES = [
   "cicilan-qurban",
   "beli-qurban-tunai",
   "tebar-qurban-voucher-cicilan",
@@ -91,6 +101,7 @@ export const DISCOUNT_TYPES = ["flat", "percentage"] as const;
 export const WAREHOUSE_STATUSES = ["active", "inactive"] as const;
 
 export const ENTRANT_TYPES = ["individual", "institution"] as const;
+
 export const SCHEDULE_OPTION_KEYS = [
   "morning",
   "afternoon",

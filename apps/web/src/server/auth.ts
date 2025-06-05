@@ -11,7 +11,6 @@ import { APP_LOCALE, APP_TZ } from "~/lib/constants";
 import { fullUrl } from "~/lib/utils";
 import { routerSchema } from "~/schemas/auth-schema";
 import { db } from "~/server/db";
-import { getPublicUrl } from "~/server/storage";
 
 const {
   signIn,
@@ -72,7 +71,7 @@ const {
                 user,
                 timezone: APP_TZ,
                 locale: APP_LOCALE,
-                defaultValue: { image: getPublicUrl("/static/avatar.png") },
+                defaultValue: { image: "/static/avatar.png" },
               }),
               password: undefined,
             },

@@ -452,7 +452,7 @@ interface DataTablePaginationProps<TData> {
 
 export function DataTablePagination<TData>({
   table,
-  hideSelectedIndicator = false,
+  hideSelectedIndicator = true,
   pageSizeOptions = [10, 20, 30, 40, 50],
 }: DataTablePaginationProps<TData>) {
   return (

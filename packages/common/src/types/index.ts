@@ -1,6 +1,7 @@
 import type {
   CURRENCIES,
   LOCALES,
+  PAGINATION_TYPES,
   TIMEZONES,
 } from "@repo/common/lib/constants";
 import type { PRODUCT_ATTRIBUTE_KEYS } from "@repo/common/lib/options";
@@ -16,6 +17,8 @@ export type Locale = (typeof LOCALES)[number];
 export type Currency = (typeof CURRENCIES)[number];
 
 export type ProductAttributeKey = (typeof PRODUCT_ATTRIBUTE_KEYS)[number];
+
+export type PaginationType = (typeof PAGINATION_TYPES)[number];
 
 export type RemoveBraces<T extends string> =
   T extends `${infer Name}{${infer _}}`

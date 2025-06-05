@@ -8,10 +8,9 @@ export const dashboardRouter = createTRPCRouter({
 
     const greeting =
       Object.entries({
-        morning: hour >= 5 && hour < 11,
-        afternoon: hour >= 11 && hour < 15,
-        evening: hour >= 15 && hour < 18,
-        night: hour >= 18 || hour < 5,
+        morning: hour >= 5 && hour < 12,
+        afternoon: hour >= 12 && hour < 16,
+        evening: hour >= 16 || hour < 5,
       }).find(([_, value]) => value)?.[0] ?? "day";
 
     return {

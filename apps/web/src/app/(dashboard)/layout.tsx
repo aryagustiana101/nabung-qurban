@@ -3,7 +3,6 @@ import type * as React from "react";
 import { AppSidebar } from "~/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
 import { auth } from "~/server/auth";
-import { getPublicUrl } from "~/server/storage";
 
 export default async function DashboardLayout({
   children,
@@ -19,10 +18,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar
-        user={user}
-        logo={{ alt: "Logo", src: getPublicUrl("/static/logo.png") }}
-      />
+      <AppSidebar user={user} />
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   );

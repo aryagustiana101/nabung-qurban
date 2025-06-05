@@ -1,4 +1,4 @@
-import { __ } from "@repo/common/lib/validation";
+import { __ } from "@repo/common";
 import { z } from "zod";
 
 export const routerSchema = {

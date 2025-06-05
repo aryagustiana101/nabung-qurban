@@ -33,8 +33,8 @@ function getQueryClient() {
 
 export const api = createTRPCReact<AppRouter>();
 
-export type RouterInputs = inferRouterInputs<AppRouter>;
-export type RouterOutputs = inferRouterOutputs<AppRouter>;
+export type RouterInput = inferRouterInputs<AppRouter>;
+export type RouterOutput = inferRouterOutputs<AppRouter>;
 
 function TRPCProvider(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();

@@ -3,6 +3,7 @@ import { DATE_FORMAT } from "@repo/common/lib/constants";
 import type {
   Currency,
   Locale,
+  PaginationType,
   RouteParams,
   Timezone,
 } from "@repo/common/types";
@@ -74,20 +75,31 @@ export function randomString(length = 21, opts?: { characters?: string }) {
 export function computePagination({
   type,
   page,
-  limit,
+  prev,
+  next,
   count,
+  limit,
+  cursor,
 }: {
-  page?: number;
   limit: number;
   count: number;
-  cursor?: number;
-  type: "offset" | "cursor";
+  page?: number | null;
+  prev?: number | null;
+  next?: number | null;
+  type: PaginationType;
+  cursor?: number | null;
 }) {
   return {
     type,
     recordCount: count,
-    offset: { page, pageCount: Math.ceil(count / limit) },
-    cursor: null,
+    offset:
+      type === "offset"
+        ? { page: page ?? null, pageCount: Math.ceil(count / limit) }
+        : null,
+    cursor:
+      type === "cursor"
+        ? { index: cursor ?? null, prev: prev ?? null, next: next ?? null }
+        : null,
   };
 }
 
