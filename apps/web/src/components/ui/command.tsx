@@ -4,6 +4,7 @@ import { Command as CommandPrimitive } from "cmdk";
 import { SearchIcon } from "lucide-react";
 import * as React from "react";
 
+import { Spinner } from "~/components/spinner";
 import {
   Dialog,
   DialogContent,
@@ -62,8 +63,11 @@ function CommandDialog({
 
 function CommandInput({
   className,
+  isLoading = false,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+}: React.ComponentProps<typeof CommandPrimitive.Input> & {
+  isLoading?: boolean;
+}) {
   return (
     <div
       data-slot="command-input-wrapper"
@@ -78,6 +82,7 @@ function CommandInput({
         )}
         {...props}
       />
+      {isLoading ? <Spinner /> : null}
     </div>
   );
 }

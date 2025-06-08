@@ -1,14 +1,9 @@
 import { computePagination } from "@repo/common";
-import {
-  type Prisma,
-  parseCategory,
-  parseProduct,
-  parseService,
-} from "@repo/database";
-import { routerSchema } from "~/schemas/product-schema";
+import { type Prisma, parseCategory } from "@repo/database";
+import { routerSchema } from "~/schemas/category-schema";
 import { createTRPCRouter, protectedProcedure } from "~/trpc/init";
 
-export const productRouter = createTRPCRouter({
+export const categoryRouter = createTRPCRouter({
   getMultiple: protectedProcedure
     .input(routerSchema.getMultiple)
     .query(async ({ input, ctx: { db, locale, timezone } }) => {
@@ -17,26 +12,14 @@ export const productRouter = createTRPCRouter({
       const limit = input.limit ?? 10;
       const pagination = input.pagination ?? "offset";
 
-      const where: Prisma.ProductWhereInput = {
-        status:
-          input.statuses && input.statuses.length > 0
-            ? { in: input.statuses }
-            : undefined,
+      const where: Prisma.CategoryWhereInput = {
         name:
           input.keyword && input.keyword.length > 0
             ? { contains: input.keyword }
             : undefined,
-        productCategories:
-          input.categories && input.categories.length > 0
-            ? { some: { category: { code: { in: input.categories } } } }
-            : undefined,
-        productServices:
-          input.services && input.services.length > 0
-            ? { some: { service: { code: { in: input.services } } } }
-            : undefined,
       };
 
-      const records = await db.product.findMany({
+      const records = await db.category.findMany({
         where,
         take: limit,
         orderBy: { id: "desc" },
@@ -44,10 +27,6 @@ export const productRouter = createTRPCRouter({
           typeof cursor === "number" && pagination === "cursor"
             ? { id: cursor }
             : undefined,
-        include: {
-          productServices: { include: { service: true } },
-          productCategories: { include: { category: true } },
-        },
         skip:
           typeof cursor === "number" && pagination === "cursor"
             ? 1
@@ -56,17 +35,17 @@ export const productRouter = createTRPCRouter({
               : undefined,
       });
 
-      const count = await db.product.count({ where });
+      const count = await db.category.count({ where });
 
       const next =
         pagination === "cursor" && records.length === limit
-          ? (records.at(-1)?.id ?? null)
+          ? (records[records.length - 1]?.id ?? null)
           : null;
 
       const last =
         pagination === "cursor" && limit <= 2
           ? ((
-              await db.product.findFirst({
+              await db.category.findFirst({
                 where,
                 take: 1,
                 select: { id: true },
@@ -88,17 +67,7 @@ export const productRouter = createTRPCRouter({
             next: next !== last ? next : null,
           }),
           records: records.map((record) => {
-            const product = parseProduct({ locale, timezone, product: record });
-
-            return {
-              ...product,
-              services: record.productServices.map(({ service }) =>
-                parseService({ locale, timezone, service: service }),
-              ),
-              categories: record.productCategories.map(({ category }) =>
-                parseCategory({ locale, timezone, category }),
-              ),
-            };
+            return parseCategory({ locale, timezone, category: record });
           }),
         },
       };

@@ -70,7 +70,7 @@ export const SERVICE_CODES = [
   "tebar-qurban-pembelian",
 ] as const;
 
-export const MAIN_SERVICE_CODES = [
+export const ACTIVE_MAIN_SERVICE_CODES = [
   "cicilan-qurban",
   "beli-qurban-tunai",
   "tebar-qurban-voucher-cicilan",

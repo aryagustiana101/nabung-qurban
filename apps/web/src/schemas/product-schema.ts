@@ -1,5 +1,5 @@
 import {
-  MAIN_SERVICE_CODES,
+  ACTIVE_MAIN_SERVICE_CODES,
   PAGINATION_TYPES,
   PRODUCT_STATUSES,
 } from "@repo/common";
@@ -18,8 +18,8 @@ export const routerSchema = {
       .array()
       .transform((value) =>
         value
-          .filter((v) => z.enum(MAIN_SERVICE_CODES).safeParse(v).success)
-          .map((v) => z.enum(MAIN_SERVICE_CODES).parse(v)),
+          .filter((v) => z.enum(ACTIVE_MAIN_SERVICE_CODES).safeParse(v).success)
+          .map((v) => z.enum(ACTIVE_MAIN_SERVICE_CODES).parse(v)),
       )
       .nullish(),
     statuses: z

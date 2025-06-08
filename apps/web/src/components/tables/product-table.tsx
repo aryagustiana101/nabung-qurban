@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  MAIN_SERVICE_CODES,
+  ACTIVE_MAIN_SERVICE_CODES,
   PRODUCT_STATUSES,
   convertCase,
 } from "@repo/common";
@@ -144,11 +144,11 @@ export function ProductTable({
     {
       id: "services",
       label: "Services",
-      options: MAIN_SERVICE_CODES.toSorted((a, b) => a.localeCompare(b)).map(
-        (v) => {
-          return { value: v, label: convertCase(v) };
-        },
-      ),
+      options: ACTIVE_MAIN_SERVICE_CODES.toSorted((a, b) =>
+        a.localeCompare(b),
+      ).map((v) => {
+        return { value: v, label: convertCase(v) };
+      }),
     },
     {
       id: "statuses",
