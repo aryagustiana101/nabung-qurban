@@ -1,51 +1,15 @@
-import { PRODUCT_STATUSES, SERVICE_CODES } from "@repo/common";
+import { FIELD, PRODUCT_STATUSES, SERVICE_CODES } from "@repo/common";
 import { z } from "zod";
 
 export const routerSchema = {
   getMultiple: z.object({
     keyword: z.string().nullish(),
-    page: z
-      .string()
-      .transform((v) => z.number().positive().safeParse(Number(v)).data ?? null)
-      .nullish(),
-    limit: z
-      .string()
-      .transform((v) => z.number().positive().safeParse(Number(v)).data ?? null)
-      .nullish(),
-    statuses: z
-      .string()
-      .transform((value) => value.split(","))
-      .transform((value) =>
-        value
-          .filter((v) => z.enum(PRODUCT_STATUSES).safeParse(v).success)
-          .map((v) => z.enum(PRODUCT_STATUSES).parse(v)),
-      )
-      .nullish(),
-    services: z
-      .string()
-      .transform((value) => value.split(","))
-      .transform((value) =>
-        value
-          .filter((v) => z.enum(SERVICE_CODES).safeParse(v).success)
-          .map((v) => z.enum(SERVICE_CODES).parse(v)),
-      )
-      .nullish(),
-    categories: z
-      .string()
-      .transform((value) => value.split(","))
-      .nullish(),
-    warehouses: z
-      .string()
-      .transform((value) => value.split(","))
-      .nullish(),
+    page: FIELD.TEXT_NUMERIC("page").nullish(),
+    limit: FIELD.TEXT_NUMERIC("limit").nullish(),
+    statuses: FIELD.TEXT_ENUM_ARRAY(PRODUCT_STATUSES).nullish(),
+    services: FIELD.TEXT_ENUM_ARRAY(SERVICE_CODES).nullish(),
+    categories: FIELD.TEXT_ARRAY().nullish(),
+    warehouses: FIELD.TEXT_ARRAY().nullish(),
   }),
-  getSingle: z.object({
-    id: z
-      .string()
-      .refine((v) => z.number().safeParse(Number(v)).success, {
-        params: ["id"],
-        message: "ID must be number",
-      })
-      .transform((v) => z.number().parse(Number(v))),
-  }),
+  getSingle: z.object({ id: FIELD.TEXT_NUMERIC("ID") }),
 };

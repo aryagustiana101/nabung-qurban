@@ -1,29 +1,17 @@
-import { __ } from "@repo/common";
+import { FIELD } from "@repo/common";
 import { z } from "zod";
 
 export const routerSchema = {
   login: z.object({
-    username: z
-      .string({ message: __("required", { attribute: "username" }) })
-      .min(1, { message: __("required", { attribute: "username" }) })
-      .trim(),
-    password: z
-      .string({ message: __("required", { attribute: "password" }) })
-      .min(1, { message: __("required", { attribute: "password" }) })
-      .trim(),
+    username: FIELD.TEXT("username"),
+    password: FIELD.TEXT("password"),
   }),
 };
 
 export const formSchema = {
   login: z.object({
-    username: z
-      .string({ message: __("required", { attribute: "username" }) })
-      .min(1, { message: __("required", { attribute: "username" }) })
-      .trim(),
-    password: z
-      .string({ message: __("required", { attribute: "password" }) })
-      .min(1, { message: __("required", { attribute: "password" }) })
-      .trim(),
+    username: FIELD.TEXT("username"),
+    password: FIELD.TEXT("password"),
   }),
 };
 

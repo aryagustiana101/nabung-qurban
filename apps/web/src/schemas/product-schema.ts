@@ -1,5 +1,6 @@
 import {
   ACTIVE_MAIN_SERVICE_CODES,
+  FIELD,
   PAGINATION_TYPES,
   PRODUCT_STATUSES,
 } from "@repo/common";
@@ -7,29 +8,13 @@ import { z } from "zod";
 
 export const routerSchema = {
   getMultiple: z.object({
-    keyword: z.string().nullish(),
-    pagination: z.enum(PAGINATION_TYPES).nullish(),
-    limit: z.number().nullish(),
     page: z.number().nullish(),
+    limit: z.number().nullish(),
     cursor: z.number().nullish(),
+    keyword: z.string().nullish(),
     categories: z.string().array().nullish(),
-    services: z
-      .string()
-      .array()
-      .transform((value) =>
-        value
-          .filter((v) => z.enum(ACTIVE_MAIN_SERVICE_CODES).safeParse(v).success)
-          .map((v) => z.enum(ACTIVE_MAIN_SERVICE_CODES).parse(v)),
-      )
-      .nullish(),
-    statuses: z
-      .string()
-      .array()
-      .transform((value) =>
-        value
-          .filter((v) => z.enum(PRODUCT_STATUSES).safeParse(v).success)
-          .map((v) => z.enum(PRODUCT_STATUSES).parse(v)),
-      )
-      .nullish(),
+    pagination: z.enum(PAGINATION_TYPES).nullish(),
+    statuses: FIELD.ARRAY_ENUM(PRODUCT_STATUSES).nullish(),
+    services: FIELD.ARRAY_ENUM(ACTIVE_MAIN_SERVICE_CODES).nullish(),
   }),
 };

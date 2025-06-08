@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { CHARACTERS, computePagination, randomString } from "@repo/common";
+import { CHARACTERS, __, computePagination, randomString } from "@repo/common";
 import type { Prisma } from "@repo/database";
 import { Hono } from "hono";
 import { db } from "~/lib/db";
@@ -151,44 +151,56 @@ app.post(
       return c.json(
         {
           success: false,
-          message: "Individual or Institution is required",
+          message: __("required", { attribute: "individual or institution" }),
           result: null,
         },
         { status: 400 },
       );
     }
 
-    if (!individual && input.level === "individual") {
+    if (
+      !individual &&
+      (input.level === "individual" || input.type === "antar_qurban")
+    ) {
       return c.json(
-        { success: false, message: "Individual is required", result: null },
+        {
+          success: false,
+          message: __("required", { attribute: "individual" }),
+          result: null,
+        },
         { status: 400 },
       );
     }
 
     if (!institution && input.level === "institution") {
       return c.json(
-        { success: false, message: "Institution is required", result: null },
+        {
+          success: false,
+          message: __("required", { attribute: "institution" }),
+          result: null,
+        },
         { status: 400 },
       );
     }
 
     if (!bank && input.type === "pejuang_qurban") {
       return c.json(
-        { success: false, message: "Bank is required", result: null },
+        {
+          success: false,
+          message: __("required", { attribute: "bank" }),
+          result: null,
+        },
         { status: 400 },
       );
     }
 
     if (!vehicle && input.type === "antar_qurban") {
       return c.json(
-        { success: false, message: "Vehicle is required", result: null },
-        { status: 400 },
-      );
-    }
-
-    if (!individual && input.type === "antar_qurban") {
-      return c.json(
-        { success: false, message: "Individual is required", result: null },
+        {
+          success: false,
+          message: __("required", { attribute: "vehicle" }),
+          result: null,
+        },
         { status: 400 },
       );
     }

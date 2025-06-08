@@ -20,7 +20,7 @@ export default async function ProductsPage({
       <AppSidebarShell
         breadcrumb={{
           items: [
-            { href: "/", title: "Dashboard" },
+            { href: "/dashboard", title: "Dashboard" },
             { href: null, title: "Products" },
           ],
         }}

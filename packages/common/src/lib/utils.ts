@@ -195,3 +195,14 @@ export const qs = {
   parse: (value: string | Record<string, string>, options?: IParseOptions) =>
     queryString.parse(value, options),
 };
+
+export function transformIndonesiaPhoneNumber(value: string) {
+  return (value.startsWith("08") ? value.replace("08", "628") : value)
+    .replaceAll(" ", "")
+    .replaceAll("+", "")
+    .replace(/\D/g, "");
+}
+
+export function isPhoneNumberLocaleIndonesia(value: string) {
+  return value ? ["62", "08"].includes(value.slice(0, 2)) : true;
+}

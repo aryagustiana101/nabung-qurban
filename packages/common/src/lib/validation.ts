@@ -161,6 +161,9 @@ export const message = {
   url: "The :attribute field must be a valid URL",
   ulid: "The :attribute field must be a valid ULID",
   uuid: "The :attribute field must be a valid UUID",
+  "phone_number.id_locale":
+    "The :attribute field must be a valid Indonesia locale phone number",
+  invalid: "The :attribute field is invalid",
 };
 
 export function __(key: keyof typeof message, params?: Record<string, string>) {
