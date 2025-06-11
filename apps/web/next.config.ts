@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
         source: "/static/:path*",
         destination: `${url.protocol}//${env.AWS_BUCKET}.${url.hostname}/static/:path*`,
       },
+      {
+        source: "/upload/:path*",
+        destination: `${url.protocol}//${env.AWS_BUCKET}.${url.hostname}/upload/:path*`,
+      },
     ];
   },
 };
