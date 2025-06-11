@@ -1,5 +1,6 @@
 import type { Optional } from "@repo/common/types";
 import { parseToken } from "@repo/database";
+import { serializeUser } from "@repo/database";
 import bcrypt from "bcryptjs";
 import { isAfter } from "date-fns";
 import type { Context } from "hono";
@@ -8,7 +9,6 @@ import jwt from "jsonwebtoken";
 import { type SafeParseReturnType, z } from "zod";
 import { env } from "~/env";
 import { db } from "~/lib/db";
-import { serializeUser } from "~/lib/serializer";
 import { getPublicUrl } from "~/lib/storage";
 import type { Env } from "~/types";
 
@@ -105,6 +105,7 @@ export const protect = createMiddleware<Env>(async (c, next) => {
         locale,
         timezone,
         record: _user,
+        publicUrl: env.WEB_PUBLIC_URL,
         defaultValue: { image: getPublicUrl("/static/avatar.png") },
       })
     : null;

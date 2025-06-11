@@ -372,6 +372,7 @@ model ProductCategory {
   product  Product  @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
+  @@unique([productId, categoryId], name: "productCategoryIdentifier", map: "product_category_identifier")
   @@index([productId])
   @@index([categoryId])
   @@map("product_categories")

@@ -1,6 +1,7 @@
 import { randomString } from "@repo/common";
+import { fullUrl } from "~/lib/utils";
 import { routerSchema } from "~/schemas/storage-schema";
-import { getPublicUrl, getUploadPresignedUrl } from "~/server/storage";
+import { getUploadPresignedUrl } from "~/server/storage";
 import { createTRPCRouter, publicProcedure } from "~/trpc/init";
 
 export const storageRouter = createTRPCRouter({
@@ -13,7 +14,7 @@ export const storageRouter = createTRPCRouter({
         success: true,
         message: null,
         result: {
-          public: getPublicUrl(file),
+          public: fullUrl(file),
           upload: await getUploadPresignedUrl(file, { expires: input.expires }),
         },
       };

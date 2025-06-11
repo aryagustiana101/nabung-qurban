@@ -166,10 +166,14 @@ export const message = {
   invalid: "The :attribute field is invalid",
 };
 
-export function __(key: keyof typeof message, params?: Record<string, string>) {
+export function __(
+  key: keyof typeof message,
+  params?: Record<string, string | number>,
+) {
   return (
     message?.[key]?.replace(/:([a-zA-Z_]+)/g, (_, match) => {
-      return params?.[match] ?? `:${match}`;
+      const param = params?.[match];
+      return param ? String(param) : `:${match}`;
     }) ?? ""
   );
 }

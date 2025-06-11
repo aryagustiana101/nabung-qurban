@@ -22,23 +22,21 @@ export const jsonSchema: z.ZodType<Json> = z.lazy(() =>
 );
 
 export const FIELD = {
-  TEXT: (attribute: string) =>
+  TEXT: (attribute: string, min = 1) =>
     z
       .string({ message: __("required", { attribute }) })
-      .min(1, { message: __("required", { attribute }) }),
+      .min(min, { message: __("min.string", { attribute, min }) }),
   TEXT_NUMERIC_DIGITS: (attribute: string, digits: number) =>
     z
       .string({ message: __("required", { attribute }) })
-      .length(digits, {
-        message: __("digits", { attribute, digits: String(digits) }),
-      })
+      .length(digits, { message: __("digits", { attribute, digits }) })
       .refine((v) => z.number().safeParse(Number(v)).success, {
         message: __("numeric", { attribute }),
       }),
-  TEXT_PHONE_NUMBER: (attribute: string) =>
+  TEXT_PHONE_NUMBER: (attribute: string, min = 1) =>
     z
       .string({ message: __("required", { attribute }) })
-      .min(1, { message: __("required", { attribute }) })
+      .min(min, { message: __("min.string", { attribute, min }) })
       .max(15, {
         message: __("max.string", { attribute, max: "15" }),
       })
@@ -77,7 +75,7 @@ export const FIELD = {
           .map((v) => z.enum(values).parse(v)),
       ),
   TEXT_ARRAY: () => z.string().transform((value) => value.split(",")),
-  ARRAY_ENUM: <T extends readonly [string, ...string[]]>(values: T) =>
+  ARRAY_TEXT_ENUM: <T extends readonly [string, ...string[]]>(values: T) =>
     z
       .string()
       .array()
@@ -86,4 +84,10 @@ export const FIELD = {
           .filter((v) => z.enum(values).safeParse(v).success)
           .map((v) => z.enum(values).parse(v)),
       ),
+  ARRAY_TEXT_URL: (attribute: string, option: string, min = 1) =>
+    z
+      .string({ message: __("required", { attribute: option }) })
+      .url({ message: __("url", { attribute: option }) })
+      .array()
+      .min(min, { message: __("min.array", { attribute, min }) }),
 };

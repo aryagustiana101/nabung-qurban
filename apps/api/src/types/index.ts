@@ -1,6 +1,5 @@
 import type { Currency, Locale, Timezone } from "@repo/common";
-import type { parseToken } from "@repo/database";
-import type { serializeUser } from "~/lib/serializer";
+import type { parseToken, serializeUser } from "@repo/database";
 
 export type Env = {
   Variables: {

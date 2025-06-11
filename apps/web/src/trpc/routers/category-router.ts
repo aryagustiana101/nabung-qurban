@@ -72,4 +72,18 @@ export const categoryRouter = createTRPCRouter({
         },
       };
     }),
+  getAllOption: protectedProcedure.query(async ({ ctx: { db } }) => {
+    const records = await db.category.findMany({
+      select: { code: true },
+      orderBy: { name: "asc" },
+    });
+
+    return {
+      success: true,
+      message: null,
+      result: records.map(({ code }) => {
+        return code;
+      }),
+    };
+  }),
 });

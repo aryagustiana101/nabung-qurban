@@ -1,6 +1,6 @@
 import { type Locale, type Timezone, computeDiscount } from "@repo/common";
+import type { Prisma } from "@repo/database/client";
 import {
-  type Prisma,
   parseAttribute,
   parseCategory,
   parseDiscount,
@@ -15,16 +15,17 @@ import {
   parseUserApplication,
   parseUserApplicationHistory,
   parseWarehouse,
-} from "@repo/database";
-import { env } from "~/env";
+} from "@repo/database/lib/parser";
 
 export function serializeUser({
   record,
   locale,
   timezone,
+  publicUrl,
   defaultValue,
 }: {
   locale: Locale;
+  publicUrl: string;
   timezone: Timezone;
   defaultValue: { image: string };
   record: Prisma.UserGetPayload<{
@@ -88,7 +89,7 @@ export function serializeUser({
               createdAt: referral.createdAt,
               updatedAt: referral.updatedAt,
               fmt: {
-                url: `${env.WEB_PUBLIC_URL}/register?ref=${referral.code}`,
+                url: `${publicUrl}/register?ref=${referral.code}`,
                 status: referral.fmt.status,
                 createdAt: referral.fmt.createdAt,
                 updatedAt: referral.fmt.updatedAt,

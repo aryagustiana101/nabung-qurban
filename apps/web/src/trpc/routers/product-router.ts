@@ -1,10 +1,5 @@
 import { computePagination } from "@repo/common";
-import {
-  type Prisma,
-  parseCategory,
-  parseProduct,
-  parseService,
-} from "@repo/database";
+import { type Prisma, serializeProduct } from "@repo/database";
 import { routerSchema } from "~/schemas/product-schema";
 import { createTRPCRouter, protectedProcedure } from "~/trpc/init";
 
@@ -44,16 +39,31 @@ export const productRouter = createTRPCRouter({
           typeof cursor === "number" && pagination === "cursor"
             ? { id: cursor }
             : undefined,
-        include: {
-          productServices: { include: { service: true } },
-          productCategories: { include: { category: true } },
-        },
         skip:
           typeof cursor === "number" && pagination === "cursor"
             ? 1
             : pagination === "offset"
               ? page * limit - limit
               : undefined,
+        include: {
+          productEntrants: { include: { entrant: true } },
+          productInventories: { orderBy: { id: "desc" } },
+          productServices: { include: { service: true } },
+          productCategories: { include: { category: true } },
+          productWarehouses: {
+            orderBy: { id: "desc" },
+            include: { warehouse: true },
+          },
+          productVariants: {
+            include: {
+              productVariantAttributes: { include: { attribute: true } },
+              productVariantDiscounts: {
+                orderBy: { id: "desc" },
+                include: { discount: true },
+              },
+            },
+          },
+        },
       });
 
       const count = await db.product.count({ where });
@@ -88,19 +98,106 @@ export const productRouter = createTRPCRouter({
             next: next !== last ? next : null,
           }),
           records: records.map((record) => {
-            const product = parseProduct({ locale, timezone, product: record });
-
-            return {
-              ...product,
-              services: record.productServices.map(({ service }) =>
-                parseService({ locale, timezone, service: service }),
-              ),
-              categories: record.productCategories.map(({ category }) =>
-                parseCategory({ locale, timezone, category }),
-              ),
-            };
+            return serializeProduct({ record, locale, timezone });
           }),
         },
       };
+    }),
+  getSingle: protectedProcedure
+    .input(routerSchema.getSingle)
+    .query(async ({ input, ctx: { db, locale, timezone } }) => {
+      const record = await db.product.findUnique({
+        where: { id: input.id },
+        include: {
+          productEntrants: { include: { entrant: true } },
+          productInventories: { orderBy: { id: "desc" } },
+          productServices: { include: { service: true } },
+          productCategories: { include: { category: true } },
+          productWarehouses: {
+            orderBy: { id: "desc" },
+            include: { warehouse: true },
+          },
+          productVariants: {
+            include: {
+              productVariantAttributes: { include: { attribute: true } },
+              productVariantDiscounts: {
+                orderBy: { id: "desc" },
+                include: { discount: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (!record) {
+        return { success: false, message: "Product not found", result: null };
+      }
+
+      return {
+        success: true,
+        message: null,
+        result: serializeProduct({ record, locale, timezone }),
+      };
+    }),
+  create: protectedProcedure
+    .input(routerSchema.create)
+    .mutation(async ({ input, ctx: { db } }) => {
+      await db.product.create({
+        data: {
+          name: input.name,
+          status: input.status,
+          thumbnail: input.thumbnail,
+          images: input.images,
+          attributes: input.attributes,
+          productCategories: {
+            createMany: {
+              skipDuplicates: true,
+              data: input.categories.map((category) => ({
+                categoryId: category.id,
+              })),
+            },
+          },
+        },
+      });
+
+      return { success: true, message: null, result: null };
+    }),
+  update: protectedProcedure
+    .input(routerSchema.update)
+    .mutation(async ({ input, ctx: { db } }) => {
+      const product = await db.product.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!product) {
+        return { success: false, message: "Product not found", result: null };
+      }
+
+      await db.product.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          status: input.status,
+          thumbnail: input.thumbnail,
+          images: input.images,
+          attributes: input.attributes,
+          productCategories: input.categories
+            ? {
+                upsert: input.categories.map((category) => ({
+                  update: {},
+                  create: { categoryId: category.id },
+                  where: {
+                    productCategoryIdentifier: {
+                      productId: product.id,
+                      categoryId: category.id,
+                    },
+                  },
+                })),
+              }
+            : undefined,
+        },
+      });
+
+      return { success: true, message: null, result: null };
     }),
 });

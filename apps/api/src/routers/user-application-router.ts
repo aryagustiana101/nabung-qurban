@@ -1,10 +1,9 @@
 import { zValidator } from "@hono/zod-validator";
 import { CHARACTERS, __, computePagination, randomString } from "@repo/common";
-import type { Prisma } from "@repo/database";
+import { type Prisma, serializeUserApplication } from "@repo/database";
 import { Hono } from "hono";
 import { db } from "~/lib/db";
 import { zodValidatorMiddleware } from "~/lib/middleware";
-import { serializeUserApplication } from "~/lib/serializer";
 import { transformRecord } from "~/lib/utils";
 import { routerSchema } from "~/schemas/user-application-schema";
 import type { Env } from "~/types";
