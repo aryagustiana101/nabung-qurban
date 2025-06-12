@@ -1,6 +1,5 @@
 "use client";
 
-import { SelectIcon } from "@radix-ui/react-select";
 import { convertCase } from "@repo/common";
 import {
   type Column,
@@ -22,6 +21,7 @@ import {
   Settings2Icon,
   XIcon,
 } from "lucide-react";
+import { Select as SelectPrimitive } from "radix-ui";
 import * as React from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -228,7 +228,7 @@ export function DataTableColumnHeader<TData, TValue>({
           className="-ml-3 h-8 w-fit border-none text-xs hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent [&>svg:last-child]:hidden"
         >
           {title}
-          <SelectIcon asChild>
+          <SelectPrimitive.Icon asChild>
             {column.getCanSort() && column.getIsSorted() === "desc" ? (
               <ArrowDownIcon className="ml-2.5 size-4" aria-hidden="true" />
             ) : column.getIsSorted() === "asc" ? (
@@ -239,7 +239,7 @@ export function DataTableColumnHeader<TData, TValue>({
                 aria-hidden="true"
               />
             )}
-          </SelectIcon>
+          </SelectPrimitive.Icon>
         </SelectTrigger>
         <SelectContent align="start">
           {column.getCanSort() && (
