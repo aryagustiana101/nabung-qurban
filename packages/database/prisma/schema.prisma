@@ -415,14 +415,23 @@ model ProductVariant {
   @@map("product_variants")
 }
 
+enum AttributeStatus {
+  active
+  inactive
+
+  @@map("attribute_statuses")
+}
+
 model Attribute {
-  id        Int      @id @default(autoincrement())
-  code      String   @unique
+  id        Int             @id @default(autoincrement())
+  code      String          @unique
   name      String
   label     String
+  status    AttributeStatus
+  scopes    Json
   rule      Json
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
 
   productVariantAttributes ProductVariantAttribute[]
   itemEntries              ItemEntry[]
@@ -440,6 +449,7 @@ model ProductVariantAttribute {
   productVariant ProductVariant @relation(fields: [productVariantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   attribute      Attribute      @relation(fields: [attributeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
+  @@unique([productVariantId, attributeId], name: "identifier", map: "product_variant_attribute_identifier")
   @@index([productVariantId])
   @@index([attributeId])
   @@map("product_variant_attributes")
@@ -484,6 +494,7 @@ model ProductVariantDiscount {
   productVariant ProductVariant @relation(fields: [productVariantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   discount       Discount       @relation(fields: [discountId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
+  @@unique([productVariantId, discountId], name: "identifier", map: "product_variant_discount_identifier")
   @@index([productVariantId])
   @@index([discountId])
   @@map("product_variant_discounts")

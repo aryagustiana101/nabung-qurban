@@ -23,6 +23,15 @@ export default async function CreateProductPage({
     statuses: ["active"],
     pagination: "cursor",
   });
+  await api.attribute.getMultiple.prefetchInfinite({
+    scopes: [scope],
+    statuses: ["active"],
+    pagination: "cursor",
+  });
+  await api.discount.getMultiple.prefetchInfinite({
+    pagination: "cursor",
+    levels: ["product_variant"],
+  });
   await api.service.getMultiple.prefetchInfinite({
     scopes: [scope],
     levels: ["main"],

@@ -146,7 +146,7 @@ export const productRouter = createTRPCRouter({
   create: protectedProcedure
     .input(routerSchema.create)
     .mutation(async ({ input, ctx: { db } }) => {
-      await db.product.create({
+      const product = await db.product.create({
         data: {
           name: input.name,
           scope: input.scope,
@@ -200,7 +200,31 @@ export const productRouter = createTRPCRouter({
         },
       });
 
-      return { success: true, message: "Create product success", result: null };
+      for (const variant of input.variants) {
+        await db.productVariant.create({
+          data: {
+            name: variant.name,
+            rule: variant.rule,
+            label: variant.label,
+            price: variant.price,
+            status: variant.status,
+            productId: product.id,
+            productVariantAttributes: {
+              createMany: {
+                skipDuplicates: true,
+                data: variant.attributes.map((attribute) => ({
+                  attributeId: attribute.id,
+                })),
+              },
+            },
+            productVariantDiscounts: variant.discount
+              ? { create: { discountId: variant.discount.id } }
+              : undefined,
+          },
+        });
+      }
+
+      return { success: true, message: "Save product success", result: null };
     }),
   update: protectedProcedure
     .input(routerSchema.update)
@@ -294,6 +318,34 @@ export const productRouter = createTRPCRouter({
         },
       });
 
-      return { success: true, message: "Update product success", result: null };
+      await db.productVariant.deleteMany({
+        where: { productId: product.id },
+      });
+
+      for (const variant of input.variants ?? []) {
+        await db.productVariant.create({
+          data: {
+            name: variant.name,
+            rule: variant.rule,
+            label: variant.label,
+            price: variant.price,
+            status: variant.status,
+            productId: product.id,
+            productVariantAttributes: {
+              createMany: {
+                skipDuplicates: true,
+                data: variant.attributes.map((attribute) => ({
+                  attributeId: attribute.id,
+                })),
+              },
+            },
+            productVariantDiscounts: variant.discount
+              ? { create: { discountId: variant.discount.id } }
+              : undefined,
+          },
+        });
+      }
+
+      return { success: true, message: "Save product success", result: null };
     }),
 });

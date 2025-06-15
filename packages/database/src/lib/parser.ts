@@ -1,4 +1,6 @@
 import {
+  ATTRIBUTE_SCOPES,
+  ATTRIBUTE_STATUSES,
   DATE_FORMAT,
   DISCOUNT_LEVELS,
   DISCOUNT_TYPES,
@@ -267,7 +269,7 @@ export function parseService({
     name: service.name,
     status: z.enum(SERVICE_STATUSES).parse(service.status),
     level: z.enum(SERVICE_LEVELS).parse(service.level),
-    scopes: z.enum(SERVICE_SCOPES).array().parse(service.scopes),
+    scopes: z.enum(SERVICE_SCOPES).array().safeParse(service.scopes).data ?? [],
     description: service.description,
     image: service.image,
     createdAt: service.createdAt,
@@ -405,10 +407,14 @@ export function parseAttribute({
     code: attribute.code,
     name: attribute.name,
     label: attribute.label,
+    status: z.enum(ATTRIBUTE_STATUSES).parse(attribute.status),
+    scopes:
+      z.enum(ATTRIBUTE_SCOPES).array().safeParse(attribute.scopes).data ?? [],
     rule: parseAttributeRule({ locale, timezone, attribute }),
     createdAt: attribute.createdAt,
     updatedAt: attribute.updatedAt,
     fmt: {
+      status: convertCase(attribute.status),
       createdAt: formatDate(
         attribute.createdAt,
         DATE_FORMAT.NORMAL,

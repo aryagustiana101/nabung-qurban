@@ -92,7 +92,7 @@ export function FileInput({
       {children}
     </DropzoneField>
   ) : (
-    <div className="flex w-full flex-col gap-2 rounded-md border p-2 text-sm">
+    <div className="flex w-full flex-col gap-4 rounded-md border p-4 text-sm">
       <div className="w-full">
         <DropzoneField
           accept={accept}
@@ -109,7 +109,7 @@ export function FileInput({
             isLoading={isUploading}
             disabled={disabled || remaining <= 0}
           >
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-4">
               <UploadIcon className="size-4" />
               <span>Upload</span>
             </div>
@@ -126,7 +126,7 @@ export function FileInput({
               onValueChange?.(urls);
             }}
           >
-            <SortableContent className="flex flex-col gap-2">
+            <SortableContent className="flex flex-col gap-4">
               {value.map((url, i) => {
                 const isImage = [".png", ".jpg", ".jpeg", ".gif"].some((ext) =>
                   url.toLowerCase().endsWith(ext),
@@ -144,7 +144,7 @@ export function FileInput({
                             className="size-8"
                             disabled={disabled}
                           >
-                            <GripVerticalIcon className="size-4" />
+                            <GripVerticalIcon />
                           </Button>
                         </SortableItemHandle>
                         <div
@@ -169,11 +169,11 @@ export function FileInput({
                             <FileIcon className="size-6" />
                           )}
                         </div>
-                        <p className="line-clamp-1">
+                        <p className="line-clamp-1 flex-1">
                           <Link
                             href={url}
                             target="_blank"
-                            className="line-clamp-1 text-sm underline hover:opacity-80"
+                            className="line-clamp-1 text-primary text-sm underline-offset-4 hover:underline"
                           >
                             {url}
                           </Link>
@@ -193,7 +193,7 @@ export function FileInput({
                           setRemaining((prev) => prev + 1);
                         }}
                       >
-                        <XIcon className="size-4" />
+                        <XIcon />
                       </Button>
                     </div>
                   </SortableItem>

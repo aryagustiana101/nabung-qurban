@@ -7,10 +7,17 @@ import {
   PRODUCT_ATTRIBUTE_KEYS,
   PRODUCT_INVENTORY_TRACKERS,
   PRODUCT_STATUSES,
+  PRODUCT_VARIANT_RULES_YEARS,
+  PRODUCT_VARIANT_STATUSES,
   type ProductScope,
   convertCase,
 } from "@repo/common";
-import { ChevronsUpDownIcon } from "lucide-react";
+import {
+  ChevronsUpDownIcon,
+  GripVerticalIcon,
+  PlusIcon,
+  XIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
@@ -18,11 +25,20 @@ import { toast } from "sonner";
 import { FileInput } from "~/components/file-input";
 import { type RouterOutput, api } from "~/components/provider";
 import {
+  AttributeSelector,
   CategorySelector,
+  DiscountSelector,
   EntrantSelector,
+  ProductVariantRuleYearSelector,
   ServiceSelector,
   WarehouseSelector,
 } from "~/components/record-selector";
+import {
+  SortableContent,
+  SortableItem,
+  SortableItemHandle,
+  SortableRoot,
+} from "~/components/sortable";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -164,6 +180,7 @@ export function ProductForm({
   onSubmit?: (input: FormSchema["product"]) => void;
 }) {
   const { isLoading } = useLoading();
+  const defaultValue = getFormDefaultValue(scope);
 
   const form = useForm<FormSchema["product"]>({
     disabled,
@@ -174,20 +191,13 @@ export function ProductForm({
       status: record?.status ?? "draft",
       thumbnail: record?.thumbnail,
       images: record?.images ?? [],
-      attributes:
-        record?.attributes ??
-        {
-          coupon: COUPON_PRODUCT_ATTRIBUTES,
-          livestock: LIVESTOCK_PRODUCT_ATTRIBUTES,
-        }?.[scope] ??
-        PRODUCT_ATTRIBUTE_KEYS.map((key) => ({ key, title: "", value: "" })),
+      attributes: record?.attributes ?? defaultValue.attributes,
       services: record?.services ?? [],
       categories: record?.categories ?? [],
-      inventories: record?.inventories ?? [
-        { sku: "", stock: 0, weight: 0, tracker: "inactive" },
-      ],
+      inventories: record?.inventories ?? defaultValue.inventories,
       warehouses: record?.warehouses ?? [],
       entrants: record?.entrants ?? [],
+      variants: record?.variants ?? defaultValue.variants,
     },
   });
 
@@ -207,13 +217,18 @@ export function ProductForm({
             <ProductConfigurationField />
           </div>
           <ProductInventoryField />
+          <ProductVariantField />
           <ProductAttributeField />
         </div>
         <div className="hidden flex-col gap-6 lg:flex">
           <ProductConfigurationField />
         </div>
         <div className="lg:col-span-full">
-          <Button type="submit" disabled={disabled} isLoading={isLoading}>
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            disabled={form.formState.disabled}
+          >
             Save
           </Button>
         </div>
@@ -424,6 +439,254 @@ function ProductInventoryField() {
   );
 }
 
+function ProductVariantField() {
+  const form = useFormContext<FormSchema["product"]>();
+  const entry = useFieldArray({ name: "variants", control: form.control });
+
+  const scope = form.watch("scope");
+  const defaultValue = getFormDefaultValue(scope);
+
+  return (
+    <Collapsible defaultOpen>
+      <Card>
+        <CardHeader className="flex items-center">
+          <div className="flex flex-1 items-center gap-2">
+            <CollapsibleTrigger asChild>
+              <Button
+                size="icon"
+                type="button"
+                variant="ghost"
+                className="size-8"
+              >
+                <ChevronsUpDownIcon />
+              </Button>
+            </CollapsibleTrigger>
+            <CardTitle>Variant</CardTitle>
+          </div>
+          <CardAction>
+            <Button
+              size="icon"
+              type="button"
+              variant="outline"
+              className="size-8"
+              disabled={form.formState.disabled}
+              onClick={() => {
+                entry.append(defaultValue.variants[0]);
+              }}
+            >
+              <PlusIcon />
+            </Button>
+          </CardAction>
+        </CardHeader>
+        <CollapsibleContent>
+          <CardContent>
+            <SortableRoot
+              value={entry.fields}
+              orientation="vertical"
+              getItemValue={(value) => value.id}
+              onMove={({ activeIndex, overIndex }) => {
+                entry.move(activeIndex, overIndex);
+              }}
+            >
+              <SortableContent className="flex flex-col gap-6">
+                {entry.fields.map((item, i) => {
+                  const name = form.watch(`variants.${i}.name`) ?? item.name;
+
+                  return (
+                    <SortableItem key={item.id} value={item.id} asChild>
+                      <div className="flex items-center gap-4">
+                        <Collapsible
+                          defaultOpen
+                          className="flex flex-1 flex-col gap-4 rounded-lg border p-4"
+                        >
+                          <div className="flex items-center gap-4">
+                            <p className="line-clamp-1 flex-1 font-semibold text-sm leading-none">
+                              {name && name.length > 0 ? name : `#${i + 1}`}
+                            </p>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                size="icon"
+                                type="button"
+                                variant="ghost"
+                                className="size-8"
+                              >
+                                <ChevronsUpDownIcon />
+                              </Button>
+                            </CollapsibleTrigger>
+                          </div>
+                          <CollapsibleContent className="grid gap-6 lg:grid-cols-2">
+                            <FormField
+                              control={form.control}
+                              name={`variants.${i}.name`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Name</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`variants.${i}.label`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Label</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`variants.${i}.price`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Price</FormLabel>
+                                  <FormControl>
+                                    <NumberInput {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`variants.${i}.status`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Status</FormLabel>
+                                  <Select
+                                    disabled={field.disabled}
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select option" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {PRODUCT_VARIANT_STATUSES.map((v, i) => (
+                                        <SelectItem key={i} value={v}>
+                                          {convertCase(v)}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`variants.${i}.rule.year`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Rule - Year</FormLabel>
+                                  <FormControl>
+                                    <ProductVariantRuleYearSelector
+                                      limit={1}
+                                      value={[field.value]}
+                                      disabled={field.disabled}
+                                      onValueChange={(value) => {
+                                        field.onChange(value[0]);
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`variants.${i}.attributes`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Attributes</FormLabel>
+                                  <FormControl>
+                                    <AttributeSelector
+                                      value={field.value}
+                                      disabled={field.disabled}
+                                      onValueChange={field.onChange}
+                                      filter={{
+                                        scopes: [scope],
+                                        statuses: ["active"],
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`variants.${i}.discount`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Discount</FormLabel>
+                                  <FormControl>
+                                    <DiscountSelector
+                                      limit={1}
+                                      disabled={field.disabled}
+                                      filter={{ levels: ["product_variant"] }}
+                                      value={field.value ? [field.value] : []}
+                                      onValueChange={(value) => {
+                                        field.onChange(value[0] ?? null);
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </CollapsibleContent>
+                        </Collapsible>
+                        <div className="flex items-center gap-2">
+                          <SortableItemHandle asChild>
+                            <Button
+                              size="icon"
+                              type="button"
+                              variant="ghost"
+                              className="size-8"
+                              disabled={form.formState.disabled}
+                            >
+                              <GripVerticalIcon />
+                            </Button>
+                          </SortableItemHandle>
+                          <Button
+                            size="icon"
+                            type="button"
+                            variant="ghost"
+                            className="size-8"
+                            disabled={
+                              form.formState.disabled ||
+                              entry.fields.length <= 1
+                            }
+                            onClick={() => {
+                              entry.remove(item.id);
+                            }}
+                          >
+                            <XIcon />
+                          </Button>
+                        </div>
+                      </div>
+                    </SortableItem>
+                  );
+                })}
+              </SortableContent>
+            </SortableRoot>
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
+  );
+}
+
 function ProductConfigurationField() {
   const form = useFormContext<FormSchema["product"]>();
 
@@ -440,10 +703,14 @@ function ProductConfigurationField() {
               <FormLabel>Services</FormLabel>
               <FormControl>
                 <ServiceSelector
-                  scopes={[scope]}
                   value={field.value}
                   disabled={field.disabled}
                   onValueChange={field.onChange}
+                  filter={{
+                    scopes: [scope],
+                    levels: ["main"],
+                    statuses: ["active"],
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -480,6 +747,7 @@ function ProductConfigurationField() {
                   value={field.value}
                   disabled={field.disabled}
                   onValueChange={field.onChange}
+                  filter={{ statuses: ["active"] }}
                 />
               </FormControl>
               <FormMessage />
@@ -599,4 +867,37 @@ function CollapsibleCard({
       </Card>
     </Collapsible>
   );
+}
+
+function getFormDefaultValue(scope: ProductScope) {
+  return {
+    inventories: [
+      { sku: "", stock: 0, weight: 0, tracker: "inactive" as const },
+    ],
+    attributes:
+      {
+        coupon: COUPON_PRODUCT_ATTRIBUTES,
+        livestock: LIVESTOCK_PRODUCT_ATTRIBUTES,
+      }?.[scope] ??
+      PRODUCT_ATTRIBUTE_KEYS.map((key) => ({ key, title: "", value: "" })),
+    variants: [
+      {
+        name: "",
+        label:
+          {
+            livestock: "Tahun Qurban",
+            coupon: "Jenis Hewan Qurban",
+          }[scope] ?? "",
+        price: 0,
+        status: "active" as const,
+        rule: {
+          year:
+            PRODUCT_VARIANT_RULES_YEARS.find(
+              (v) => v.max && v.max === new Date().getFullYear(),
+            ) ?? PRODUCT_VARIANT_RULES_YEARS[0],
+        },
+        attributes: [],
+      },
+    ],
+  };
 }

@@ -207,6 +207,7 @@ export function serializeProductVariant({
   return {
     id: productVariant.id,
     name: productVariant.name,
+    label: productVariant.label,
     status: productVariant.status,
     price: productVariant.price,
     rule: productVariant.rule,

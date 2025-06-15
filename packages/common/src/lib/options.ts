@@ -186,3 +186,17 @@ export const COUPON_PRODUCT_ATTRIBUTES: {
       "Untuk pembelian menggunakan DP, pelunasan hanya bisa dilakukan maksimal 90 % (atau sesuai parameter dari NQ), jika  bobot hewan yang didistribusikan lebih berat dari bobot yang dipesan pembeli harus membayar kelebihannya, sedangkan jika kondisi bobot kurang dari bobot pesanan maka  kelebihan pembayaran akan masuk ke saldo shohibul qurban.",
   },
 ];
+
+export const ATTRIBUTE_STATUSES = ["active", "inactive"] as const;
+
+export const ATTRIBUTE_SCOPES = ["coupon", "livestock"] as const;
+
+export const PRODUCT_VARIANT_RULES_YEARS: {
+  min: number | null;
+  max: number | null;
+}[] = [
+  { min: null, max: 2025 },
+  { min: null, max: 2026 },
+  { min: null, max: 2027 },
+  { min: null, max: 2028 },
+];

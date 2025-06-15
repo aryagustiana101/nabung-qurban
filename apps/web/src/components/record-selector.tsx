@@ -1,9 +1,17 @@
 "use client";
 
-import type { computePagination } from "@repo/common";
+import {
+  PRODUCT_VARIANT_RULES_YEARS,
+  type computePagination,
+} from "@repo/common";
 import { CheckIcon, ChevronsUpDownIcon, RotateCcwIcon } from "lucide-react";
 import * as React from "react";
-import { type RouterOutput, api } from "~/components/provider";
+import { Combobox } from "~/components/combobox";
+import {
+  type RouterInput,
+  type RouterOutput,
+  api,
+} from "~/components/provider";
 import { Button } from "~/components/ui/button";
 import {
   Command,
@@ -36,6 +44,14 @@ type Warehouse = NonNullable<
   RouterOutput["warehouse"]["getMultiple"]["result"]
 >["records"][number];
 
+type Attribute = NonNullable<
+  RouterOutput["attribute"]["getMultiple"]["result"]
+>["records"][number];
+
+type Discount = NonNullable<
+  RouterOutput["discount"]["getMultiple"]["result"]
+>["records"][number];
+
 export function CategorySelector({
   limit,
   children,
@@ -49,6 +65,10 @@ export function CategorySelector({
   disabled?: boolean;
   value?: Category[] | null;
   onValueChange?: (value: Category[]) => void;
+  filter?: Omit<
+    RouterInput["category"]["getMultiple"],
+    "cursor" | "page" | "limit" | "keyword" | "pagination"
+  >;
 }>) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(_value ?? []);
@@ -122,8 +142,8 @@ export function CategorySelector({
 
 export function ServiceSelector({
   limit,
+  filter,
   children,
-  scopes,
   onValueChange,
   value: _value,
   asChild = false,
@@ -133,8 +153,11 @@ export function ServiceSelector({
   asChild?: boolean;
   disabled?: boolean;
   value?: Service[] | null;
-  scopes?: Service["scopes"];
   onValueChange?: (value: Service[]) => void;
+  filter?: Omit<
+    RouterInput["service"]["getMultiple"],
+    "cursor" | "page" | "limit" | "keyword" | "pagination"
+  >;
 }>) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(_value ?? []);
@@ -145,13 +168,7 @@ export function ServiceSelector({
   }, [_value]);
 
   const query = api.service.getMultiple.useInfiniteQuery(
-    {
-      scopes,
-      keyword,
-      levels: ["main"],
-      pagination: "cursor",
-      statuses: ["active"],
-    },
+    { ...(filter ?? {}), keyword, pagination: "cursor" },
     {
       initialCursor: 0,
       getNextPageParam: (page) => {
@@ -214,6 +231,7 @@ export function ServiceSelector({
 
 export function WarehouseSelector({
   limit,
+  filter,
   children,
   onValueChange,
   value: _value,
@@ -225,6 +243,10 @@ export function WarehouseSelector({
   disabled?: boolean;
   value?: Warehouse[] | null;
   onValueChange?: (value: Warehouse[]) => void;
+  filter?: Omit<
+    RouterInput["warehouse"]["getMultiple"],
+    "cursor" | "page" | "limit" | "keyword" | "pagination"
+  >;
 }>) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(_value ?? []);
@@ -235,7 +257,7 @@ export function WarehouseSelector({
   }, [_value]);
 
   const query = api.warehouse.getMultiple.useInfiniteQuery(
-    { keyword, pagination: "cursor", statuses: ["active"] },
+    { ...(filter ?? {}), keyword, pagination: "cursor" },
     {
       initialCursor: 0,
       getNextPageParam: (page) => {
@@ -309,6 +331,10 @@ export function EntrantSelector({
   disabled?: boolean;
   value?: Entrant[] | null;
   onValueChange?: (value: Entrant[]) => void;
+  filter?: Omit<
+    RouterInput["entrant"]["getMultiple"],
+    "cursor" | "page" | "limit" | "keyword" | "pagination"
+  >;
 }>) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(_value ?? []);
@@ -332,6 +358,247 @@ export function EntrantSelector({
 
   return (
     <RecordSelector<Entrant>
+      open={open}
+      setOpen={setOpen}
+      keyword={keyword}
+      asChild={asChild}
+      disabled={disabled}
+      setKeyword={setKeyword}
+      isError={query.isError}
+      pages={query?.data?.pages}
+      isLoading={query.isLoading}
+      isFetching={query.isFetching}
+      hasNextPage={query.hasNextPage}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMoreClick={async () => {
+        await query.fetchNextPage();
+      }}
+      getCurrentRecord={(record) => {
+        return value.find((v) => v.id === record.id);
+      }}
+      getRecordLabel={(record) => {
+        return <p className="line-clamp-1">{record.name}</p>;
+      }}
+      onRecordSelect={(record, current) => {
+        const items = (
+          current ? value.filter((v) => v.id !== record.id) : [record, ...value]
+        ).slice(0, limit);
+
+        setValue(items);
+        onValueChange?.(items);
+      }}
+      getLabel={() => {
+        return value.length > 0 ? (
+          <span>
+            {isSingleOption
+              ? (value?.[0]?.name ?? "-")
+              : `Selected ${value.length} ${value.length === 1 ? "record" : "records"}`}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {isSingleOption ? "Select record" : "Select records"}
+          </span>
+        );
+      }}
+    >
+      {children}
+    </RecordSelector>
+  );
+}
+
+export function ProductVariantRuleYearSelector({
+  limit,
+  children,
+  value: _value,
+  onValueChange,
+  disabled = false,
+}: React.PropsWithChildren<{
+  limit?: number;
+  disabled?: boolean;
+  value?: { min: number | null; max: number | null }[];
+  onValueChange?: (value: { min: number | null; max: number | null }[]) => void;
+}>) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(_value ?? []);
+
+  React.useEffect(() => {
+    setValue(_value ?? []);
+  }, [_value]);
+
+  const isSingleOption = limit && limit <= 1;
+
+  return (
+    <Combobox
+      open={open}
+      setOpen={setOpen}
+      disabled={disabled}
+      records={PRODUCT_VARIANT_RULES_YEARS}
+      getOptionCurrentRecord={(record) => {
+        return value.find((v) => v.min === record.min && v.max === record.max);
+      }}
+      getOptionLabel={(record) => {
+        return <p className="line-clamp-1">{record.max}</p>;
+      }}
+      onOptionSelect={(record, current) => {
+        const items = (
+          current
+            ? value.filter((v) => v.min !== record.min || v.max !== record.max)
+            : [record, ...value]
+        ).slice(0, limit);
+
+        setValue(items);
+        onValueChange?.(items);
+        setOpen(false);
+      }}
+      getLabel={() => {
+        return value.length > 0 ? (
+          <span>
+            {isSingleOption
+              ? (value?.[0]?.max ?? "-")
+              : `Selected ${value.length} ${value.length === 1 ? "option" : "options"}`}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {isSingleOption ? "Select option" : "Select options"}
+          </span>
+        );
+      }}
+    >
+      {children}
+    </Combobox>
+  );
+}
+
+export function AttributeSelector({
+  limit,
+  filter,
+  children,
+  onValueChange,
+  value: _value,
+  asChild = false,
+  disabled = false,
+}: React.PropsWithChildren<{
+  limit?: number;
+  asChild?: boolean;
+  disabled?: boolean;
+  value?: Attribute[] | null;
+  onValueChange?: (value: Attribute[]) => void;
+  filter?: Omit<
+    RouterInput["attribute"]["getMultiple"],
+    "cursor" | "page" | "limit" | "keyword" | "pagination"
+  >;
+}>) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(_value ?? []);
+  const [keyword, setKeyword] = React.useState<string>();
+
+  React.useEffect(() => {
+    setValue(_value ?? []);
+  }, [_value]);
+
+  const query = api.attribute.getMultiple.useInfiniteQuery(
+    { ...(filter ?? {}), keyword, pagination: "cursor" },
+    {
+      initialCursor: 0,
+      getNextPageParam: (page) => {
+        return page?.result?.pagination?.cursor?.next ?? null;
+      },
+    },
+  );
+
+  const isSingleOption = limit && limit <= 1;
+
+  return (
+    <RecordSelector<Attribute>
+      open={open}
+      setOpen={setOpen}
+      keyword={keyword}
+      asChild={asChild}
+      disabled={disabled}
+      setKeyword={setKeyword}
+      isError={query.isError}
+      pages={query?.data?.pages}
+      isLoading={query.isLoading}
+      isFetching={query.isFetching}
+      hasNextPage={query.hasNextPage}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMoreClick={async () => {
+        await query.fetchNextPage();
+      }}
+      getCurrentRecord={(record) => {
+        return value.find((v) => v.id === record.id);
+      }}
+      getRecordLabel={(record) => {
+        return <p className="line-clamp-1">{record.name}</p>;
+      }}
+      onRecordSelect={(record, current) => {
+        const items = (
+          current ? value.filter((v) => v.id !== record.id) : [record, ...value]
+        ).slice(0, limit);
+
+        setValue(items);
+        onValueChange?.(items);
+      }}
+      getLabel={() => {
+        return value.length > 0 ? (
+          <span>
+            {isSingleOption
+              ? (value?.[0]?.name ?? "-")
+              : `Selected ${value.length} ${value.length === 1 ? "record" : "records"}`}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {isSingleOption ? "Select record" : "Select records"}
+          </span>
+        );
+      }}
+    >
+      {children}
+    </RecordSelector>
+  );
+}
+
+export function DiscountSelector({
+  limit,
+  filter,
+  children,
+  onValueChange,
+  value: _value,
+  asChild = false,
+  disabled = false,
+}: React.PropsWithChildren<{
+  limit?: number;
+  asChild?: boolean;
+  disabled?: boolean;
+  value?: Discount[] | null;
+  onValueChange?: (value: Discount[]) => void;
+  filter?: Omit<
+    RouterInput["discount"]["getMultiple"],
+    "cursor" | "page" | "limit" | "keyword" | "pagination"
+  >;
+}>) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(_value ?? []);
+  const [keyword, setKeyword] = React.useState<string>();
+
+  React.useEffect(() => {
+    setValue(_value ?? []);
+  }, [_value]);
+
+  const query = api.discount.getMultiple.useInfiniteQuery(
+    { ...(filter ?? {}), keyword, pagination: "cursor" },
+    {
+      initialCursor: 0,
+      getNextPageParam: (page) => {
+        return page?.result?.pagination?.cursor?.next ?? null;
+      },
+    },
+  );
+
+  const isSingleOption = limit && limit <= 1;
+
+  return (
+    <RecordSelector<Discount>
       open={open}
       setOpen={setOpen}
       keyword={keyword}
@@ -432,7 +699,7 @@ export function RecordSelector<T>({
       onOpenChange={(value) => {
         setOpen(value);
         if (!value) {
-          setKeyword("");
+          setKeyword(undefined);
         }
       }}
     >

@@ -24,6 +24,19 @@ export default async function DetailProductPage({
 
   await api.entrant.getMultiple.prefetchInfinite({ pagination: "cursor" });
   await api.category.getMultiple.prefetchInfinite({ pagination: "cursor" });
+  await api.warehouse.getMultiple.prefetchInfinite({
+    statuses: ["active"],
+    pagination: "cursor",
+  });
+  await api.attribute.getMultiple.prefetchInfinite({
+    statuses: ["active"],
+    pagination: "cursor",
+    scopes: [product.scope],
+  });
+  await api.discount.getMultiple.prefetchInfinite({
+    pagination: "cursor",
+    levels: ["product_variant"],
+  });
   await api.service.getMultiple.prefetchInfinite({
     levels: ["main"],
     statuses: ["active"],

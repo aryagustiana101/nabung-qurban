@@ -1,6 +1,7 @@
 import {
   COUPON_PRODUCT_ATTRIBUTES,
   LIVESTOCK_PRODUCT_ATTRIBUTES,
+  PRODUCT_VARIANT_RULES_YEARS,
 } from "@repo/common";
 import { type Prisma, PrismaClient } from "@repo/database/client";
 import { env } from "@repo/database/env";
@@ -449,6 +450,8 @@ async function main() {
       id: 1,
       code: "1-domba",
       name: "1 Domba",
+      status: "active",
+      scopes: ["livestock"],
       label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
@@ -459,6 +462,8 @@ async function main() {
       id: 2,
       code: "1-unta",
       name: "1 Unta",
+      status: "active",
+      scopes: ["livestock"],
       label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
@@ -469,13 +474,17 @@ async function main() {
       id: 3,
       code: "1-7-unta",
       name: "1/7 Unta",
+      status: "active",
+      scopes: ["livestock"],
       label: "Jenis Hewan Qurban",
       rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
     },
     {
       id: 4,
+      status: "active",
       code: "1-10-unta",
       name: "1/10 Unta",
+      scopes: ["livestock"],
       label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: 1 },
@@ -484,8 +493,10 @@ async function main() {
     },
     {
       id: 5,
+      status: "active",
       code: "1-kambing",
       name: "1 Kambing",
+      scopes: ["livestock"],
       label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
@@ -496,6 +507,8 @@ async function main() {
       id: 6,
       code: "1-sapi",
       name: "1 Sapi",
+      status: "active",
+      scopes: ["livestock"],
       label: "Jenis Hewan Qurban",
       rule: {
         quantity: { min: 1, max: null },
@@ -504,13 +517,17 @@ async function main() {
     },
     {
       id: 7,
+      status: "active",
       code: "1-7-sapi",
       name: "1/7 Sapi",
+      scopes: ["livestock"],
       label: "Jenis Hewan Qurban",
       rule: { quantity: { min: 1, max: 1 }, participant: { min: 7, max: 7 } },
     },
     {
       id: 8,
+      status: "active",
+      scopes: ["coupon"],
       code: "1446-H-2025",
       name: "1446 H/2025",
       label: "Tahun Qurban",
@@ -521,6 +538,8 @@ async function main() {
     },
     {
       id: 9,
+      status: "active",
+      scopes: ["coupon"],
       code: "1447-H-2026",
       name: "1447 H/2026",
       label: "Tahun Qurban",
@@ -531,6 +550,8 @@ async function main() {
     },
     {
       id: 10,
+      status: "active",
+      scopes: ["coupon"],
       code: "1448-H-2027",
       name: "1448 H/2027",
       label: "Tahun Qurban",
@@ -549,7 +570,7 @@ async function main() {
       price: 30_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 2,
@@ -558,7 +579,7 @@ async function main() {
       price: 5_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 3,
@@ -567,7 +588,7 @@ async function main() {
       price: 4_000_000,
       name: "1447 H/2026",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2026 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[1],
     },
     {
       id: 4,
@@ -576,7 +597,7 @@ async function main() {
       price: 70_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 5,
@@ -585,7 +606,7 @@ async function main() {
       price: 65_000_000,
       name: "1447 H/2026",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2026 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[1],
     },
     {
       id: 6,
@@ -594,7 +615,7 @@ async function main() {
       price: 55_000_000,
       name: "1448 H/2027",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2027 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[2],
     },
     {
       id: 7,
@@ -603,7 +624,7 @@ async function main() {
       price: 25_000_000,
       name: "1446 H/2025",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 8,
@@ -612,7 +633,7 @@ async function main() {
       price: 20_000_000,
       name: "1447 H/2026",
       label: "Tahun Qurban",
-      rule: { year: { min: null, max: 2026 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[1],
     },
     {
       id: 9,
@@ -621,7 +642,7 @@ async function main() {
       price: 1_300_000,
       name: "Kambing tipe 1",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 10,
@@ -630,7 +651,7 @@ async function main() {
       price: 1_500_000,
       name: "Kambing tipe 2",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 11,
@@ -639,7 +660,7 @@ async function main() {
       price: 3_600_000,
       name: "Sapi tipe 1",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 12,
@@ -648,7 +669,7 @@ async function main() {
       price: 3_400_000,
       name: "Sapi tipe 2",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 13,
@@ -657,7 +678,7 @@ async function main() {
       price: 2_600_000,
       name: "Sapi tipe 3",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
     {
       id: 14,
@@ -666,7 +687,7 @@ async function main() {
       price: 2_400_000,
       name: "Sapi tipe 4",
       label: "Jenis Hewan Qurban",
-      rule: { year: { min: null, max: 2025 } },
+      rule: PRODUCT_VARIANT_RULES_YEARS[0],
     },
   ];
 

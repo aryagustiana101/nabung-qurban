@@ -6,10 +6,13 @@ import {
   PRODUCT_INVENTORY_TRACKERS,
   PRODUCT_SCOPES,
   PRODUCT_STATUSES,
+  PRODUCT_VARIANT_STATUSES,
   __,
 } from "@repo/common";
 import { z } from "zod";
+import { attributeSchema } from "~/schemas/attribute-schema";
 import { categorySchema } from "~/schemas/category-schema";
+import { discountSchema } from "~/schemas/discount-schema";
 import { entrantSchema } from "~/schemas/entrant-schema";
 import { serviceSchema } from "~/schemas/service-schema";
 import { warehouseSchema } from "~/schemas/warehouse-schema";
@@ -52,6 +55,22 @@ export const routerSchema = {
       .array(),
     warehouses: z.object({ id: z.number() }).array(),
     entrants: z.object({ id: z.number() }).array(),
+    variants: z
+      .object({
+        name: z.string(),
+        label: z.string(),
+        status: z.enum(PRODUCT_VARIANT_STATUSES),
+        price: z.number(),
+        rule: z.object({
+          year: z.object({
+            min: z.number().nullable(),
+            max: z.number().nullable(),
+          }),
+        }),
+        attributes: z.object({ id: z.number() }).array(),
+        discount: z.object({ id: z.number() }).nullish(),
+      })
+      .array(),
   }),
   update: z.object({
     id: FIELD.NUMBER("id"),
@@ -81,6 +100,24 @@ export const routerSchema = {
       .optional(),
     warehouses: z.object({ id: z.number() }).array().optional(),
     entrants: z.object({ id: z.number() }).array().optional(),
+    variants: z
+      .object({
+        id: z.number().nullish(),
+        name: z.string(),
+        label: z.string(),
+        status: z.enum(PRODUCT_VARIANT_STATUSES),
+        price: z.number(),
+        rule: z.object({
+          year: z.object({
+            min: z.number().nullable(),
+            max: z.number().nullable(),
+          }),
+        }),
+        attributes: z.object({ id: z.number() }).array(),
+        discount: z.object({ id: z.number() }).nullish(),
+      })
+      .array()
+      .optional(),
   }),
 };
 
@@ -121,6 +158,31 @@ export const formSchema = {
     entrants: entrantSchema.array().min(1, {
       message: __("min.array", { attribute: "entrants", min: 1 }),
     }),
+    variants: z
+      .object({
+        id: z.number().nullish(),
+        name: FIELD.TEXT("name"),
+        label: FIELD.TEXT("label"),
+        status: FIELD.ENUM(PRODUCT_VARIANT_STATUSES, "status"),
+        price: FIELD.NUMBER("price").min(1, {
+          message: __("min.numeric", { attribute: "price", min: 1 }),
+        }),
+        rule: z.object(
+          {
+            year: z.object(
+              { min: z.number().nullable(), max: z.number().nullable() },
+              { message: __("required", { attribute: "year" }) },
+            ),
+          },
+          { message: __("required", { attribute: "rule" }) },
+        ),
+        attributes: attributeSchema.array().min(1, {
+          message: __("min.array", { attribute: "attributes", min: 1 }),
+        }),
+        discount: discountSchema.nullish(),
+      })
+      .array()
+      .min(1, { message: __("min.array", { attribute: "variants", min: 1 }) }),
   }),
 };
 
