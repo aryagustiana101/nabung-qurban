@@ -85,12 +85,16 @@ export type SidebarNavigation = {
 };
 
 export function AppSidebar({ user: _user }: { user: User }) {
+  const _params = useParams();
   const session = useSession();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { isMobile, state } = useSidebar();
-  const params = useParams<{ code: string }>();
   const [openLogoutDialog, setOpenLogoutDialog] = React.useState(false);
+
+  const params = Object.entries(_params).reduce((acc, [_, value]) => {
+    return [...(acc ?? []), ...(typeof value === "string" ? [value] : [])];
+  }, [] as string[]);
 
   const navigation: SidebarNavigation = {
     groups: [
@@ -107,7 +111,7 @@ export function AppSidebar({ user: _user }: { user: User }) {
             active: [
               "/dashboard/products",
               "/dashboard/products/new",
-              `/dashboard/products/${params.code}`,
+              `/dashboard/products/${params[0]}`,
             ],
           },
         ],
