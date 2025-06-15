@@ -106,7 +106,7 @@ export const DISCOUNT_TYPES = ["flat", "percentage"] as const;
 
 export const WAREHOUSE_STATUSES = ["active", "inactive"] as const;
 
-export const ENTRANT_TYPES = ["individual", "institution"] as const;
+export const ENTRANT_CODES = ["individual", "institution"] as const;
 
 export const SCHEDULE_OPTION_KEYS = [
   "morning",

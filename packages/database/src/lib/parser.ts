@@ -2,7 +2,7 @@ import {
   DATE_FORMAT,
   DISCOUNT_LEVELS,
   DISCOUNT_TYPES,
-  ENTRANT_TYPES,
+  ENTRANT_CODES,
   type Locale,
   PRODUCT_ATTRIBUTE_KEYS,
   PRODUCT_INVENTORY_TRACKERS,
@@ -664,7 +664,7 @@ export function parseEntrant({
 }) {
   return {
     id: entrant.id,
-    code: z.enum(ENTRANT_TYPES).parse(entrant.code),
+    code: z.enum(ENTRANT_CODES).parse(entrant.code),
     name: entrant.name,
     label: entrant.label,
     description: entrant.description,

@@ -154,6 +154,14 @@ export const productRouter = createTRPCRouter({
           thumbnail: input.thumbnail,
           images: input.images,
           attributes: input.attributes,
+          productServices: {
+            createMany: {
+              skipDuplicates: true,
+              data: input.services.map((service) => ({
+                serviceId: service.id,
+              })),
+            },
+          },
           productCategories: {
             createMany: {
               skipDuplicates: true,
@@ -162,10 +170,26 @@ export const productRouter = createTRPCRouter({
               })),
             },
           },
+          productWarehouses: {
+            createMany: {
+              skipDuplicates: true,
+              data: input.warehouses.map((warehouse) => ({
+                warehouseId: warehouse.id,
+              })),
+            },
+          },
+          productEntrants: {
+            createMany: {
+              skipDuplicates: true,
+              data: input.entrants.map((entrant) => ({
+                entrantId: entrant.id,
+              })),
+            },
+          },
         },
       });
 
-      return { success: true, message: null, result: null };
+      return { success: true, message: "Create product success", result: null };
     }),
   update: protectedProcedure
     .input(routerSchema.update)
@@ -187,6 +211,20 @@ export const productRouter = createTRPCRouter({
           thumbnail: input.thumbnail,
           images: input.images,
           attributes: input.attributes,
+          productServices: input.services
+            ? {
+                upsert: input.services.map((service) => ({
+                  update: {},
+                  create: { serviceId: service.id },
+                  where: {
+                    identifier: {
+                      productId: product.id,
+                      serviceId: service.id,
+                    },
+                  },
+                })),
+              }
+            : undefined,
           productCategories: input.categories
             ? {
                 upsert: input.categories.map((category) => ({
@@ -201,9 +239,37 @@ export const productRouter = createTRPCRouter({
                 })),
               }
             : undefined,
+          productWarehouses: input.warehouses
+            ? {
+                upsert: input.warehouses.map((warehouse) => ({
+                  update: {},
+                  create: { warehouseId: warehouse.id },
+                  where: {
+                    identifier: {
+                      productId: product.id,
+                      warehouseId: warehouse.id,
+                    },
+                  },
+                })),
+              }
+            : undefined,
+          productEntrants: input.entrants
+            ? {
+                upsert: input.entrants.map((entrant) => ({
+                  update: {},
+                  create: { entrantId: entrant.id },
+                  where: {
+                    identifier: {
+                      productId: product.id,
+                      entrantId: entrant.id,
+                    },
+                  },
+                })),
+              }
+            : undefined,
         },
       });
 
-      return { success: true, message: null, result: null };
+      return { success: true, message: "Update product success", result: null };
     }),
 });

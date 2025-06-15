@@ -22,6 +22,7 @@ export default async function DetailProductPage({
     return notFound();
   }
 
+  await api.entrant.getMultiple.prefetchInfinite({ pagination: "cursor" });
   await api.category.getMultiple.prefetchInfinite({ pagination: "cursor" });
   await api.service.getMultiple.prefetchInfinite({
     levels: ["main"],

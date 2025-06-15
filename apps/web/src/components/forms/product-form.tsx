@@ -18,7 +18,9 @@ import { FileInput } from "~/components/file-input";
 import { type RouterOutput, api } from "~/components/provider";
 import {
   CategorySelector,
+  EntrantSelector,
   ServiceSelector,
+  WarehouseSelector,
 } from "~/components/record-selector";
 import { Button } from "~/components/ui/button";
 import {
@@ -59,9 +61,15 @@ type Product = NonNullable<RouterOutput["product"]["getSingle"]["result"]>;
 export function CreateProductForm({ scope }: { scope: ProductScope }) {
   const router = useRouter();
   const utils = api.useUtils();
-  const { isLoading } = useLoading();
+  const { isLoading, setIsLoading } = useLoading();
 
   const mutation = api.product.create.useMutation({
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
     onSuccess: (output) => {
       toast(output.message ?? "Please try again in a few moments");
 
@@ -99,16 +107,22 @@ export function CreateProductForm({ scope }: { scope: ProductScope }) {
 export function UpdateProductForm({ product }: { product: Product }) {
   const router = useRouter();
   const utils = api.useUtils();
-  const { isLoading } = useLoading();
+  const { isLoading, setIsLoading } = useLoading();
 
   const mutation = api.product.update.useMutation({
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
     onSuccess: (output) => {
       toast(output.message ?? "Please try again in a few moments");
 
       if (output.success) {
         utils.product.invalidate();
-        router.push("/dashboard/products");
-        return;
+        router.refresh();
+        window.scrollTo(0, 0);
       }
 
       mutation.reset();
@@ -168,6 +182,8 @@ export function ProductForm({
         PRODUCT_ATTRIBUTE_KEYS.map((key) => ({ key, title: "", value: "" })),
       services: record?.services ?? [],
       categories: record?.categories ?? [],
+      warehouses: record?.warehouses ?? [],
+      entrants: record?.entrants ?? [],
     },
   });
 
@@ -349,6 +365,41 @@ function ProductConfigurationField() {
               <FormControl>
                 <CategorySelector
                   limit={1}
+                  value={field.value}
+                  disabled={field.disabled}
+                  onValueChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="warehouses"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Warehouses</FormLabel>
+              <FormControl>
+                <WarehouseSelector
+                  limit={1}
+                  value={field.value}
+                  disabled={field.disabled}
+                  onValueChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="entrants"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Entrants</FormLabel>
+              <FormControl>
+                <EntrantSelector
                   value={field.value}
                   disabled={field.disabled}
                   onValueChange={field.onChange}

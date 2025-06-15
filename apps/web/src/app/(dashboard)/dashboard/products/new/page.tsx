@@ -17,7 +17,12 @@ export default async function CreateProductPage({
       (await searchParamsCache.parse(searchParams)).scope,
     ).data ?? "livestock";
 
+  await api.entrant.getMultiple.prefetchInfinite({ pagination: "cursor" });
   await api.category.getMultiple.prefetchInfinite({ pagination: "cursor" });
+  await api.warehouse.getMultiple.prefetchInfinite({
+    statuses: ["active"],
+    pagination: "cursor",
+  });
   await api.service.getMultiple.prefetchInfinite({
     scopes: [scope],
     levels: ["main"],

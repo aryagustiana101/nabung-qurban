@@ -9,7 +9,9 @@ import {
 } from "@repo/common";
 import { z } from "zod";
 import { categorySchema } from "~/schemas/category-schema";
+import { entrantSchema } from "~/schemas/entrant-schema";
 import { serviceSchema } from "~/schemas/service-schema";
+import { warehouseSchema } from "~/schemas/warehouse-schema";
 
 export const routerSchema = {
   getMultiple: z.object({
@@ -37,7 +39,10 @@ export const routerSchema = {
         value: z.string(),
       })
       .array(),
+    services: z.object({ id: z.number() }).array(),
     categories: z.object({ id: z.number() }).array(),
+    warehouses: z.object({ id: z.number() }).array(),
+    entrants: z.object({ id: z.number() }).array(),
   }),
   update: z.object({
     id: FIELD.NUMBER("id"),
@@ -54,7 +59,10 @@ export const routerSchema = {
       })
       .array()
       .optional(),
+    services: z.object({ id: z.number() }).array().optional(),
     categories: z.object({ id: z.number() }).array().optional(),
+    warehouses: z.object({ id: z.number() }).array().optional(),
+    entrants: z.object({ id: z.number() }).array().optional(),
   }),
 };
 
@@ -77,6 +85,12 @@ export const formSchema = {
     }),
     categories: categorySchema.array().min(1, {
       message: __("min.array", { attribute: "categories", min: 1 }),
+    }),
+    warehouses: warehouseSchema.array().min(1, {
+      message: __("min.array", { attribute: "warehouses", min: 1 }),
+    }),
+    entrants: entrantSchema.array().min(1, {
+      message: __("min.array", { attribute: "entrants", min: 1 }),
     }),
   }),
 };

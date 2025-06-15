@@ -28,6 +28,14 @@ type Service = NonNullable<
   RouterOutput["service"]["getMultiple"]["result"]
 >["records"][number];
 
+type Entrant = NonNullable<
+  RouterOutput["entrant"]["getMultiple"]["result"]
+>["records"][number];
+
+type Warehouse = NonNullable<
+  RouterOutput["warehouse"]["getMultiple"]["result"]
+>["records"][number];
+
 export function CategorySelector({
   limit,
   children,
@@ -156,6 +164,174 @@ export function ServiceSelector({
 
   return (
     <RecordSelector<Service>
+      open={open}
+      setOpen={setOpen}
+      keyword={keyword}
+      asChild={asChild}
+      disabled={disabled}
+      setKeyword={setKeyword}
+      isError={query.isError}
+      pages={query?.data?.pages}
+      isLoading={query.isLoading}
+      isFetching={query.isFetching}
+      hasNextPage={query.hasNextPage}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMoreClick={async () => {
+        await query.fetchNextPage();
+      }}
+      getCurrentRecord={(record) => {
+        return value.find((v) => v.id === record.id);
+      }}
+      getRecordLabel={(record) => {
+        return <p className="line-clamp-1">{record.name}</p>;
+      }}
+      onRecordSelect={(record, current) => {
+        const items = (
+          current ? value.filter((v) => v.id !== record.id) : [record, ...value]
+        ).slice(0, limit);
+
+        setValue(items);
+        onValueChange?.(items);
+      }}
+      getLabel={() => {
+        return value.length > 0 ? (
+          <span>
+            {isSingleOption
+              ? (value?.[0]?.name ?? "-")
+              : `Selected ${value.length} ${value.length === 1 ? "record" : "records"}`}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {isSingleOption ? "Select record" : "Select records"}
+          </span>
+        );
+      }}
+    >
+      {children}
+    </RecordSelector>
+  );
+}
+
+export function WarehouseSelector({
+  limit,
+  children,
+  onValueChange,
+  value: _value,
+  asChild = false,
+  disabled = false,
+}: React.PropsWithChildren<{
+  limit?: number;
+  asChild?: boolean;
+  disabled?: boolean;
+  value?: Warehouse[] | null;
+  onValueChange?: (value: Warehouse[]) => void;
+}>) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(_value ?? []);
+  const [keyword, setKeyword] = React.useState<string>();
+
+  React.useEffect(() => {
+    setValue(_value ?? []);
+  }, [_value]);
+
+  const query = api.warehouse.getMultiple.useInfiniteQuery(
+    { keyword, pagination: "cursor", statuses: ["active"] },
+    {
+      initialCursor: 0,
+      getNextPageParam: (page) => {
+        return page?.result?.pagination?.cursor?.next ?? null;
+      },
+    },
+  );
+
+  const isSingleOption = limit && limit <= 1;
+
+  return (
+    <RecordSelector<Warehouse>
+      open={open}
+      setOpen={setOpen}
+      keyword={keyword}
+      asChild={asChild}
+      disabled={disabled}
+      setKeyword={setKeyword}
+      isError={query.isError}
+      pages={query?.data?.pages}
+      isLoading={query.isLoading}
+      isFetching={query.isFetching}
+      hasNextPage={query.hasNextPage}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMoreClick={async () => {
+        await query.fetchNextPage();
+      }}
+      getCurrentRecord={(record) => {
+        return value.find((v) => v.id === record.id);
+      }}
+      getRecordLabel={(record) => {
+        return <p className="line-clamp-1">{record.name}</p>;
+      }}
+      onRecordSelect={(record, current) => {
+        const items = (
+          current ? value.filter((v) => v.id !== record.id) : [record, ...value]
+        ).slice(0, limit);
+
+        setValue(items);
+        onValueChange?.(items);
+      }}
+      getLabel={() => {
+        return value.length > 0 ? (
+          <span>
+            {isSingleOption
+              ? (value?.[0]?.name ?? "-")
+              : `Selected ${value.length} ${value.length === 1 ? "record" : "records"}`}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {isSingleOption ? "Select record" : "Select records"}
+          </span>
+        );
+      }}
+    >
+      {children}
+    </RecordSelector>
+  );
+}
+
+export function EntrantSelector({
+  limit,
+  children,
+  onValueChange,
+  value: _value,
+  asChild = false,
+  disabled = false,
+}: React.PropsWithChildren<{
+  limit?: number;
+  asChild?: boolean;
+  disabled?: boolean;
+  value?: Entrant[] | null;
+  onValueChange?: (value: Entrant[]) => void;
+}>) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(_value ?? []);
+  const [keyword, setKeyword] = React.useState<string>();
+
+  React.useEffect(() => {
+    setValue(_value ?? []);
+  }, [_value]);
+
+  const query = api.entrant.getMultiple.useInfiniteQuery(
+    { keyword, pagination: "cursor" },
+    {
+      initialCursor: 0,
+      getNextPageParam: (page) => {
+        return page?.result?.pagination?.cursor?.next ?? null;
+      },
+    },
+  );
+
+  const isSingleOption = limit && limit <= 1;
+
+  return (
+    <RecordSelector<Entrant>
       open={open}
       setOpen={setOpen}
       keyword={keyword}
