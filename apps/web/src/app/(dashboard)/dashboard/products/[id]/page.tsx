@@ -1,12 +1,14 @@
+import { convertCase } from "@repo/common";
 import { notFound } from "next/navigation";
 import * as React from "react";
 import { AppSidebarShell } from "~/components/app-sidebar";
 import { UpdateProductForm } from "~/components/forms/product-form";
+import { LoadingProvider } from "~/components/provider";
 import { HydrateClient, api } from "~/server/trpc";
 
-export const metadata = { title: "Update Product" };
+export const metadata = { title: "Detail Product" };
 
-export default async function UpdateProductPage({
+export default async function DetailProductPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -20,7 +22,13 @@ export default async function UpdateProductPage({
     return notFound();
   }
 
-  await api.category.getMultiple.prefetch({ pagination: "cursor" });
+  await api.category.getMultiple.prefetchInfinite({ pagination: "cursor" });
+  await api.service.getMultiple.prefetchInfinite({
+    levels: ["main"],
+    statuses: ["active"],
+    pagination: "cursor",
+    scopes: [product.scope],
+  });
 
   return (
     <HydrateClient>
@@ -29,11 +37,13 @@ export default async function UpdateProductPage({
           items: [
             { href: "/dashboard", title: "Dashboard" },
             { href: "/dashboard/products", title: "Products" },
-            { href: null, title: "Detail" },
+            { href: null, title: `${convertCase(product.scope)} Detail` },
           ],
         }}
       >
-        <UpdateProductForm product={product} />
+        <LoadingProvider>
+          <UpdateProductForm product={product} />
+        </LoadingProvider>
       </AppSidebarShell>
     </HydrateClient>
   );

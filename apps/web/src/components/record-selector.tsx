@@ -24,6 +24,10 @@ type Category = NonNullable<
   RouterOutput["category"]["getMultiple"]["result"]
 >["records"][number];
 
+type Service = NonNullable<
+  RouterOutput["service"]["getMultiple"]["result"]
+>["records"][number];
+
 export function CategorySelector({
   limit,
   children,
@@ -60,6 +64,98 @@ export function CategorySelector({
 
   return (
     <RecordSelector<Category>
+      open={open}
+      setOpen={setOpen}
+      keyword={keyword}
+      asChild={asChild}
+      disabled={disabled}
+      setKeyword={setKeyword}
+      isError={query.isError}
+      pages={query?.data?.pages}
+      isLoading={query.isLoading}
+      isFetching={query.isFetching}
+      hasNextPage={query.hasNextPage}
+      isFetchingNextPage={query.isFetchingNextPage}
+      onLoadMoreClick={async () => {
+        await query.fetchNextPage();
+      }}
+      getCurrentRecord={(record) => {
+        return value.find((v) => v.id === record.id);
+      }}
+      getRecordLabel={(record) => {
+        return <p className="line-clamp-1">{record.name}</p>;
+      }}
+      onRecordSelect={(record, current) => {
+        const items = (
+          current ? value.filter((v) => v.id !== record.id) : [record, ...value]
+        ).slice(0, limit);
+
+        setValue(items);
+        onValueChange?.(items);
+      }}
+      getLabel={() => {
+        return value.length > 0 ? (
+          <span>
+            {isSingleOption
+              ? (value?.[0]?.name ?? "-")
+              : `Selected ${value.length} ${value.length === 1 ? "record" : "records"}`}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {isSingleOption ? "Select record" : "Select records"}
+          </span>
+        );
+      }}
+    >
+      {children}
+    </RecordSelector>
+  );
+}
+
+export function ServiceSelector({
+  limit,
+  children,
+  scopes,
+  onValueChange,
+  value: _value,
+  asChild = false,
+  disabled = false,
+}: React.PropsWithChildren<{
+  limit?: number;
+  asChild?: boolean;
+  disabled?: boolean;
+  value?: Service[] | null;
+  scopes?: Service["scopes"];
+  onValueChange?: (value: Service[]) => void;
+}>) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(_value ?? []);
+  const [keyword, setKeyword] = React.useState<string>();
+
+  React.useEffect(() => {
+    setValue(_value ?? []);
+  }, [_value]);
+
+  const query = api.service.getMultiple.useInfiniteQuery(
+    {
+      scopes,
+      keyword,
+      levels: ["main"],
+      pagination: "cursor",
+      statuses: ["active"],
+    },
+    {
+      initialCursor: 0,
+      getNextPageParam: (page) => {
+        return page?.result?.pagination?.cursor?.next ?? null;
+      },
+    },
+  );
+
+  const isSingleOption = limit && limit <= 1;
+
+  return (
+    <RecordSelector<Service>
       open={open}
       setOpen={setOpen}
       keyword={keyword}
@@ -154,7 +250,16 @@ export function RecordSelector<T>({
   }[];
 }>) {
   return (
-    <Popover modal={true} open={open} onOpenChange={setOpen}>
+    <Popover
+      modal={true}
+      open={open}
+      onOpenChange={(value) => {
+        setOpen(value);
+        if (!value) {
+          setKeyword("");
+        }
+      }}
+    >
       <PopoverTrigger asChild disabled={disabled}>
         {asChild ? (
           children

@@ -4,6 +4,20 @@ import { routerSchema } from "~/schemas/category-schema";
 import { createTRPCRouter, protectedProcedure } from "~/trpc/init";
 
 export const categoryRouter = createTRPCRouter({
+  getAll: protectedProcedure.query(async ({ ctx: { db } }) => {
+    const records = await db.category.findMany({
+      select: { code: true },
+      orderBy: { code: "asc" },
+    });
+
+    return {
+      success: true,
+      message: null,
+      result: records.map(({ code }) => {
+        return code;
+      }),
+    };
+  }),
   getMultiple: protectedProcedure
     .input(routerSchema.getMultiple)
     .query(async ({ input, ctx: { db, locale, timezone } }) => {
@@ -39,7 +53,7 @@ export const categoryRouter = createTRPCRouter({
 
       const next =
         pagination === "cursor" && records.length === limit
-          ? (records[records.length - 1]?.id ?? null)
+          ? (records.at(-1)?.id ?? null)
           : null;
 
       const last =
@@ -72,18 +86,4 @@ export const categoryRouter = createTRPCRouter({
         },
       };
     }),
-  getAllOption: protectedProcedure.query(async ({ ctx: { db } }) => {
-    const records = await db.category.findMany({
-      select: { code: true },
-      orderBy: { name: "asc" },
-    });
-
-    return {
-      success: true,
-      message: null,
-      result: records.map(({ code }) => {
-        return code;
-      }),
-    };
-  }),
 });

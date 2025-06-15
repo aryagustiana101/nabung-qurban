@@ -1,9 +1,10 @@
 "use client";
 
 import {
-  ACTIVE_MAIN_SERVICE_CODES,
+  PRODUCT_SCOPES,
   PRODUCT_STATUSES,
   convertCase,
+  qs,
 } from "@repo/common";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontalIcon } from "lucide-react";
@@ -21,7 +22,7 @@ import {
   api,
 } from "~/components/provider";
 import { Badge } from "~/components/ui/badge";
-import { Button, buttonVariants } from "~/components/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +34,7 @@ import { useDataTable } from "~/hooks/use-data-table";
 type Product = NonNullable<
   RouterOutput["product"]["getMultiple"]["result"]
 >["records"][number] & {
+  scopes?: unknown;
   keyword?: unknown;
   statuses?: unknown;
   services?: unknown;
@@ -41,12 +43,19 @@ type Product = NonNullable<
 
 export function ProductTable({
   input,
-  categories,
-}: { categories: string[]; input: RouterInput["product"]["getMultiple"] }) {
+  option,
+}: {
+  input: RouterInput["product"]["getMultiple"];
+  option: {
+    services: string[];
+    categories: string[];
+  };
+}) {
   const query = api.product.getMultiple.useQuery(input);
 
   const columns: ColumnDef<Product>[] = React.useMemo(
     () => [
+      { id: "scopes" },
       { id: "keyword" },
       { id: "statuses" },
       { id: "services" },
@@ -56,6 +65,15 @@ export function ProductTable({
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Name" />
         ),
+      },
+      {
+        accessorKey: "fmt.scope",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Scope" />
+        ),
+        cell: ({ row }) => {
+          return <Badge variant="outline">{row.original.fmt.scope}</Badge>;
+        },
       },
       {
         accessorKey: "fmt.status",
@@ -133,22 +151,31 @@ export function ProductTable({
   const filterFields: DataTableFilterField<Product>[] = [
     { id: "keyword", label: "Keyword", placeholder: "Filter Keyword" },
     {
-      id: "categories",
-      label: "Categories",
-      options: categories
+      id: "services",
+      label: "Services",
+      options: option.services
         .toSorted((a, b) => a.localeCompare(b))
         .map((value) => {
           return { value, label: convertCase(value) };
         }),
     },
     {
-      id: "services",
-      label: "Services",
-      options: ACTIVE_MAIN_SERVICE_CODES.toSorted((a, b) =>
-        a.localeCompare(b),
-      ).map((v) => {
-        return { value: v, label: convertCase(v) };
-      }),
+      id: "categories",
+      label: "Categories",
+      options: option.categories
+        .toSorted((a, b) => a.localeCompare(b))
+        .map((value) => {
+          return { value, label: convertCase(value) };
+        }),
+    },
+    {
+      id: "scopes",
+      label: "Scopes",
+      options: PRODUCT_SCOPES.toSorted((a, b) => a.localeCompare(b)).map(
+        (value) => {
+          return { value, label: convertCase(value) };
+        },
+      ),
     },
     {
       id: "statuses",
@@ -171,6 +198,7 @@ export function ProductTable({
     pageCount: query?.data?.result?.pagination?.offset?.pageCount ?? 0,
     initialState: {
       columnVisibility: {
+        scopes: false,
         keyword: false,
         statuses: false,
         services: false,
@@ -188,12 +216,26 @@ export function ProductTable({
           filterFields={filterFields}
         >
           <div className="flex items-center gap-2">
-            <Link
-              href="/dashboard/products/new"
-              className={buttonVariants({ size: "sm", variant: "outline" })}
-            >
-              Create
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline">
+                  Create
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="start">
+                {PRODUCT_SCOPES.map((scope, i) => {
+                  return (
+                    <DropdownMenuItem key={i} asChild>
+                      <Link
+                        href={`/dashboard/products/new?${qs.stringify({ scope })}`}
+                      >
+                        {convertCase(scope)}
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </DataTableToolbar>
       </DataTable>

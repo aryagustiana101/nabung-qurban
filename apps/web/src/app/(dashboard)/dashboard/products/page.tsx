@@ -13,7 +13,10 @@ export default async function ProductsPage({
   const input = await searchParamsCache.parse(searchParams);
 
   await api.product.getMultiple.prefetch(input);
-  const categories = (await api.category.getAllOption())?.result ?? [];
+  const categories = (await api.category.getAll())?.result ?? [];
+  const services =
+    (await api.service.getAll({ levels: ["main"], statuses: ["active"] }))
+      ?.result ?? [];
 
   return (
     <HydrateClient>
@@ -25,7 +28,7 @@ export default async function ProductsPage({
           ],
         }}
       >
-        <ProductTable input={input} categories={categories} />
+        <ProductTable input={input} option={{ services, categories }} />
       </AppSidebarShell>
     </HydrateClient>
   );

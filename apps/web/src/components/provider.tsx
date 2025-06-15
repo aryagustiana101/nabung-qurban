@@ -15,6 +15,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import * as React from "react";
 import superjson from "superjson";
 import { Toaster } from "~/components/ui/sonner";
+import { LoadingContext } from "~/hooks/use-loading";
 import { APP_ENV } from "~/lib/constants";
 import { fullUrl } from "~/lib/utils";
 import { makeQueryClient } from "~/trpc/query-client";
@@ -127,4 +128,14 @@ function TopLoader() {
       }
     />
   ) : null;
+}
+
+export function LoadingProvider({ children }: React.PropsWithChildren) {
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  return (
+    <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
+      {children}
+    </LoadingContext.Provider>
+  );
 }
