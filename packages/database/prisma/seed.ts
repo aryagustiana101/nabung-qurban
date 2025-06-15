@@ -1,4 +1,7 @@
-import type { ProductAttributeKey } from "@repo/common";
+import {
+  COUPON_PRODUCT_ATTRIBUTES,
+  LIVESTOCK_PRODUCT_ATTRIBUTES,
+} from "@repo/common";
 import { type Prisma, PrismaClient } from "@repo/database/client";
 import { env } from "@repo/database/env";
 import { addMonths } from "date-fns";
@@ -217,6 +220,7 @@ async function main() {
   const services: Prisma.ServiceCreateManyInput[] = [
     {
       id: 1,
+      scopes: [],
       status: "active",
       description: null,
       level: "alternative",
@@ -227,6 +231,7 @@ async function main() {
     },
     {
       id: 2,
+      scopes: [],
       status: "active",
       description: null,
       level: "alternative",
@@ -237,6 +242,7 @@ async function main() {
     },
     {
       id: 3,
+      scopes: [],
       code: "ppob",
       name: "PPOB",
       level: "main",
@@ -248,6 +254,7 @@ async function main() {
       id: 4,
       level: "main",
       status: "active",
+      scopes: ["livestock"],
       code: "cicilan-qurban",
       name: "Cicilan Qurban",
       description:
@@ -259,6 +266,7 @@ async function main() {
       id: 5,
       level: "main",
       status: "active",
+      scopes: ["livestock"],
       code: "beli-qurban-tunai",
       name: "Beli Qurban Tunai",
       description:
@@ -270,6 +278,7 @@ async function main() {
       id: 6,
       level: "main",
       status: "active",
+      scopes: ["coupon"],
       code: "tebar-qurban-voucher-cicilan",
       name: "Tebar Qurban Voucher Cicilan",
       description: null,
@@ -280,6 +289,7 @@ async function main() {
       id: 7,
       level: "main",
       status: "active",
+      scopes: ["coupon"],
       code: "tebar-qurban-voucher-beli",
       name: "Tebar Qurban Voucher Beli",
       description: null,
@@ -290,6 +300,7 @@ async function main() {
       id: 8,
       level: "main",
       status: "active",
+      scopes: ["livestock"],
       code: "tebar-qurban-cicilan",
       name: "Tebar Qurban Cicilan",
       description:
@@ -301,6 +312,7 @@ async function main() {
       id: 9,
       level: "main",
       status: "active",
+      scopes: ["livestock"],
       code: "tebar-qurban-pembelian",
       name: "Tebar Qurban Pembelian",
       description:
@@ -317,52 +329,13 @@ async function main() {
     { id: 4, code: "sapi", name: "Sapi" },
   ];
 
-  const productAttributes: {
-    title: string;
-    value: string;
-    key: ProductAttributeKey;
-  }[] = [
-    {
-      title: "",
-      key: "pricing_info",
-      value: "Harga belum termasuk biaya Admin dan pengiriman",
-    },
-    {
-      title: "",
-      key: "transaction_info",
-      value:
-        "Pembayaran Mulai Rp 5.000.000\nMaks. pelunasan H-7 sebelum Idul Adha",
-    },
-    {
-      title: "",
-      key: "delivery_info",
-      value: "Qurban dikirim H-3",
-    },
-    {
-      title: "",
-      key: "additional_info",
-      value: "Gambar hewan qurban hanya display",
-    },
-    {
-      key: "detail_product",
-      title: "Detail Qurban",
-      value:
-        "Tahun Qurban dan jenis hewan qurban mempengaruhi harga qurban per-ekornya",
-    },
-    {
-      key: "important_info",
-      title: "Informasi Penting",
-      value:
-        "Untuk pembelian menggunakan DP, pelunasan hanya bisa dilakukan maksimal 90 % (atau sesuai parameter dari NQ), jika  bobot hewan yang didistribusikan lebih berat dari bobot yang dipesan pembeli harus membayar kelebihannya, sedangkan jika kondisi bobot kurang dari bobot pesanan maka  kelebihan pembayaran akan masuk ke saldo shohibul qurban.",
-    },
-  ];
-
   const products: Prisma.ProductCreateManyInput[] = [
     {
       id: 1,
+      scope: "livestock",
       status: "published",
-      attributes: productAttributes,
       name: "Sapi premium 450 Kg",
+      attributes: LIVESTOCK_PRODUCT_ATTRIBUTES,
       thumbnail:
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-4-thumbnail.png",
       images: [
@@ -373,9 +346,10 @@ async function main() {
     },
     {
       id: 2,
+      scope: "livestock",
       status: "published",
-      attributes: productAttributes,
       name: "Kambing premium 40 Kg",
+      attributes: LIVESTOCK_PRODUCT_ATTRIBUTES,
       thumbnail:
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-3-thumbnail.png",
       images: [
@@ -386,9 +360,10 @@ async function main() {
     },
     {
       id: 3,
+      scope: "livestock",
       status: "published",
-      attributes: productAttributes,
       name: "Sapi Bali premium super 700 Kg",
+      attributes: LIVESTOCK_PRODUCT_ATTRIBUTES,
       thumbnail:
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-2-thumbnail.png",
       images: [
@@ -399,9 +374,10 @@ async function main() {
     },
     {
       id: 4,
+      scope: "livestock",
       status: "published",
-      attributes: productAttributes,
       name: "Sapi Bali premium super 280 Kg",
+      attributes: LIVESTOCK_PRODUCT_ATTRIBUTES,
       thumbnail:
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-1-thumbnail.png",
       images: [
@@ -412,80 +388,26 @@ async function main() {
     },
     {
       id: 5,
+      scope: "coupon",
       status: "published",
       name: "Voucher Kambing",
+      attributes: COUPON_PRODUCT_ATTRIBUTES,
       thumbnail:
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-6-thumbnail.png",
       images: [
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-6-image-1.png",
       ],
-      attributes: [
-        {
-          title: "",
-          key: "pricing_info",
-          value: "Harga belum termasuk biaya Admin",
-        },
-        {
-          title: "",
-          key: "transaction_info",
-          value: "Maks. pelunasan H-7 sebelum Idul Adha",
-        },
-        {
-          title: "",
-          key: "additional_info",
-          value: "Gambar hewan qurban hanya display",
-        },
-        {
-          key: "detail_product",
-          title: "Detail Voucher Qurban",
-          value:
-            "Tahun Qurban dan variasi voucher hewan qurban mempengaruhi harga",
-        },
-        {
-          key: "important_info",
-          title: "Informasi Penting",
-          value:
-            "Untuk pembelian menggunakan DP, pelunasan hanya bisa dilakukan maksimal 90 % (atau sesuai parameter dari NQ), jika  bobot hewan yang didistribusikan lebih berat dari bobot yang dipesan pembeli harus membayar kelebihannya, sedangkan jika kondisi bobot kurang dari bobot pesanan maka  kelebihan pembayaran akan masuk ke saldo shohibul qurban.",
-        },
-      ],
     },
     {
       id: 6,
+      scope: "coupon",
       status: "published",
       name: "Voucher Qurban 1/7 Sapi",
+      attributes: COUPON_PRODUCT_ATTRIBUTES,
       thumbnail:
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-5-thumbnail.png",
       images: [
         "https://nabung-qurban.sgp1.vultrobjects.com/mock/product-5-image-1.png",
-      ],
-      attributes: [
-        {
-          title: "",
-          key: "pricing_info",
-          value: "Harga belum termasuk biaya Admin",
-        },
-        {
-          title: "",
-          key: "transaction_info",
-          value: "Maks. pelunasan H-7 sebelum Idul Adha",
-        },
-        {
-          title: "",
-          key: "additional_info",
-          value: "Gambar hewan qurban hanya display",
-        },
-        {
-          key: "detail_product",
-          title: "Detail Voucher Qurban",
-          value:
-            "Tahun Qurban dan variasi voucher hewan qurban mempengaruhi harga",
-        },
-        {
-          key: "important_info",
-          title: "Informasi Penting",
-          value:
-            "Untuk pembelian menggunakan DP, pelunasan hanya bisa dilakukan maksimal 90 % (atau sesuai parameter dari NQ), jika  bobot hewan yang didistribusikan lebih berat dari bobot yang dipesan pembeli harus membayar kelebihannya, sedangkan jika kondisi bobot kurang dari bobot pesanan maka  kelebihan pembayaran akan masuk ke saldo shohibul qurban.",
-        },
       ],
     },
   ];
@@ -955,8 +877,10 @@ async function main() {
     { id: 6, productId: 3, entrantId: 1 },
     { id: 7, productId: 4, entrantId: 2 },
     { id: 8, productId: 4, entrantId: 1 },
-    { id: 9, productId: 5, entrantId: 1 },
-    { id: 10, productId: 6, entrantId: 1 },
+    { id: 9, productId: 5, entrantId: 2 },
+    { id: 10, productId: 5, entrantId: 1 },
+    { id: 11, productId: 6, entrantId: 2 },
+    { id: 12, productId: 6, entrantId: 1 },
   ];
 
   const schedules: Prisma.ScheduleCreateManyInput[] = [

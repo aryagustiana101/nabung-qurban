@@ -13,6 +13,10 @@ export const productRouter = createTRPCRouter({
       const pagination = input.pagination ?? "offset";
 
       const where: Prisma.ProductWhereInput = {
+        scope:
+          input.scopes && input.scopes.length > 0
+            ? { in: input.scopes }
+            : undefined,
         status:
           input.statuses && input.statuses.length > 0
             ? { in: input.statuses }
@@ -145,6 +149,7 @@ export const productRouter = createTRPCRouter({
       await db.product.create({
         data: {
           name: input.name,
+          scope: input.scope,
           status: input.status,
           thumbnail: input.thumbnail,
           images: input.images,
@@ -177,6 +182,7 @@ export const productRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+          scope: input.scope,
           status: input.status,
           thumbnail: input.thumbnail,
           images: input.images,
@@ -187,7 +193,7 @@ export const productRouter = createTRPCRouter({
                   update: {},
                   create: { categoryId: category.id },
                   where: {
-                    productCategoryIdentifier: {
+                    identifier: {
                       productId: product.id,
                       categoryId: category.id,
                     },

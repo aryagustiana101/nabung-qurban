@@ -3,11 +3,13 @@ import {
   FIELD,
   PAGINATION_TYPES,
   PRODUCT_ATTRIBUTE_KEYS,
+  PRODUCT_SCOPES,
   PRODUCT_STATUSES,
   __,
 } from "@repo/common";
 import { z } from "zod";
 import { categorySchema } from "~/schemas/category-schema";
+import { serviceSchema } from "~/schemas/service-schema";
 
 export const routerSchema = {
   getMultiple: z.object({
@@ -17,12 +19,14 @@ export const routerSchema = {
     keyword: z.string().nullish(),
     categories: z.string().array().nullish(),
     pagination: z.enum(PAGINATION_TYPES).nullish(),
+    scopes: FIELD.ARRAY_TEXT_ENUM(PRODUCT_SCOPES).nullish(),
     statuses: FIELD.ARRAY_TEXT_ENUM(PRODUCT_STATUSES).nullish(),
     services: FIELD.ARRAY_TEXT_ENUM(ACTIVE_MAIN_SERVICE_CODES).nullish(),
   }),
   getSingle: z.object({ id: FIELD.NUMBER("id") }),
   create: z.object({
     name: FIELD.TEXT("name"),
+    scope: FIELD.ENUM(PRODUCT_SCOPES, "scope"),
     status: FIELD.ENUM(PRODUCT_STATUSES, "status"),
     thumbnail: FIELD.TEXT_URL("thumbnail"),
     images: FIELD.ARRAY_TEXT_URL("images", "image"),
@@ -38,6 +42,7 @@ export const routerSchema = {
   update: z.object({
     id: FIELD.NUMBER("id"),
     name: FIELD.TEXT("name").optional(),
+    scope: FIELD.ENUM(PRODUCT_SCOPES, "scope").optional(),
     status: FIELD.ENUM(PRODUCT_STATUSES, "status").optional(),
     thumbnail: FIELD.TEXT_URL("thumbnail").optional(),
     images: FIELD.ARRAY_TEXT_URL("images", "image").optional(),
@@ -56,6 +61,7 @@ export const routerSchema = {
 export const formSchema = {
   product: z.object({
     name: FIELD.TEXT("name"),
+    scope: FIELD.ENUM(PRODUCT_SCOPES, "scope"),
     status: FIELD.ENUM(PRODUCT_STATUSES, "status"),
     thumbnail: FIELD.TEXT_URL("thumbnail"),
     images: FIELD.ARRAY_TEXT_URL("images", "image"),
@@ -66,6 +72,9 @@ export const formSchema = {
         value: z.string(),
       })
       .array(),
+    services: serviceSchema.array().min(1, {
+      message: __("min.array", { attribute: "services", min: 1 }),
+    }),
     categories: categorySchema.array().min(1, {
       message: __("min.array", { attribute: "categories", min: 1 }),
     }),

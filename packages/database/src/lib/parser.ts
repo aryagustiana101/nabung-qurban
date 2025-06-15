@@ -6,10 +6,12 @@ import {
   type Locale,
   PRODUCT_ATTRIBUTE_KEYS,
   PRODUCT_INVENTORY_TRACKERS,
+  PRODUCT_SCOPES,
   PRODUCT_STATUSES,
   PRODUCT_VARIANT_STATUSES,
   SERVICE_CODES,
   SERVICE_LEVELS,
+  SERVICE_SCOPES,
   SERVICE_STATUSES,
   TOKEN_STATUSES,
   type Timezone,
@@ -265,6 +267,7 @@ export function parseService({
     name: service.name,
     status: z.enum(SERVICE_STATUSES).parse(service.status),
     level: z.enum(SERVICE_LEVELS).parse(service.level),
+    scopes: z.enum(SERVICE_SCOPES).array().parse(service.scopes),
     description: service.description,
     image: service.image,
     createdAt: service.createdAt,
@@ -333,6 +336,7 @@ export function parseProduct({
   return {
     id: product.id,
     name: product.name,
+    scope: z.enum(PRODUCT_SCOPES).parse(product.scope),
     status: z.enum(PRODUCT_STATUSES).parse(product.status),
     thumbnail: product.thumbnail,
     images: parseProductImages({ product, locale, timezone }),
@@ -340,6 +344,7 @@ export function parseProduct({
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
     fmt: {
+      scope: convertCase(product.scope),
       status: convertCase(product.status),
       createdAt: formatDate(
         product.createdAt,

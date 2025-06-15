@@ -130,6 +130,7 @@ export function serializeProduct({
   return {
     id: product.id,
     name: product.name,
+    scope: product.scope,
     status: product.status,
     thumbnail: product.thumbnail,
     images: product.images,

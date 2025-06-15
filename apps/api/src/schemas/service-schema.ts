@@ -1,4 +1,9 @@
-import { FIELD, SERVICE_LEVELS, SERVICE_STATUSES } from "@repo/common";
+import {
+  FIELD,
+  SERVICE_LEVELS,
+  SERVICE_SCOPES,
+  SERVICE_STATUSES,
+} from "@repo/common";
 import { z } from "zod";
 
 export const routerSchema = {
@@ -8,6 +13,7 @@ export const routerSchema = {
     limit: FIELD.TEXT_NUMERIC("limit").nullish(),
     levels: FIELD.TEXT_ENUM_ARRAY(SERVICE_LEVELS).nullish(),
     statuses: FIELD.TEXT_ENUM_ARRAY(SERVICE_STATUSES).nullish(),
+    scopes: FIELD.TEXT_ENUM_ARRAY(SERVICE_SCOPES).nullish(),
   }),
   getSingle: z.object({ code: FIELD.TEXT("code") }),
 };

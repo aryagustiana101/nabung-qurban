@@ -20,6 +20,7 @@ app.get(
     const page = input.page ?? 1;
     const keyword = input.keyword;
     const limit = input.limit ?? 10;
+    const scopes = input.scopes ?? [];
     const statuses = input.statuses ?? [];
     const services = input.services ?? [];
     const categories = input.categories ?? [];
@@ -27,6 +28,7 @@ app.get(
 
     const where: Prisma.ProductWhereInput = {
       OR: keyword ? [{ name: { contains: keyword } }] : undefined,
+      scope: scopes.length > 0 ? { in: scopes } : undefined,
       status: statuses.length > 0 ? { in: statuses } : undefined,
       productServices:
         services.length > 0

@@ -21,11 +21,13 @@ app.get(
     const keyword = input.keyword;
     const limit = input.limit ?? 10;
     const levels = input.levels ?? [];
+    const scopes = input.scopes ?? [];
     const statuses = input.statuses ?? [];
 
     const where: Prisma.ServiceWhereInput = {
       level: levels.length > 0 ? { in: levels } : undefined,
       status: statuses.length > 0 ? { in: statuses } : undefined,
+      scopes: scopes.length > 0 ? { array_contains: scopes } : undefined,
       OR: keyword
         ? [
             { name: { contains: keyword } },
