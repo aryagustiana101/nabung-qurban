@@ -3,6 +3,7 @@ import {
   FIELD,
   PAGINATION_TYPES,
   PRODUCT_ATTRIBUTE_KEYS,
+  PRODUCT_INVENTORY_TRACKERS,
   PRODUCT_SCOPES,
   PRODUCT_STATUSES,
   __,
@@ -41,6 +42,14 @@ export const routerSchema = {
       .array(),
     services: z.object({ id: z.number() }).array(),
     categories: z.object({ id: z.number() }).array(),
+    inventories: z
+      .object({
+        sku: z.string(),
+        stock: z.number(),
+        weight: z.number(),
+        tracker: z.enum(PRODUCT_INVENTORY_TRACKERS),
+      })
+      .array(),
     warehouses: z.object({ id: z.number() }).array(),
     entrants: z.object({ id: z.number() }).array(),
   }),
@@ -61,6 +70,15 @@ export const routerSchema = {
       .optional(),
     services: z.object({ id: z.number() }).array().optional(),
     categories: z.object({ id: z.number() }).array().optional(),
+    inventories: z
+      .object({
+        sku: z.string(),
+        stock: z.number(),
+        weight: z.number(),
+        tracker: z.enum(PRODUCT_INVENTORY_TRACKERS),
+      })
+      .array()
+      .optional(),
     warehouses: z.object({ id: z.number() }).array().optional(),
     entrants: z.object({ id: z.number() }).array().optional(),
   }),
@@ -76,8 +94,8 @@ export const formSchema = {
     attributes: z
       .object({
         key: z.enum(PRODUCT_ATTRIBUTE_KEYS),
-        title: z.string(),
-        value: z.string(),
+        title: FIELD.TEXT("title", 0),
+        value: FIELD.TEXT("value", 0),
       })
       .array(),
     services: serviceSchema.array().min(1, {
@@ -86,6 +104,17 @@ export const formSchema = {
     categories: categorySchema.array().min(1, {
       message: __("min.array", { attribute: "categories", min: 1 }),
     }),
+    inventories: z
+      .object({
+        sku: FIELD.TEXT("sku", 0),
+        stock: FIELD.NUMBER("stock"),
+        weight: FIELD.NUMBER("weight"),
+        tracker: FIELD.ENUM(PRODUCT_INVENTORY_TRACKERS, "tracker"),
+      })
+      .array()
+      .min(1, {
+        message: __("min.array", { attribute: "inventories", min: 1 }),
+      }),
     warehouses: warehouseSchema.array().min(1, {
       message: __("min.array", { attribute: "warehouses", min: 1 }),
     }),

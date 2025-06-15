@@ -1,5 +1,6 @@
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import * as React from "react";
+import { z } from "zod";
 
 import { cn } from "~/lib/utils";
 
@@ -19,7 +20,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   );
 }
 
-export default function PasswordInput({
+export function PasswordInput({
   className,
   ...props
 }: React.ComponentProps<"input">) {
@@ -40,6 +41,30 @@ export default function PasswordInput({
         {isVisible ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
       </button>
     </div>
+  );
+}
+
+export function NumberInput({
+  className,
+  onChange,
+  ...props
+}: Omit<React.ComponentProps<"input">, "type" | "inputMode" | "onChange"> & {
+  onChange?: (value: number) => void;
+}) {
+  return (
+    <Input
+      {...props}
+      type="text"
+      inputMode="numeric"
+      onChange={(e) => {
+        const raw = e.target.value;
+        const value = z.number().safeParse(Number(raw)).data;
+
+        if (typeof value === "number") {
+          onChange?.(value);
+        }
+      }}
+    />
   );
 }
 

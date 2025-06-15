@@ -170,6 +170,17 @@ export const productRouter = createTRPCRouter({
               })),
             },
           },
+          productInventories: {
+            createMany: {
+              skipDuplicates: true,
+              data: input.inventories.map((inventory) => ({
+                sku: inventory.sku,
+                stock: inventory.stock,
+                weight: inventory.weight,
+                tracker: inventory.tracker,
+              })),
+            },
+          },
           productWarehouses: {
             createMany: {
               skipDuplicates: true,
@@ -235,6 +246,19 @@ export const productRouter = createTRPCRouter({
                       productId: product.id,
                       categoryId: category.id,
                     },
+                  },
+                })),
+              }
+            : undefined,
+          productInventories: input.inventories
+            ? {
+                updateMany: input.inventories.map((inventory) => ({
+                  where: { productId: product.id },
+                  data: {
+                    sku: inventory.sku,
+                    stock: inventory.stock,
+                    weight: inventory.weight,
+                    tracker: inventory.tracker,
                   },
                 })),
               }

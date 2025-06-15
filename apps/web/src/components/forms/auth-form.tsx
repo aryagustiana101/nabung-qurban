@@ -27,7 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import PasswordInput, { Input } from "~/components/ui/input";
+import { Input, PasswordInput } from "~/components/ui/input";
 import { cn, fullUrl } from "~/lib/utils";
 import { type FormSchema, formSchema } from "~/schemas/auth-schema";
 

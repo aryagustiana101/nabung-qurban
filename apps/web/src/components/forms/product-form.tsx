@@ -5,6 +5,7 @@ import {
   COUPON_PRODUCT_ATTRIBUTES,
   LIVESTOCK_PRODUCT_ATTRIBUTES,
   PRODUCT_ATTRIBUTE_KEYS,
+  PRODUCT_INVENTORY_TRACKERS,
   PRODUCT_STATUSES,
   type ProductScope,
   convertCase,
@@ -43,7 +44,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
+import { Input, NumberInput } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -182,6 +183,9 @@ export function ProductForm({
         PRODUCT_ATTRIBUTE_KEYS.map((key) => ({ key, title: "", value: "" })),
       services: record?.services ?? [],
       categories: record?.categories ?? [],
+      inventories: record?.inventories ?? [
+        { sku: "", stock: 0, weight: 0, tracker: "inactive" },
+      ],
       warehouses: record?.warehouses ?? [],
       entrants: record?.entrants ?? [],
     },
@@ -202,6 +206,7 @@ export function ProductForm({
           <div className="lg:hidden">
             <ProductConfigurationField />
           </div>
+          <ProductInventoryField />
           <ProductAttributeField />
         </div>
         <div className="hidden flex-col gap-6 lg:flex">
@@ -330,6 +335,95 @@ function ProductInformationField() {
   );
 }
 
+function ProductInventoryField() {
+  const form = useFormContext<FormSchema["product"]>();
+  const entry = useFieldArray({ name: "inventories", control: form.control });
+
+  return (
+    <CollapsibleCard title="Inventory">
+      <div className="flex flex-col gap-6">
+        {entry.fields.map((_, i) => {
+          return (
+            <div key={i} className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                <FormField
+                  control={form.control}
+                  name={`inventories.${i}.sku`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>SKU</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`inventories.${i}.tracker`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Tracker</FormLabel>
+                      <Select
+                        disabled={field.disabled}
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select option" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {PRODUCT_INVENTORY_TRACKERS.map((v, i) => (
+                            <SelectItem key={i} value={v}>
+                              {convertCase(v)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                <FormField
+                  control={form.control}
+                  name={`inventories.${i}.stock`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Stock</FormLabel>
+                      <FormControl>
+                        <NumberInput {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`inventories.${i}.weight`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Weight</FormLabel>
+                      <FormControl>
+                        <NumberInput {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </CollapsibleCard>
+  );
+}
+
 function ProductConfigurationField() {
   const form = useFormContext<FormSchema["product"]>();
 
@@ -421,7 +515,7 @@ function ProductAttributeField() {
   const scope = form.watch("scope");
 
   return (
-    <CollapsibleCard title="Attributes" defaultOpen={false}>
+    <CollapsibleCard title="Attribute" defaultOpen={false}>
       <div className="flex flex-col gap-6">
         {entry.fields.map((item, i) => {
           const prefix = convertCase(item.key);

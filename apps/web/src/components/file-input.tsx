@@ -41,9 +41,11 @@ export function FileInput({
     result: { url: string | null; success: boolean }[] | null;
   }) => void;
 }>) {
-  const [remaining, setRemaining] = React.useState(maxFiles);
   const { uploadFile, isUploading, resetUpload } = useUploadFile();
   const [value, setValue] = React.useState<string[] | null | undefined>(_value);
+  const [remaining, setRemaining] = React.useState(
+    maxFiles - (_value?.length ?? 0),
+  );
 
   React.useEffect(() => {
     setValue(_value);
