@@ -63,7 +63,9 @@ export function formatMoney(
     currency,
     style: "currency",
     maximumFractionDigits,
-  }).format(value);
+  })
+    .format(value)
+    .replace(/\u00a0/g, " ");
 }
 
 export function randomString(length = 21, opts?: { characters?: string }) {
