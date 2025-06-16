@@ -110,7 +110,7 @@ importers:
         version: 3.2.2(react@19.1.0)
       '@hookform/resolvers':
         specifier: ^5.1.1
-        version: 5.1.1(react-hook-form@7.57.0(react@19.1.0))
+        version: 5.1.1(react-hook-form@7.58.0(react@19.1.0))
       '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
@@ -190,8 +190,8 @@ importers:
         specifier: ^14.3.8
         version: 14.3.8(react@19.1.0)
       react-hook-form:
-        specifier: ^7.57.0
-        version: 7.57.0(react@19.1.0)
+        specifier: ^7.58.0
+        version: 7.58.0(react@19.1.0)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -2774,8 +2774,8 @@ packages:
     peerDependencies:
       react: '>= 16.8 || 18.0.0'
 
-  react-hook-form@7.57.0:
-    resolution: {integrity: sha512-RbEks3+cbvTP84l/VXGUZ+JMrKOS8ykQCRYdm5aYsxnDquL0vspsyNhGRO7pcH6hsZqWlPOjLye7rJqdtdAmlg==}
+  react-hook-form@7.58.0:
+    resolution: {integrity: sha512-zGijmEed35oNfOfy7ub99jfjkiLhHwA3dl5AgyKdWC6QQzhnc7tkWewSa+T+A2EpLrc6wo5DUoZctS9kufWJjA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
@@ -3760,10 +3760,10 @@ snapshots:
       hono: 4.7.11
       zod: 3.25.64
 
-  '@hookform/resolvers@5.1.1(react-hook-form@7.57.0(react@19.1.0))':
+  '@hookform/resolvers@5.1.1(react-hook-form@7.58.0(react@19.1.0))':
     dependencies:
       '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.57.0(react@19.1.0)
+      react-hook-form: 7.58.0(react@19.1.0)
 
   '@img/sharp-darwin-arm64@0.34.2':
     optionalDependencies:
@@ -5746,7 +5746,7 @@ snapshots:
       prop-types: 15.8.1
       react: 19.1.0
 
-  react-hook-form@7.57.0(react@19.1.0):
+  react-hook-form@7.58.0(react@19.1.0):
     dependencies:
       react: 19.1.0
 
