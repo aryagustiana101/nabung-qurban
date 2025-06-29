@@ -188,6 +188,7 @@ export function convertCase(
   value: string,
   format: "capitalCase" | "sentenceCase" | "snakeCase" = "capitalCase",
 ) {
+  // biome-ignore lint/performance/noDynamicNamespaceImportAccess:Ignore no dynamic namespace import access
   return changeCase[format](value);
 }
 

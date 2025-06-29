@@ -3,9 +3,9 @@
 import { convertCase } from "@repo/common";
 import {
   type Column,
+  flexRender,
   type Row,
   type Table as TanstackTable,
-  flexRender,
 } from "@tanstack/react-table";
 import {
   ArrowDownIcon,

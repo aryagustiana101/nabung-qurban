@@ -2,26 +2,26 @@
 
 import {
   type ColumnFiltersState,
-  type PaginationState,
-  type RowSelectionState,
-  type TableOptions,
-  type TableState,
-  type Updater,
-  type VisibilityState,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type PaginationState,
+  type RowSelectionState,
+  type TableOptions,
+  type TableState,
+  type Updater,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import {
   type Parser,
-  type UseQueryStateOptions,
   parseAsArrayOf,
   parseAsInteger,
   parseAsString,
+  type UseQueryStateOptions,
   useQueryState,
   useQueryStates,
 } from "nuqs";

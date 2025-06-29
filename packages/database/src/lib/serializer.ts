@@ -1,4 +1,4 @@
-import { type Locale, type Timezone, computeDiscount } from "@repo/common";
+import { computeDiscount, type Locale, type Timezone } from "@repo/common";
 import type { Prisma } from "@repo/database/client";
 import {
   parseAttribute,

@@ -2,8 +2,7 @@ import "server-only";
 
 import { parseUser } from "@repo/database";
 import bcrypt from "bcryptjs";
-import NextAuth from "next-auth";
-import { AuthError } from "next-auth";
+import NextAuth, { AuthError } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { cache } from "react";
 import { env } from "~/env";

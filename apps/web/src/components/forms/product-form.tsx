@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   COUPON_PRODUCT_ATTRIBUTES,
+  convertCase,
   LIVESTOCK_PRODUCT_ATTRIBUTES,
   PRODUCT_ATTRIBUTE_KEYS,
   PRODUCT_INVENTORY_TRACKERS,
@@ -10,7 +11,6 @@ import {
   PRODUCT_VARIANT_RULES_YEARS,
   PRODUCT_VARIANT_STATUSES,
   type ProductScope,
-  convertCase,
 } from "@repo/common";
 import {
   ChevronsUpDownIcon,
@@ -23,7 +23,7 @@ import * as React from "react";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { FileInput } from "~/components/file-input";
-import { type RouterOutput, api } from "~/components/provider";
+import { api, type RouterOutput } from "~/components/provider";
 import {
   AttributeSelector,
   CategorySelector,

@@ -1,4 +1,4 @@
-import { TRPCError, initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 import { ZodError } from "zod";
@@ -9,11 +9,7 @@ import { db } from "~/server/db";
 export type RouterContext = Awaited<ReturnType<typeof createTRPCContext>>;
 
 export const createTRPCContext = cache(
-  async ({
-    headers,
-  }: {
-    headers: Headers;
-  }) => {
+  async ({ headers }: { headers: Headers }) => {
     return {
       db,
       headers,

@@ -21,7 +21,7 @@ import { fullUrl } from "~/lib/utils";
 import { makeQueryClient } from "~/trpc/query-client";
 import type { AppRouter } from "~/trpc/routers/_app-router";
 
-let clientQueryClientSingleton: QueryClient | undefined = undefined;
+let clientQueryClientSingleton: QueryClient | undefined;
 
 function getQueryClient() {
   if (typeof window === "undefined") {

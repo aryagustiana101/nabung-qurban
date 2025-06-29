@@ -39,6 +39,7 @@ function composeRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
 }
 
 function useComposedRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
+  // biome-ignore lint/correctness/useExhaustiveDependencies:Ignore use exhaustive dependencies
   return React.useCallback(composeRefs(...refs), refs);
 }
 

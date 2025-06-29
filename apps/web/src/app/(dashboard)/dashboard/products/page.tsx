@@ -9,7 +9,9 @@ export const metadata = { title: "Products" };
 
 export default async function ProductsPage({
   searchParams,
-}: { searchParams: Promise<SearchParams> }) {
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const input = await searchParamsCache.parse(searchParams);
 
   await api.product.getMultiple.prefetch(input);

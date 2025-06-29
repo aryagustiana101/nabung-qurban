@@ -11,7 +11,9 @@ export const metadata = { title: "Create Product" };
 
 export default async function CreateProductPage({
   searchParams,
-}: { searchParams: Promise<SearchParams> }) {
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const scope =
     FIELD.ENUM(PRODUCT_SCOPES, "scope").safeParse(
       (await searchParamsCache.parse(searchParams)).scope,

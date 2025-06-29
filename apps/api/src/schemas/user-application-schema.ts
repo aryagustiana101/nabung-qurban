@@ -1,11 +1,11 @@
 import {
+  __,
   FIELD,
   USER_APPLICATION_JACKET_PAYMENT_METHODS,
   USER_APPLICATION_JACKET_PICKUP_METHODS,
   USER_APPLICATION_LEVELS,
   USER_APPLICATION_STATUSES,
   USER_APPLICATION_TYPES,
-  __,
 } from "@repo/common";
 import { z } from "zod";
 import { transformRecord } from "~/lib/utils";

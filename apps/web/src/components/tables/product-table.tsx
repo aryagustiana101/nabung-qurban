@@ -1,9 +1,9 @@
 "use client";
 
 import {
+  convertCase,
   PRODUCT_SCOPES,
   PRODUCT_STATUSES,
-  convertCase,
   qs,
 } from "@repo/common";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -17,9 +17,9 @@ import {
   DataTableToolbar,
 } from "~/components/data-table";
 import {
+  api,
   type RouterInput,
   type RouterOutput,
-  api,
 } from "~/components/provider";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
